@@ -11,7 +11,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByInstaller<FooInstaller>().AsSingle().NonLazy();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
             Assert.IsNotNull(foo.Bar);
             Assert.IsEqual(foo, Container.Resolve<Foo>());
         }
@@ -21,7 +21,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByInstaller<FooInstaller>().AsTransient().NonLazy();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
             Assert.IsNotNull(foo.Bar);
             Assert.IsNotEqual(foo, Container.Resolve<Foo>());
         }
@@ -31,7 +31,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().FromSubContainerResolve().ByInstaller<FooInstaller>().AsSingle().NonLazy();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
             Assert.IsNotNull(foo.Bar);
             Assert.IsEqual(foo, Container.Resolve<Foo>());
         }

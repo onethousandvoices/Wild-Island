@@ -12,10 +12,10 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestSingleMatch()
         {
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
 
-            var bar = foo.gameObject.AddComponent<Bar>();
-            var qux1 = foo.gameObject.AddComponent<Qux>();
+            Bar bar = foo.gameObject.AddComponent<Bar>();
+            Qux qux1 = foo.gameObject.AddComponent<Qux>();
             foo.gameObject.AddComponent<Qux>();
 
             PreInstall();
@@ -37,7 +37,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestSingleMatchOptional1()
         {
-            var foo = new GameObject().AddComponent<FooOptional>();
+            FooOptional foo = new GameObject().AddComponent<FooOptional>();
 
             PreInstall();
 
@@ -52,8 +52,8 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestSingleMatchOptional2()
         {
-            var foo = new GameObject().AddComponent<FooOptional>();
-            var bar = foo.gameObject.AddComponent<Bar>();
+            FooOptional foo = new GameObject().AddComponent<FooOptional>();
+            Bar bar = foo.gameObject.AddComponent<Bar>();
 
             PreInstall();
 
@@ -81,11 +81,11 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestMultiple()
         {
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
 
-            var bar = foo.gameObject.AddComponent<Bar>();
-            var qux1 = foo.gameObject.AddComponent<Qux>();
-            var qux2 = foo.gameObject.AddComponent<Qux>();
+            Bar bar = foo.gameObject.AddComponent<Bar>();
+            Qux qux1 = foo.gameObject.AddComponent<Qux>();
+            Qux qux2 = foo.gameObject.AddComponent<Qux>();
 
             PreInstall();
 
@@ -122,7 +122,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestMissingSuccess()
         {
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
             foo.gameObject.AddComponent<Bar>();
 
             PreInstall();
@@ -140,11 +140,11 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestMultipleNonGeneric()
         {
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
 
-            var bar = foo.gameObject.AddComponent<Bar>();
-            var qux1 = foo.gameObject.AddComponent<Qux>();
-            var qux2 = foo.gameObject.AddComponent<Qux>();
+            Bar bar = foo.gameObject.AddComponent<Bar>();
+            Qux qux1 = foo.gameObject.AddComponent<Qux>();
+            Qux qux2 = foo.gameObject.AddComponent<Qux>();
 
             PreInstall();
 
@@ -181,7 +181,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunTestMissingSuccessNonGeneric()
         {
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
             foo.gameObject.AddComponent<Bar>();
 
             PreInstall();

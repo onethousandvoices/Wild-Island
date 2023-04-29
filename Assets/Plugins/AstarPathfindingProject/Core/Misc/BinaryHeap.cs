@@ -119,7 +119,7 @@ namespace Pathfinding {
 				throw new System.Exception("Binary Heap Size really large (>65534). A heap size this large is probably the cause of pathfinding running in an infinite loop. ");
 			}
 
-			var newHeap = new Tuple[newSize];
+			Tuple[] newHeap = new Tuple[newSize];
 			heap.CopyTo(newHeap, 0);
 #if ASTARDEBUG
 			UnityEngine.Debug.Log("Resizing binary heap to "+newSize);
@@ -192,8 +192,8 @@ namespace Pathfinding {
 			if (numberOfItems == 0) return returnItem;
 
 			// Last item in the heap array
-			var swapItem = heap[numberOfItems];
-			var swapItemG = swapItem.node.G;
+			Tuple swapItem = heap[numberOfItems];
+			uint swapItemG = swapItem.node.G;
 
 			int swapIndex = 0, parent;
 
@@ -290,7 +290,7 @@ namespace Pathfinding {
 
 			for (int i = 2; i < numberOfItems; i++) {
 				int bubbleIndex = i;
-				var node = heap[i];
+				Tuple node = heap[i];
 				uint nodeF = node.F;
 				while (bubbleIndex != 1) {
 					int parentIndex = bubbleIndex / D;

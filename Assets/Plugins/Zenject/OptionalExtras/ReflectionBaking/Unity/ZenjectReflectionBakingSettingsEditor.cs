@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -108,7 +109,7 @@ namespace Zenject.ReflectionBaking
 
                 EditorGUILayout.PropertyField(_isEnabledInBuilds, true);
 
-                var oldIsEnabledInEditorValue = _isEnabledInEditor.boolValue;
+                bool oldIsEnabledInEditorValue = _isEnabledInEditor.boolValue;
                 EditorGUILayout.PropertyField(_isEnabledInEditor, true);
 
                 if (oldIsEnabledInEditorValue != _isEnabledInEditor.boolValue)
@@ -191,11 +192,11 @@ namespace Zenject.ReflectionBaking
         {
             GenericMenu menu = new GenericMenu();
 
-            var paths = AssemblyPathRegistry.GetAllGeneratedAssemblyRelativePaths();
+            List<string> paths = AssemblyPathRegistry.GetAllGeneratedAssemblyRelativePaths();
 
             for (int i = 0; i < paths.Count; i++)
             {
-                var path = paths[i];
+                string path = paths[i];
 
                 bool foundMatch = false;
 

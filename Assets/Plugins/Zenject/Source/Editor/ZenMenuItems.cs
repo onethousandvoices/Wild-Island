@@ -34,7 +34,7 @@ namespace Zenject.Internal
         [MenuItem("GameObject/Zenject/Scene Context", false, 9)]
         public static void CreateSceneContext(MenuCommand menuCommand)
         {
-            var root = new GameObject("SceneContext").AddComponent<SceneContext>();
+            SceneContext root = new GameObject("SceneContext").AddComponent<SceneContext>();
             Selection.activeGameObject = root.gameObject;
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -43,7 +43,7 @@ namespace Zenject.Internal
         [MenuItem("GameObject/Zenject/Decorator Context", false, 9)]
         public static void CreateDecoratorContext(MenuCommand menuCommand)
         {
-            var root = new GameObject("DecoratorContext").AddComponent<SceneDecoratorContext>();
+            SceneDecoratorContext root = new GameObject("DecoratorContext").AddComponent<SceneDecoratorContext>();
             Selection.activeGameObject = root.gameObject;
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -52,7 +52,7 @@ namespace Zenject.Internal
         [MenuItem("GameObject/Zenject/Game Object Context", false, 9)]
         public static void CreateGameObjectContext(MenuCommand menuCommand)
         {
-            var root = new GameObject("GameObjectContext").AddComponent<GameObjectContext>();
+            GameObjectContext root = new GameObject("GameObjectContext").AddComponent<GameObjectContext>();
             Selection.activeGameObject = root.gameObject;
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -61,7 +61,7 @@ namespace Zenject.Internal
         [MenuItem("Edit/Zenject/Create Project Context")]
         public static void CreateProjectContextInDefaultLocation()
         {
-            var fullDirPath = Path.Combine(Application.dataPath, "Resources");
+            string fullDirPath = Path.Combine(Application.dataPath, "Resources");
 
             if (!Directory.Exists(fullDirPath))
             {
@@ -74,7 +74,7 @@ namespace Zenject.Internal
         [MenuItem("Assets/Create/Zenject/Default Scene Contract Config", false, 80)]
         public static void CreateDefaultSceneContractConfig()
         {
-            var folderPath = ZenUnityEditorUtil.GetCurrentDirectoryAssetPathFromSelection();
+            string folderPath = ZenUnityEditorUtil.GetCurrentDirectoryAssetPathFromSelection();
 
             if (!folderPath.EndsWith("/Resources"))
             {
@@ -83,7 +83,7 @@ namespace Zenject.Internal
                 return;
             }
 
-            var config = ScriptableObject.CreateInstance<DefaultSceneContractConfig>();
+            DefaultSceneContractConfig config = ScriptableObject.CreateInstance<DefaultSceneContractConfig>();
 
             ZenUnityEditorUtil.SaveScriptableObjectAsset(
                 Path.Combine(folderPath, DefaultSceneContractConfig.ResourcePath + ".asset"), config);
@@ -163,7 +163,7 @@ namespace Zenject.Internal
         [MenuItem("Assets/Create/Zenject/Project Context", false, 40)]
         public static void CreateProjectContext()
         {
-            var absoluteDir = ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
+            string absoluteDir = ZenUnityEditorUtil.TryGetSelectedFolderPathInProjectsTab();
 
             if (absoluteDir == null)
             {
@@ -173,7 +173,7 @@ namespace Zenject.Internal
                 return;
             }
 
-            var parentFolderName = Path.GetFileName(absoluteDir);
+            string parentFolderName = Path.GetFileName(absoluteDir);
 
             if (parentFolderName != "Resources")
             {
@@ -188,17 +188,17 @@ namespace Zenject.Internal
 
         static void CreateProjectContextInternal(string absoluteDir)
         {
-            var assetPath = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(absoluteDir);
-            var prefabPath = (Path.Combine(assetPath, ProjectContext.ProjectContextResourcePath) + ".prefab").Replace("\\", "/");
+            string assetPath = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(absoluteDir);
+            string prefabPath = (Path.Combine(assetPath, ProjectContext.ProjectContextResourcePath) + ".prefab").Replace("\\", "/");
 
-            var gameObject = new GameObject();
+            GameObject gameObject = new GameObject();
 
             try
             {
                 gameObject.AddComponent<ProjectContext>();
 
 #if UNITY_2018_3_OR_NEWER
-                var prefabObj = PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
+                GameObject prefabObj = PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
 #else
                 var prefabObj = PrefabUtility.ReplacePrefab(gameObject, PrefabUtility.CreateEmptyPrefab(prefabPath));
 #endif
@@ -224,7 +224,7 @@ namespace Zenject.Internal
             string friendlyName, string defaultFileName,
             string templateStr, string folderPath)
         {
-            var absolutePath = EditorUtility.SaveFilePanel(
+            string absolutePath = EditorUtility.SaveFilePanel(
                 "Choose name for " + friendlyName,
                 folderPath,
                 defaultFileName + ".cs",
@@ -241,12 +241,12 @@ namespace Zenject.Internal
                 absolutePath += ".cs";
             }
 
-            var className = Path.GetFileNameWithoutExtension(absolutePath);
+            string className = Path.GetFileNameWithoutExtension(absolutePath);
             File.WriteAllText(absolutePath, templateStr.Replace("CLASS_NAME", className));
 
             AssetDatabase.Refresh();
 
-            var assetPath = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(absolutePath);
+            string assetPath = ZenUnityEditorUtil.ConvertFullAbsolutePathToAssetPath(absolutePath);
 
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
@@ -259,7 +259,7 @@ namespace Zenject.Internal
         {
             ZenUnityEditorUtil.SaveThenRunPreserveSceneSetup(() =>
                 {
-                    var numValidated = ZenUnityEditorUtil.ValidateAllActiveScenes();
+                    int numValidated = ZenUnityEditorUtil.ValidateAllActiveScenes();
                     Log.Info("Validated all '{0}' active scenes successfully", numValidated);
                 });
         }

@@ -64,7 +64,7 @@ namespace Pathfinding {
 
 			// Split the path into different parts (separated by custom links)
 			// and run the funnel algorithm on each of them in turn
-			var parts = Funnel.SplitIntoParts(p);
+			List<Funnel.PathPart> parts = Funnel.SplitIntoParts(p);
 
 			if (parts.Count == 0) {
 				// As a really special case, it might happen that the path contained only a single node
@@ -77,10 +77,10 @@ namespace Pathfinding {
 			}
 
 			for (int i = 0; i < parts.Count; i++) {
-				var part = parts[i];
+				Funnel.PathPart part = parts[i];
 				if (!part.isLink) {
-					var portals = Funnel.ConstructFunnelPortals(p.path, part);
-					var result = Funnel.Calculate(portals, unwrap, splitAtEveryPortal);
+					Funnel.FunnelPortals portals = Funnel.ConstructFunnelPortals(p.path, part);
+					List<Vector3> result = Funnel.Calculate(portals, unwrap, splitAtEveryPortal);
 					funnelPath.AddRange(result);
 					ListPool<Vector3>.Release(ref portals.left);
 					ListPool<Vector3>.Release(ref portals.right);

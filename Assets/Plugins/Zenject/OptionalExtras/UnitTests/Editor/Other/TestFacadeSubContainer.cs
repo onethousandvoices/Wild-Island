@@ -17,7 +17,7 @@ namespace Zenject.Tests.Other
             TickTest.WasRun = false;
             DisposeTest.WasRun = false;
 
-            var container = new DiContainer();
+            DiContainer container = new DiContainer();
 
             container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
@@ -26,9 +26,9 @@ namespace Zenject.Tests.Other
             container.BindInterfacesAndSelfTo<FooKernel>()
                 .FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
 
-            var tickManager = container.Resolve<TickableManager>();
-            var initManager = container.Resolve<InitializableManager>();
-            var disposeManager = container.Resolve<DisposableManager>();
+            TickableManager tickManager = container.Resolve<TickableManager>();
+            InitializableManager initManager = container.Resolve<InitializableManager>();
+            DisposableManager disposeManager = container.Resolve<DisposableManager>();
 
             Assert.That(!InitTest.WasRun);
             Assert.That(!TickTest.WasRun);

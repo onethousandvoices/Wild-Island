@@ -91,9 +91,9 @@ namespace Zenject.Tests.Bindings
             {
                 int top = 0;
 
-                foreach (var tex in _textures)
+                foreach (Texture tex in _textures)
                 {
-                    var rect = new Rect(0, top, Screen.width * 0.5f, Screen.height * 0.5f);
+                    Rect rect = new Rect(0, top, Screen.width * 0.5f, Screen.height * 0.5f);
 
                     GUI.DrawTexture(rect, tex);
 

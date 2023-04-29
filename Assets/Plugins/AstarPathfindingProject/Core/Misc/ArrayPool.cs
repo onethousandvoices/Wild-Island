@@ -70,7 +70,7 @@ namespace Pathfinding.Util {
 				}
 
 				if (pool[bucketIndex].Count > 0) {
-					var array = pool[bucketIndex].Pop();
+					T[] array = pool[bucketIndex].Pop();
 #if !ASTAR_OPTIMIZE_POOLING
 					inPool.Remove(array);
 #endif
@@ -103,7 +103,7 @@ namespace Pathfinding.Util {
 				lock (pool) {
 					Stack<T[]> stack = exactPool[length];
 					if (stack != null && stack.Count > 0) {
-						var array = stack.Pop();
+						T[] array = stack.Pop();
 #if !ASTAR_OPTIMIZE_POOLING
 						inPool.Remove(array);
 #endif
@@ -167,7 +167,7 @@ namespace Pathfinding.Util {
 		/// are rarely being reused will lead to an effective memory leak.
 		/// </summary>
 		public static T[] ToArrayFromPool<T>(this List<T> list) {
-			var arr = ArrayPool<T>.ClaimWithExactLength(list.Count);
+			T[] arr = ArrayPool<T>.ClaimWithExactLength(list.Count);
 
 			for (int i = 0; i < arr.Length; i++) {
 				arr[i] = list[i];

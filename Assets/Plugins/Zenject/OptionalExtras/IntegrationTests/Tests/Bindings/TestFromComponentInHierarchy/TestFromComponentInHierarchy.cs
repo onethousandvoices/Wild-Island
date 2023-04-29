@@ -14,14 +14,14 @@ namespace Zenject.Tests.Bindings
 
         public void Setup1()
         {
-            var root = new GameObject();
+            GameObject root = new GameObject();
 
             _foo1 = root.AddComponent<Foo>();
 
-            var child1 = new GameObject();
+            GameObject child1 = new GameObject();
             child1.transform.SetParent(root.transform);
 
-            var child2 = new GameObject();
+            GameObject child2 = new GameObject();
             child2.transform.SetParent(root.transform);
 
             _foo2 = child2.AddComponent<Foo>();
@@ -29,9 +29,9 @@ namespace Zenject.Tests.Bindings
 
         public void Setup2()
         {
-            var root = new GameObject();
+            GameObject root = new GameObject();
 
-            var child1 = new GameObject();
+            GameObject child1 = new GameObject();
             child1.transform.SetParent(root.transform);
         }
 
@@ -45,7 +45,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 1);
             Assert.IsEqual(qux.Foos[0], _foo1);
             yield break;
@@ -61,7 +61,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 2);
             Assert.IsEqual(qux.Foos[0], _foo1);
             Assert.IsEqual(qux.Foos[1], _foo2);
@@ -91,7 +91,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 0);
             yield break;
         }
@@ -106,7 +106,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qiv = Container.Resolve<Qiv>();
+            Qiv qiv = Container.Resolve<Qiv>();
             Assert.IsNull(qiv.Foo);
             yield break;
         }
@@ -121,7 +121,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 1);
             Assert.IsEqual(qux.Foos[0], _foo1);
             yield break;
@@ -137,7 +137,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 2);
             Assert.IsEqual(qux.Foos[0], _foo1);
             Assert.IsEqual(qux.Foos[1], _foo2);
@@ -167,7 +167,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qux = Container.Resolve<Qux>();
+            Qux qux = Container.Resolve<Qux>();
             Assert.IsEqual(qux.Foos.Count, 0);
             yield break;
         }
@@ -182,7 +182,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qiv = Container.Resolve<Qiv>();
+            Qiv qiv = Container.Resolve<Qiv>();
             Assert.IsNull(qiv.Foo);
             yield break;
         }

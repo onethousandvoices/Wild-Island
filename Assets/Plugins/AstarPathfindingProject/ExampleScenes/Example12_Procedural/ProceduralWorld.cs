@@ -115,7 +115,7 @@ namespace Pathfinding.Examples {
 				for (int z = p.y-range; z <= p.y+range; z++) {
 					if (!tiles.ContainsKey(new Int2(x, z))) {
 						ProceduralTile tile = new ProceduralTile(this, x, z);
-						var generator = tile.Generate();
+						IEnumerator generator = tile.Generate();
 						// Tick it one step forward
 						generator.MoveNext();
 						// Calculate the rest later
@@ -138,7 +138,7 @@ namespace Pathfinding.Examples {
 		IEnumerator GenerateTiles () {
 			while (true) {
 				if (tileGenerationQueue.Count > 0) {
-					var generator = tileGenerationQueue.Dequeue();
+					IEnumerator generator = tileGenerationQueue.Dequeue();
 					yield return StartCoroutine(generator);
 				}
 				yield return null;

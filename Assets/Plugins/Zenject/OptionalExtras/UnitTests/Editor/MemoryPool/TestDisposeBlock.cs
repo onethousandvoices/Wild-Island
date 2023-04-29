@@ -68,12 +68,12 @@ namespace Zenject.Tests
         [Test]
         public void TestExceptions()
         {
-            var qux1 = new Qux();
-            var qux2 = new Qux();
+            Qux qux1 = new Qux();
+            Qux qux2 = new Qux();
 
             try
             {
-                using (var block = DisposeBlock.Spawn())
+                using (DisposeBlock block = DisposeBlock.Spawn())
                 {
                     block.Add(qux1);
                     block.Add(qux2);
@@ -91,7 +91,7 @@ namespace Zenject.Tests
         [Test]
         public void TestWithStaticMemoryPool()
         {
-            var pool = Foo.Pool;
+            StaticMemoryPool<string, Foo> pool = Foo.Pool;
 
             pool.Clear();
 
@@ -99,7 +99,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            using (var block = DisposeBlock.Spawn())
+            using (DisposeBlock block = DisposeBlock.Spawn())
             {
                 block.Spawn(pool, "asdf");
 
@@ -118,13 +118,13 @@ namespace Zenject.Tests
         {
             Container.BindMemoryPool<Bar, Bar.Pool>();
 
-            var pool = Container.Resolve<Bar.Pool>();
+            Bar.Pool pool = Container.Resolve<Bar.Pool>();
 
             Assert.IsEqual(pool.NumTotal, 0);
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            using (var block = DisposeBlock.Spawn())
+            using (DisposeBlock block = DisposeBlock.Spawn())
             {
                 block.Spawn(pool);
 

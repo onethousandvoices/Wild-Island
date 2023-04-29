@@ -148,11 +148,11 @@ namespace Zenject
         {
             // Use a random ID so that our provider is the only one that can find it and so it doesn't
             // conflict with anything else
-            var factoryId = Guid.NewGuid();
+            Guid factoryId = Guid.NewGuid();
 
             // Important to use NoFlush here otherwise the main binding will finalize early
-            var subBinder = BindContainer.BindNoFlush<IFactory<TContract>>()
-                .WithId(factoryId);
+            ConcreteBinderGeneric<IFactory<TContract>> subBinder = BindContainer.BindNoFlush<IFactory<TContract>>()
+                                                                                .WithId(factoryId);
 
             factoryBindGenerator(subBinder);
 
@@ -166,7 +166,7 @@ namespace Zenject
                 BindInfo,
                 (container, type) => new IFactoryProvider<TContract>(container, factoryId));
 
-            var binder = new ScopeConcreteIdArgConditionCopyNonLazyBinder(BindInfo);
+            ScopeConcreteIdArgConditionCopyNonLazyBinder binder = new ScopeConcreteIdArgConditionCopyNonLazyBinder(BindInfo);
             // Needed for example if the user uses MoveIntoDirectSubContainers
             binder.AddSecondaryCopyBindInfo(subBinder.BindInfo);
             return binder;
@@ -528,9 +528,9 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
-                        var match = monoBehaviour.GetComponentInChildren(concreteType, includeInactive);
+                        Component match = monoBehaviour.GetComponentInChildren(concreteType, includeInactive);
 
                         if (match == null)
                         {
@@ -565,10 +565,10 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
-                        var res = monoBehaviour.GetComponentsInChildren(concreteType, includeInactive)
-                            .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
+                        IEnumerable<Component> res = monoBehaviour.GetComponentsInChildren(concreteType, includeInactive)
+                                                                  .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
 
                         if (excludeSelf)
                         {
@@ -606,17 +606,17 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
-                        var matches = monoBehaviour.GetComponentsInParent(concreteType, includeInactive)
-                            .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
+                        IEnumerable<Component> matches = monoBehaviour.GetComponentsInParent(concreteType, includeInactive)
+                                                                      .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
 
                         if (excludeSelf)
                         {
                             matches = matches.Where(x => x.gameObject != monoBehaviour.gameObject);
                         }
 
-                        var match = matches.FirstOrDefault();
+                        Component match = matches.FirstOrDefault();
 
                         if (match == null)
                         {
@@ -652,10 +652,10 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
-                        var res = monoBehaviour.GetComponentsInParent(concreteType, includeInactive)
-                            .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
+                        IEnumerable<Component> res = monoBehaviour.GetComponentsInParent(concreteType, includeInactive)
+                                                                  .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
 
                         if (excludeSelf)
                         {
@@ -687,9 +687,9 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
-                        var match = monoBehaviour.GetComponent(concreteType);
+                        Component match = monoBehaviour.GetComponent(concreteType);
 
                         if (match == null)
                         {
@@ -723,7 +723,7 @@ namespace Zenject
 
                         Assert.IsNotNull(ctx.ObjectInstance);
 
-                        var monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
+                        MonoBehaviour monoBehaviour = (MonoBehaviour)ctx.ObjectInstance;
 
                         return monoBehaviour.GetComponents(concreteType)
                             .Where(x => !ReferenceEquals(x, monoBehaviour)).Cast<object>();
@@ -749,9 +749,9 @@ namespace Zenject
                 BindInfo,
                 (container, concreteType) => new MethodMultipleProviderUntyped(ctx =>
                     {
-                        var match = container.Resolve<Context>().GetRootGameObjects()
-                            .Select(x => x.GetComponentInChildren(concreteType, includeInactive))
-                            .Where(x => x != null && !ReferenceEquals(x, ctx.ObjectInstance)).FirstOrDefault();
+                        Component match = container.Resolve<Context>().GetRootGameObjects()
+                                                   .Select(x => x.GetComponentInChildren(concreteType, includeInactive))
+                                                   .Where(x => x != null && !ReferenceEquals(x, ctx.ObjectInstance)).FirstOrDefault();
 
                         if (match == null)
                         {
@@ -781,9 +781,9 @@ namespace Zenject
                 BindInfo,
                 (container, concreteType) => new MethodMultipleProviderUntyped(ctx =>
                     {
-                        var res = container.Resolve<Context>().GetRootGameObjects()
-                            .SelectMany(x => x.GetComponentsInChildren(concreteType, includeInactive))
-                            .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
+                        IEnumerable<Component> res = container.Resolve<Context>().GetRootGameObjects()
+                                                              .SelectMany(x => x.GetComponentsInChildren(concreteType, includeInactive))
+                                                              .Where(x => !ReferenceEquals(x, ctx.ObjectInstance));
 
                         if (predicate != null)
                         {

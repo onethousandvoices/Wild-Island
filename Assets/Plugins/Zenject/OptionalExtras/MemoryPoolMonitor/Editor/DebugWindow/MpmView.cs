@@ -62,13 +62,13 @@ namespace Zenject.MemoryPoolMonitor
 
         string GetName(IMemoryPool pool)
         {
-            var type = pool.GetType();
+            Type type = pool.GetType();
             return "{0}.{1}".Fmt(type.Namespace, type.PrettyName());
         }
 
         Texture2D CreateColorTexture(Color color)
         {
-            var texture = new Texture2D(1, 1);
+            Texture2D texture = new Texture2D(1, 1);
             texture.SetPixel(1, 1, color);
             texture.Apply();
             return texture;
@@ -194,7 +194,7 @@ namespace Zenject.MemoryPoolMonitor
             GUI.Label(new Rect(
                 0, 0, _settings.FilterPaddingLeft, _settings.FilterHeight), "Filter:", _settings.FilterTextStyle);
 
-            var searchFilter = GUI.TextField(
+            string searchFilter = GUI.TextField(
                 new Rect(_settings.FilterPaddingLeft, _settings.FilterPaddingTop, _settings.FilterWidth, _settings.FilterInputHeight), _searchFilter, 999);
 
             if (searchFilter != _searchFilter)
@@ -240,11 +240,11 @@ namespace Zenject.MemoryPoolMonitor
             GUI.DrawTexture(new Rect(
                 0, HeaderTop - 0.5f * _settings.SplitterWidth, width, _settings.SplitterWidth), LineTexture);
 
-            var columnPos = 0.0f;
+            float columnPos = 0.0f;
 
             for (int i = 0; i < NumColumns; i++)
             {
-                var columnWidth = GetColumnWidth(i);
+                float columnWidth = GetColumnWidth(i);
                 DrawColumn1(i, columnPos, columnWidth);
                 columnPos += columnWidth;
             }
@@ -253,7 +253,7 @@ namespace Zenject.MemoryPoolMonitor
         void DrawColumn1(
             int index, float position, float width)
         {
-            var columnHeight = _settings.HeaderHeight + _pools.Count() * _settings.RowHeight;
+            float columnHeight = _settings.HeaderHeight + _pools.Count() * _settings.RowHeight;
 
             if (index < 4)
             {
@@ -262,7 +262,7 @@ namespace Zenject.MemoryPoolMonitor
                     _settings.SplitterWidth, columnHeight), LineTexture);
             }
 
-            var headerBounds = new Rect(
+            Rect headerBounds = new Rect(
                 position + 0.5f * _settings.SplitterWidth,
                 _settings.FilterHeight,
                 width - _settings.SplitterWidth, _settings.HeaderHeight);
@@ -289,13 +289,13 @@ namespace Zenject.MemoryPoolMonitor
 
         Type TryGetPoolTypeUnderMouse()
         {
-            var mousePositionInContent = Event.current.mousePosition + Vector2.up * _scrollPosition;
+            Vector2 mousePositionInContent = Event.current.mousePosition + Vector2.up * _scrollPosition;
 
             for (int i = 0; i < _pools.Count; i++)
             {
-                var pool = _pools[i];
+                IMemoryPool pool = _pools[i];
 
-                var rowRect = GetPoolRowRect(i);
+                Rect rowRect = GetPoolRowRect(i);
                 rowRect.y += HeaderTop;
 
                 if (rowRect.Contains(mousePositionInContent))
@@ -315,12 +315,12 @@ namespace Zenject.MemoryPoolMonitor
 
         void DrawRowBackgrounds()
         {
-            var mousePositionInContent = Event.current.mousePosition;
+            Vector2 mousePositionInContent = Event.current.mousePosition;
 
             for (int i = 0; i < _pools.Count; i++)
             {
-                var pool = _pools[i];
-                var rowRect = GetPoolRowRect(i);
+                IMemoryPool pool = _pools[i];
+                Rect rowRect = GetPoolRowRect(i);
 
                 Texture2D background;
 
@@ -362,11 +362,11 @@ namespace Zenject.MemoryPoolMonitor
         {
             DrawRowBackgrounds();
 
-            var columnPos = 0.0f;
+            float columnPos = 0.0f;
 
             for (int i = 0; i < NumColumns; i++)
             {
-                var columnWidth = GetColumnWidth(i);
+                float columnWidth = GetColumnWidth(i);
                 DrawColumn(i, columnPos, columnWidth);
                 columnPos += columnWidth;
             }
@@ -375,7 +375,7 @@ namespace Zenject.MemoryPoolMonitor
         void DrawColumn(
             int index, float position, float width)
         {
-            var columnHeight = _settings.HeaderHeight + _pools.Count() * _settings.RowHeight;
+            float columnHeight = _settings.HeaderHeight + _pools.Count() * _settings.RowHeight;
 
             if (index < 4)
             {
@@ -384,16 +384,16 @@ namespace Zenject.MemoryPoolMonitor
                     _settings.SplitterWidth, columnHeight), LineTexture);
             }
 
-            var columnBounds = new Rect(
+            Rect columnBounds = new Rect(
                 position + 0.5f * _settings.SplitterWidth, 0, width - _settings.SplitterWidth, columnHeight);
 
             GUI.BeginGroup(columnBounds);
             {
                 for (int i = 0; i < _pools.Count; i++)
                 {
-                    var pool = _pools[i];
+                    IMemoryPool pool = _pools[i];
 
-                    var cellBounds = new Rect(
+                    Rect cellBounds = new Rect(
                         0, _settings.RowHeight * i,
                         columnBounds.width, _settings.RowHeight);
 
@@ -430,7 +430,7 @@ namespace Zenject.MemoryPoolMonitor
                 }
                 case 4:
                 {
-                    var buttonBounds = new Rect(
+                    Rect buttonBounds = new Rect(
                         bounds.x + _settings.ButtonMargin, bounds.y, bounds.width - _settings.ButtonMargin, bounds.height);
 
                     if (GUI.Button(buttonBounds, "Clear"))
@@ -441,7 +441,7 @@ namespace Zenject.MemoryPoolMonitor
                 }
                 case 5:
                 {
-                    var buttonBounds = new Rect(
+                    Rect buttonBounds = new Rect(
                         bounds.x, bounds.y, bounds.width - 15.0f, bounds.height);
 
                     if (GUI.Button(buttonBounds, "Expand"))
@@ -466,8 +466,8 @@ namespace Zenject.MemoryPoolMonitor
 
             if (_sortColumn == index)
             {
-                var offset = _settings.TriangleOffset;
-                var image = _sortDescending ? _settings.TriangleDown : _settings.TriangleUp;
+                Vector2 offset = _settings.TriangleOffset;
+                Texture2D image = _sortDescending ? _settings.TriangleDown : _settings.TriangleUp;
 
                 GUI.DrawTexture(new Rect(bounds.x + offset.x, bounds.y + offset.y, image.width, image.height), image);
             }
@@ -489,7 +489,7 @@ namespace Zenject.MemoryPoolMonitor
         {
             if (_sortDescending)
             {
-                var temp = right;
+                IMemoryPool temp = right;
                 right = left;
                 left = temp;
             }

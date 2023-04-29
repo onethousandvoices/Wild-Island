@@ -9,7 +9,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<IFoo>().FromInstance(foo).NonLazy();
             Container.Bind<Foo>().FromInstance(foo).NonLazy();
@@ -31,7 +31,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<IFoo>().FromInstance(foo).AsSingle().NonLazy();
             Container.Bind<Foo>().FromInstance(foo).AsSingle().NonLazy();

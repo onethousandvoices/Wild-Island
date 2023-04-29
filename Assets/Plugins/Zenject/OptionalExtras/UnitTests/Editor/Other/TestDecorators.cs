@@ -198,7 +198,7 @@ namespace Zenject.Tests.Other
             Container.Bind<ISaveHandler>().To<SaveHandler>().AsSingle();
             Container.Decorate<ISaveHandler>().With<SaveDecorator1>();
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
 
             CallCounter = 1;
             SaveHandler.CallCount = 0;

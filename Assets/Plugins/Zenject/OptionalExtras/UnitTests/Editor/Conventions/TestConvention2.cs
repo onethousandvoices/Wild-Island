@@ -11,7 +11,7 @@ namespace Zenject.Tests.Convention.Two
         [Test]
         public void TestBindAllInterfacesSimple()
         {
-            var container = new DiContainer();
+            DiContainer container = new DiContainer();
 
             container.Bind(x => x.AllInterfaces()).To<Foo>().AsTransient();
 
@@ -22,7 +22,7 @@ namespace Zenject.Tests.Convention.Two
         [Test]
         public void TestBindAllInterfaces2()
         {
-            var container = new DiContainer();
+            DiContainer container = new DiContainer();
 
             container.Bind(x => x.AllInterfaces())
                 .To(x => x.AllNonAbstractClasses().InNamespace("Zenject.Tests.Convention.Two")).AsTransient();

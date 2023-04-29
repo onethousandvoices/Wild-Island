@@ -10,7 +10,7 @@ namespace Pathfinding {
 		};
 
 		public override void OnInspectorGUI (NavGraph target) {
-			var graph = target as PointGraph;
+			PointGraph graph = target as PointGraph;
 
 			graph.root = ObjectField(new GUIContent("Root", "All childs of this object will be used as nodes, if it is not set, a tag search will be used instead (see below)"), graph.root, typeof(Transform), true, false) as Transform;
 

@@ -9,7 +9,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindInstance(foo).NonLazy();
 
@@ -21,7 +21,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindInstance(foo).NonLazy();
 
@@ -33,7 +33,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelfIdentifier()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindInstance(foo).WithId("foo").NonLazy();
 
@@ -45,7 +45,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcreteIdentifier()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindInstance(foo).WithId("foo").NonLazy();
 

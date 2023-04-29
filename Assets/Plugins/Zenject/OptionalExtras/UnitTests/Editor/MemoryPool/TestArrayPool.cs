@@ -9,7 +9,7 @@ namespace Zenject.Tests
         [Test]
         public void RunTest()
         {
-            var pool = ArrayPool<string>.GetPool(2);
+            ArrayPool<string> pool = ArrayPool<string>.GetPool(2);
 
             pool.Clear();
             pool.ClearActiveCount();
@@ -18,7 +18,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
 
-            var arr1 = pool.Spawn();
+            string[] arr1 = pool.Spawn();
 
             Assert.IsEqual(arr1.Length, 2);
 
@@ -35,7 +35,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var arr2 = pool.Spawn();
+            string[] arr2 = pool.Spawn();
 
             Assert.IsEqual(arr2.Length, 2);
             Assert.IsNull(arr2[0]);
@@ -48,7 +48,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var arr3 = pool.Spawn();
+            string[] arr3 = pool.Spawn();
 
             Assert.IsNotEqual(arr2, arr3);
 

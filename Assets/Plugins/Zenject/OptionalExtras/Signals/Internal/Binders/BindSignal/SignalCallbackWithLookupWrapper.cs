@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace Zenject
 {
@@ -36,7 +37,7 @@ namespace Zenject
 
         void OnSignalFired(object signal)
         {
-            var objects = _container.ResolveIdAll(_objectType, _lookupId);
+            IList objects = _container.ResolveIdAll(_objectType, _lookupId);
 
             for (int i = 0; i < objects.Count; i++)
             {

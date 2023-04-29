@@ -26,9 +26,9 @@ namespace Zenject.SpaceFighter
 
         public void FixedTick()
         {
-            var lookDir = _view.LookDir;
+            Vector3 lookDir = _view.LookDir;
 
-            var error = Vector3.Angle(lookDir, DesiredLookDir);
+            float error = Vector3.Angle(lookDir, DesiredLookDir);
 
             if (Vector3.Cross(lookDir, DesiredLookDir).z < 0)
             {

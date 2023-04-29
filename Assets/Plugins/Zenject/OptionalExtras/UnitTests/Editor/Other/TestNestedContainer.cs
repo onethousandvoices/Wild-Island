@@ -30,7 +30,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestCase1()
         {
-            var container1 = new DiContainer();
+            DiContainer container1 = new DiContainer();
 
             Assert.Throws(() => container1.Resolve<IFoo>());
             Assert.Throws(() => Container.Resolve<IFoo>());
@@ -40,7 +40,7 @@ namespace Zenject.Tests.Other
             Assert.Throws(() => container1.Resolve<IFoo>());
             Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);
 
-            var container2 = Container.CreateSubContainer();
+            DiContainer container2 = Container.CreateSubContainer();
 
             Assert.IsEqual(container2.Resolve<IFoo>().GetBar(), 0);
             Assert.IsEqual(Container.Resolve<IFoo>().GetBar(), 0);

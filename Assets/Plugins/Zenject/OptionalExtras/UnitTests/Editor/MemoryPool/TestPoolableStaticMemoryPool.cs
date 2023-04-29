@@ -10,7 +10,7 @@ namespace Zenject.Tests
         [Test]
         public void RunTest()
         {
-            var pool = Foo.Pool;
+            PoolableStaticMemoryPool<string, Foo> pool = Foo.Pool;
 
             pool.Clear();
 
@@ -18,7 +18,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
 
-            var foo = pool.Spawn("asdf");
+            Foo foo = pool.Spawn("asdf");
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumInactive, 0);

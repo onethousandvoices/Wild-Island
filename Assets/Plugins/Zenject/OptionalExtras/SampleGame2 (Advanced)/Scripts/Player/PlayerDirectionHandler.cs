@@ -17,12 +17,12 @@ namespace Zenject.SpaceFighter
 
         public void Tick()
         {
-            var mouseRay = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            Ray mouseRay = _mainCamera.ScreenPointToRay(Input.mousePosition);
 
-            var mousePos = mouseRay.origin;
+            Vector3 mousePos = mouseRay.origin;
             mousePos.z = 0;
 
-            var goalDir = mousePos - _player.Position;
+            Vector3 goalDir = mousePos - _player.Position;
             goalDir.z = 0;
             goalDir.Normalize();
 

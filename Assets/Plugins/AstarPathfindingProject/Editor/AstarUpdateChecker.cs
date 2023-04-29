@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 #if UNITY_2018_1_OR_NEWER
@@ -115,7 +116,7 @@ namespace Pathfinding {
 
 		static void RefreshServerMessage () {
 			if (!hasParsedServerMessage) {
-				var serverMessage = EditorPrefs.GetString("AstarServerMessage");
+				string serverMessage = EditorPrefs.GetString("AstarServerMessage");
 
 				if (!string.IsNullOrEmpty(serverMessage)) {
 					ParseServerMessage(serverMessage);
@@ -179,8 +180,8 @@ namespace Pathfinding {
 			// Check if it is time to check for updates
 			// Check for updates a bit earlier if we are in play mode or have the AstarPath object in the scene
 			// as then the collected statistics will be a bit more accurate
-			var offsetMinutes = (Application.isPlaying && Time.time > 60) || AstarPath.active != null ? -20 : 20;
-			var minutesUntilUpdate = lastUpdateCheck.AddDays(updateCheckRate).AddMinutes(offsetMinutes).Subtract(System.DateTime.UtcNow).TotalMinutes;
+			int offsetMinutes = (Application.isPlaying && Time.time > 60) || AstarPath.active != null ? -20 : 20;
+			double minutesUntilUpdate = lastUpdateCheck.AddDays(updateCheckRate).AddMinutes(offsetMinutes).Subtract(System.DateTime.UtcNow).TotalMinutes;
 			if (minutesUntilUpdate < 0) {
 				DownloadVersionInfo();
 			}
@@ -189,7 +190,7 @@ namespace Pathfinding {
 		}
 
 		static void DownloadVersionInfo () {
-			var script = AstarPath.active != null ? AstarPath.active : GameObject.FindObjectOfType(typeof(AstarPath)) as AstarPath;
+			AstarPath script = AstarPath.active != null ? AstarPath.active : GameObject.FindObjectOfType(typeof(AstarPath)) as AstarPath;
 
 			if (script != null) {
 				script.ConfigureReferencesInternal();
@@ -251,7 +252,7 @@ namespace Pathfinding {
 
 			if (splits.Length > 4) {
 				// First 4 are just compatibility fields
-				var fields = splits.Skip(4).ToArray();
+				string[] fields = splits.Skip(4).ToArray();
 
 				// Take all pairs of fields
 				for (int i = 0; i < (fields.Length/2)*2; i += 2) {
@@ -278,7 +279,7 @@ namespace Pathfinding {
 #if !ASTAR_ATAVISM
 			try {
 				System.DateTime remindDate;
-				var remindVersion = new System.Version(EditorPrefs.GetString("AstarRemindUpdateVersion", "0.0.0.0"));
+				Version remindVersion = new System.Version(EditorPrefs.GetString("AstarRemindUpdateVersion", "0.0.0.0"));
 				if (latestVersion == remindVersion && System.DateTime.TryParse(EditorPrefs.GetString("AstarRemindUpdateDate", "1/1/1971 00:00:01"), out remindDate)) {
 					if (System.DateTime.UtcNow < remindDate) {
 						// Don't remind yet
@@ -292,7 +293,7 @@ namespace Pathfinding {
 				Debug.LogError("Invalid AstarRemindUpdateVersion or AstarRemindUpdateDate");
 			}
 
-			var skipVersion = new System.Version(EditorPrefs.GetString("AstarSkipUpToVersion", AstarPath.Version.ToString()));
+			Version skipVersion = new System.Version(EditorPrefs.GetString("AstarSkipUpToVersion", AstarPath.Version.ToString()));
 
 			if (AstarPathEditor.FullyDefinedVersion(latestVersion) != AstarPathEditor.FullyDefinedVersion(skipVersion) && AstarPathEditor.FullyDefinedVersion(latestVersion) > AstarPathEditor.FullyDefinedVersion(AstarPath.Version)) {
 				EditorPrefs.DeleteKey("AstarSkipUpToVersion");

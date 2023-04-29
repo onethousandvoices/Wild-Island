@@ -61,7 +61,7 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test2>().AsSingle().NonLazy();
             Container.Bind<Test3>().AsSingle().NonLazy();
 
-            var test3 = Container.Resolve<Test3>();
+            Test3 test3 = Container.Resolve<Test3>();
             Assert.That(test3.HasInitialized);
             Assert.That(test3.HasInitialized2);
         }
@@ -86,7 +86,7 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<SimpleBase>().To<SimpleDerived>().AsSingle().NonLazy();
 
-            var simple = Container.Resolve<SimpleBase>();
+            SimpleBase simple = Container.Resolve<SimpleBase>();
 
             Assert.That(simple.WasCalled);
         }
@@ -96,7 +96,7 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<IFoo>().To<FooDerived>().AsSingle().NonLazy();
 
-            var foo = Container.Resolve<IFoo>();
+            IFoo foo = Container.Resolve<IFoo>();
 
             Assert.That(((FooDerived)foo).WasDerivedCalled);
             Assert.That(((FooBase)foo).WasBaseCalled);

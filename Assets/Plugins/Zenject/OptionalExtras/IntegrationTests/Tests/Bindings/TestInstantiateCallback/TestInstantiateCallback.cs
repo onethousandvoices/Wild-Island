@@ -42,7 +42,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -53,7 +53,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
         {
             PreInstall();
 
-            var gameObject = new GameObject();
+            GameObject gameObject = new GameObject();
 
             Container.Bind<Foo>().FromNewComponentOn(gameObject)
                 .AsSingle().OnInstantiated<Foo>((ctx, obj) =>
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -75,7 +75,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
         {
             PreInstall();
 
-            var gameObject = new GameObject();
+            GameObject gameObject = new GameObject();
 
             Container.Bind<Foo>().FromNewComponentOn(ctx => gameObject)
                 .AsSingle().OnInstantiated<Foo>((ctx, obj) =>
@@ -86,7 +86,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -106,7 +106,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -126,7 +126,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -146,7 +146,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -163,7 +163,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
         {
             PreInstall();
 
-            var bar = new GameObject().AddComponent<Bar>();
+            Bar bar = new GameObject().AddComponent<Bar>();
 
             Container.QueueForInject(bar);
             Container.Bind<Foo>().FromNewComponentSibling()
@@ -193,7 +193,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;
@@ -213,7 +213,7 @@ namespace Zenject.Tests.Bindings.InstantiateCallback
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
             yield break;

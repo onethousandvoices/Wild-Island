@@ -51,7 +51,7 @@ namespace Pathfinding {
 			// the resize operation is thread safe
 			lock (lockObject) {
 				if (graphIndex >= _navmeshHolders.Length) {
-					var gg = new INavmeshHolder[graphIndex+1];
+					INavmeshHolder[] gg = new INavmeshHolder[graphIndex+1];
 					_navmeshHolders.CopyTo(gg, 0);
 					_navmeshHolders = gg;
 				}
@@ -89,7 +89,7 @@ namespace Pathfinding {
 		public void GetVertices (out Int3 v0, out Int3 v1, out Int3 v2) {
 			// Get the object holding the vertex data for this node
 			// This is usually a graph or a recast graph tile
-			var holder = GetNavmeshHolder(GraphIndex);
+			INavmeshHolder holder = GetNavmeshHolder(GraphIndex);
 
 			v0 = holder.GetVertex(this.v0);
 			v1 = holder.GetVertex(this.v1);
@@ -100,7 +100,7 @@ namespace Pathfinding {
 		public void GetVerticesInGraphSpace (out Int3 v0, out Int3 v1, out Int3 v2) {
 			// Get the object holding the vertex data for this node
 			// This is usually a graph or a recast graph tile
-			var holder = GetNavmeshHolder(GraphIndex);
+			INavmeshHolder holder = GetNavmeshHolder(GraphIndex);
 
 			v0 = holder.GetVertexInGraphSpace(this.v0);
 			v1 = holder.GetVertexInGraphSpace(this.v1);
@@ -149,10 +149,10 @@ namespace Pathfinding {
 			p = GetNavmeshHolder(GraphIndex).transform.InverseTransform(p);
 
 			// Find the closest point on the triangle to p when looking at the triangle from above (relative to the graph)
-			var closest = Pathfinding.Polygon.ClosestPointOnTriangleXZ((Vector3)a, (Vector3)b, (Vector3)c, p);
+			Vector3 closest = Pathfinding.Polygon.ClosestPointOnTriangleXZ((Vector3)a, (Vector3)b, (Vector3)c, p);
 
 			// Make sure the point is actually inside the node
-			var i3closest = (Int3)closest;
+			Int3 i3closest = (Int3)closest;
 			if (ContainsPointInGraphSpace(i3closest)) {
 				// Common case
 				return i3closest;
@@ -168,7 +168,7 @@ namespace Pathfinding {
 				for (int dx = -1; dx <= 1; dx++) {
 					for (int dz = -1; dz <= 1; dz++) {
 						if ((dx != 0 || dz != 0)) {
-							var candidate = new Int3(i3closest.x + dx, i3closest.y, i3closest.z + dz);
+							Int3 candidate = new Int3(i3closest.x + dx, i3closest.y, i3closest.z + dz);
 							if (ContainsPointInGraphSpace(candidate)) return candidate;
 						}
 					}
@@ -177,9 +177,9 @@ namespace Pathfinding {
 				// Happens veery rarely.
 				// Pick the closest vertex of the triangle.
 				// The vertex is guaranteed to be inside the triangle.
-				var da = (a - i3closest).sqrMagnitudeLong;
-				var db = (b - i3closest).sqrMagnitudeLong;
-				var dc = (c - i3closest).sqrMagnitudeLong;
+				long da = (a - i3closest).sqrMagnitudeLong;
+				long db = (b - i3closest).sqrMagnitudeLong;
+				long dc = (c - i3closest).sqrMagnitudeLong;
 				return da < db ? (da < dc ? a : c) : (db < dc ? b : c);
 			}
 		}
@@ -238,8 +238,8 @@ namespace Pathfinding {
 
 			// Loop through all connections
 			for (int i = connections.Length-1; i >= 0; i--) {
-				var conn = connections[i];
-				var other = conn.node;
+				Connection conn = connections[i];
+				GraphNode other = conn.node;
 
 				// Make sure we can traverse the neighbour
 				if (path.CanTraverse(conn.node)) {
@@ -305,7 +305,7 @@ namespace Pathfinding {
 		/// See: <see cref="GetPortal"/> which also handles edges that are shared over tile borders and some types of node links
 		/// </summary>
 		public int SharedEdge (GraphNode other) {
-			var edge = -1;
+			int edge = -1;
 
 			if (connections != null) {
 				for (int i = 0; i < connections.Length; i++) {
@@ -330,8 +330,8 @@ namespace Pathfinding {
 
 			// Since the nodes are in the same graph, they are both TriangleMeshNodes
 			// So we don't need to care about other types of nodes
-			var toTriNode = toNode as TriangleMeshNode;
-			var edge = SharedEdge(toTriNode);
+			TriangleMeshNode toTriNode = toNode as TriangleMeshNode;
+			int edge = SharedEdge(toTriNode);
 
 			// A connection was found, but it specifically didn't use an edge
 			if (edge == 0xFF) return false;
@@ -343,7 +343,7 @@ namespace Pathfinding {
 				if (connections != null) {
 					for (int i = 0; i < connections.Length; i++) {
 						if (connections[i].node.GraphIndex != GraphIndex) {
-							var mid = connections[i].node as NodeLink3Node;
+							NodeLink3Node mid = connections[i].node as NodeLink3Node;
 							if (mid != null && mid.GetOther(this) == toTriNode) {
 								// We have found a node which is connected through a NodeLink3Node
 								mid.GetPortal(toTriNode, left, right, false);
@@ -382,7 +382,7 @@ namespace Pathfinding {
 				else if (System.Math.Abs(z1-z2) == 1) coord = 0;
 				else return false; // Tiles are not adjacent. This is likely a custom connection between two nodes.
 
-				var otherEdge = toTriNode.SharedEdge(this);
+				int otherEdge = toTriNode.SharedEdge(this);
 
 				// A connection was found, but it specifically didn't use an edge. This is odd since the connection in the other direction did use an edge
 				if (otherEdge == 0xFF) throw new System.Exception("Connection used edge in one direction, but not in the other direction. Has the wrong overload of AddConnection been used?");
@@ -421,7 +421,7 @@ namespace Pathfinding {
 
 		/// <summary>TODO: This is the area in XZ space, use full 3D space for higher correctness maybe?</summary>
 		public override float SurfaceArea () {
-			var holder = GetNavmeshHolder(GraphIndex);
+			INavmeshHolder holder = GetNavmeshHolder(GraphIndex);
 
 			return System.Math.Abs(VectorMath.SignedTriangleAreaTimes2XZ(holder.GetVertex(v0), holder.GetVertex(v1), holder.GetVertex(v2))) * 0.5f;
 		}
@@ -438,7 +438,7 @@ namespace Pathfinding {
 				r2 = Random.value;
 			} while (r1+r2 > 1);
 
-			var holder = GetNavmeshHolder(GraphIndex);
+			INavmeshHolder holder = GetNavmeshHolder(GraphIndex);
 			// Pick the point corresponding to the trilinear coordinate
 			return ((Vector3)(holder.GetVertex(v1)-holder.GetVertex(v0)))*r1 + ((Vector3)(holder.GetVertex(v2)-holder.GetVertex(v0)))*r2 + (Vector3)holder.GetVertex(v0);
 		}

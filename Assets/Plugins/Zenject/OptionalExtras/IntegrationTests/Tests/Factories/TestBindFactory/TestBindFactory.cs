@@ -33,8 +33,8 @@ namespace Zenject.Tests.Factories
 
             PostInstall();
 
-            var factory = Container.Resolve<Bar.Factory>();
-            var bar = factory.Create();
+            Bar.Factory factory = Container.Resolve<Bar.Factory>();
+            Bar bar = factory.Create();
             Assert.IsNotNull(bar);
             Assert.IsNotEqual(bar, factory.Create());
             yield break;
@@ -44,14 +44,14 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromComponentInHierarchy()
         {
             PreInstall();
-            var foo = new GameObject().AddComponent<Foo>();
+            Foo foo = new GameObject().AddComponent<Foo>();
 
             Container.BindFactory<Foo, Foo.Factory>().FromComponentInHierarchy();
 
             PostInstall();
 
-            var factory = Container.Resolve<Foo.Factory>();
-            var foo2 = factory.Create();
+            Foo.Factory factory = Container.Resolve<Foo.Factory>();
+            Foo foo2 = factory.Create();
             Assert.IsNotNull(foo2);
             Assert.IsEqual(foo, foo2);
             Assert.IsEqual(foo, factory.Create());
@@ -66,7 +66,7 @@ namespace Zenject.Tests.Factories
 
             PostInstall();
 
-            var factory = Container.Resolve<Foo.Factory>();
+            Foo.Factory factory = Container.Resolve<Foo.Factory>();
 
             // zero matches
             Assert.Throws(() => factory.Create());
@@ -86,24 +86,24 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOn()
         {
             PreInstall();
-            var go = new GameObject();
+            GameObject go = new GameObject();
 
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOn(go);
 
             PostInstall();
 
-            var factory = Container.Resolve<Foo.Factory>();
+            Foo.Factory factory = Container.Resolve<Foo.Factory>();
 
             Assert.IsNull(go.GetComponent<Foo>());
-            var foo = factory.Create();
+            Foo foo = factory.Create();
             Assert.IsNotNull(go.GetComponent<Foo>());
             Assert.IsEqual(go.GetComponent<Foo>(), foo);
 
-            var foo2 = factory.Create();
+            Foo foo2 = factory.Create();
 
             Assert.IsNotEqual(foo2, foo);
 
-            var allFoos = go.GetComponents<Foo>();
+            Foo[] allFoos = go.GetComponents<Foo>();
             Assert.IsEqual(allFoos.Length, 2);
             Assert.IsEqual(allFoos[0], foo);
             Assert.IsEqual(allFoos[1], foo2);
@@ -195,7 +195,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOnSelf()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOn(gameObject);
 
@@ -221,7 +221,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOnConcrete()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<IFoo, IFooFactory>().To<Foo>().FromNewComponentOn(gameObject);
 
@@ -422,7 +422,7 @@ namespace Zenject.Tests.Factories
 
             FixtureUtil.CallFactoryCreateMethod<Foo, Foo.Factory>(Container);
 
-            var child = GameObject.Find("Foos").transform.GetChild(0);
+            Transform child = GameObject.Find("Foos").transform.GetChild(0);
 
             Assert.IsNotNull(child.GetComponent<Foo>());
             yield break;
@@ -432,7 +432,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestUnderTransform()
         {
             PreInstall();
-            var tempGameObject = new GameObject("Foo");
+            GameObject tempGameObject = new GameObject("Foo");
 
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject().
                 UnderTransform(tempGameObject.transform);
@@ -449,7 +449,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestUnderTransformGetter()
         {
             PreInstall();
-            var tempGameObject = new GameObject("Foo");
+            GameObject tempGameObject = new GameObject("Foo");
 
             Container.BindFactory<Foo, Foo.Factory>().FromNewComponentOnNewGameObject()
                 .UnderTransform(context => tempGameObject.transform);

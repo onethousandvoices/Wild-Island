@@ -9,16 +9,16 @@ namespace Pathfinding {
 		bool debug = false;
 
 		protected void AutoRepathInspector () {
-			var mode = FindProperty("autoRepath.mode");
+			SerializedProperty mode = FindProperty("autoRepath.mode");
 
 			PropertyField(mode, "Recalculate paths automatically");
 			if (!mode.hasMultipleDifferentValues) {
-				var modeValue = (AutoRepathPolicy.Mode)mode.enumValueIndex;
+				AutoRepathPolicy.Mode modeValue = (AutoRepathPolicy.Mode)mode.enumValueIndex;
 				EditorGUI.indentLevel++;
 				if (modeValue == AutoRepathPolicy.Mode.EveryNSeconds) {
 					FloatField("autoRepath.interval", min: 0f);
 				} else if (modeValue == AutoRepathPolicy.Mode.Dynamic) {
-					var maxInterval = FindProperty("autoRepath.maximumInterval");
+					SerializedProperty maxInterval = FindProperty("autoRepath.maximumInterval");
 					FloatField(maxInterval, min: 0f);
 					Slider("autoRepath.sensitivity", 1.0f, 20.0f);
 					if (PropertyField("autoRepath.visualizeSensitivity")) {
@@ -33,7 +33,7 @@ namespace Pathfinding {
 		protected void DebugInspector () {
 			debug = EditorGUILayout.Foldout(debug, "Debug info");
 			if (debug) {
-				var ai = target as IAstarAI;
+				IAstarAI ai = target as IAstarAI;
 				EditorGUI.BeginDisabledGroup(true);
 				EditorGUILayout.Toggle("Reached Destination", ai.reachedDestination);
 				EditorGUILayout.Toggle("Reached End Of Path", ai.reachedEndOfPath);
@@ -45,7 +45,7 @@ namespace Pathfinding {
 		}
 
 		protected override void Inspector () {
-			var isAIPath = typeof(AIPath).IsAssignableFrom(target.GetType());
+			bool isAIPath = typeof(AIPath).IsAssignableFrom(target.GetType());
 
 			Section("Shape");
 			FloatField("radius", min: 0.01f);
@@ -61,9 +61,9 @@ namespace Pathfinding {
 
 			if (isAIPath) {
 				EditorGUI.BeginChangeCheck();
-				var acceleration = FindProperty("maxAcceleration");
+				SerializedProperty acceleration = FindProperty("maxAcceleration");
 				int acc = acceleration.hasMultipleDifferentValues ? -1 : (acceleration.floatValue >= 0 ? 1 : 0);
-				var nacc = EditorGUILayout.Popup("Max Acceleration", acc, new [] { "Default", "Custom" });
+				int nacc = EditorGUILayout.Popup("Max Acceleration", acc, new [] { "Default", "Custom" });
 				if (EditorGUI.EndChangeCheck()) {
 					if (nacc == 0) acceleration.floatValue = -2.5f;
 					else if (acceleration.floatValue < 0) acceleration.floatValue = 10;
@@ -109,19 +109,19 @@ namespace Pathfinding {
 				PropertyField("constrainInsideGraph");
 			}
 
-			var mono = target as MonoBehaviour;
+			MonoBehaviour mono = target as MonoBehaviour;
 			mono.TryGetComponent<Rigidbody>(out Rigidbody rigid);
 			mono.TryGetComponent<Rigidbody2D>(out Rigidbody2D rigid2D);
 			mono.TryGetComponent<CharacterController>(out CharacterController controller);
-			var canUseGravity = (controller != null && controller.enabled) || ((rigid == null || rigid.isKinematic) && (rigid2D == null || rigid2D.isKinematic));
+			bool canUseGravity = (controller != null && controller.enabled) || ((rigid == null || rigid.isKinematic) && (rigid2D == null || rigid2D.isKinematic));
 
-			var gravity = FindProperty("gravity");
-			var groundMask = FindProperty("groundMask");
+			SerializedProperty gravity = FindProperty("gravity");
+			SerializedProperty groundMask = FindProperty("groundMask");
 
 			if (canUseGravity) {
 				EditorGUI.BeginChangeCheck();
 				int grav = gravity.hasMultipleDifferentValues ? -1 : (gravity.vector3Value == Vector3.zero ? 0 : (float.IsNaN(gravity.vector3Value.x) ? 1 : 2));
-				var ngrav = EditorGUILayout.Popup("Gravity", grav, new [] { "None", "Use Project Settings", "Custom" });
+				int ngrav = EditorGUILayout.Popup("Gravity", grav, new [] { "None", "Use Project Settings", "Custom" });
 				if (EditorGUI.EndChangeCheck()) {
 					if (ngrav == 0) gravity.vector3Value = Vector3.zero;
 					else if (ngrav == 1) gravity.vector3Value = new Vector3(float.NaN, float.NaN, float.NaN);

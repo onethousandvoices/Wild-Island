@@ -14,7 +14,7 @@ namespace Pathfinding {
 
 		public static void SetGridGraph (int graphIndex, GridGraph graph) {
 			if (_gridGraphs.Length <= graphIndex) {
-				var gg = new GridGraph[graphIndex+1];
+				GridGraph[] gg = new GridGraph[graphIndex+1];
 				for (int i = 0; i < _gridGraphs.Length; i++) gg[i] = _gridGraphs[i];
 				_gridGraphs = gg;
 			}
@@ -139,7 +139,7 @@ namespace Pathfinding {
 				// Note: This assumes that all connections are bidirectional
 				// which should hold for all grid graphs unless some custom code has been added
 				for (int i = 0; i < 8; i++) {
-					var other = GetNeighbourAlongDirection(i) as GridNode;
+					GridNode other = GetNeighbourAlongDirection(i) as GridNode;
 					if (other != null) {
 						// Remove reverse connection. See doc for GridGraph.neighbourOffsets to see which indices are used for what.
 						other.SetConnectionInternal(i < 4 ? ((i + 2) % 4) : (((i-2) % 4) + 4), false);
@@ -173,7 +173,7 @@ namespace Pathfinding {
 		}
 
 		public override Vector3 ClosestPointOnNode (Vector3 p) {
-			var gg = GetGridGraph(GraphIndex);
+			GridGraph gg = GetGridGraph(GraphIndex);
 
 			// Convert to graph space
 			p = gg.transform.InverseTransform(p);
@@ -185,7 +185,7 @@ namespace Pathfinding {
 			// Handle the y coordinate separately
 			float y = gg.transform.InverseTransform((Vector3)position).y;
 
-			var closestInGraphSpace = new Vector3(Mathf.Clamp(p.x, x, x+1f), y, Mathf.Clamp(p.z, z, z+1f));
+			Vector3 closestInGraphSpace = new Vector3(Mathf.Clamp(p.x, x, x+1f), y, Mathf.Clamp(p.z, z, z+1f));
 
 			// Convert to world space
 			return gg.transform.Transform(closestInGraphSpace);
@@ -251,7 +251,7 @@ namespace Pathfinding {
 			handler.heap.Add(pathNode);
 
 			ushort pid = handler.PathID;
-			var index = NodeInGridIndex;
+			int index = NodeInGridIndex;
 			for (int i = 0; i < 8; i++) {
 				if (HasConnectionInDirection(i)) {
 					GridNode other = nodes[index + neighbourOffsets[i]];
@@ -275,7 +275,7 @@ namespace Pathfinding {
 				int[] neighbourOffsets = gg.neighbourOffsets;
 				uint[] neighbourCosts = gg.neighbourCosts;
 				GridNode[] nodes = gg.nodes;
-				var index = NodeInGridIndex;
+				int index = NodeInGridIndex;
 
 				for (int i = 0; i < 8; i++) {
 					if (HasConnectionInDirection(i)) {

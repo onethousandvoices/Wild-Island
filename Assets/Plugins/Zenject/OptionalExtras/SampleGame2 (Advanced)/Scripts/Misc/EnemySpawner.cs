@@ -57,7 +57,7 @@ namespace Zenject.SpaceFighter
             float speed = Random.Range(_settings.SpeedMin, _settings.SpeedMax);
             float accuracy = Random.Range(_settings.AccuracyMin, _settings.AccuracyMax);
 
-            var enemyFacade = _enemyFactory.Create(accuracy, speed);
+            EnemyFacade enemyFacade = _enemyFactory.Create(accuracy, speed);
             enemyFacade.Position = ChooseRandomStartPosition();
 
             _lastSpawnTime = Time.realtimeSinceStartup;
@@ -65,8 +65,8 @@ namespace Zenject.SpaceFighter
 
         Vector3 ChooseRandomStartPosition()
         {
-            var side = Random.Range(0, 3);
-            var posOnSide = Random.Range(0, 1.0f);
+            int side = Random.Range(0, 3);
+            float posOnSide = Random.Range(0, 1.0f);
 
             float buffer = 2.0f;
 

@@ -10,7 +10,7 @@ namespace Zenject.MemoryPoolMonitor
     {
         static void Exchange(List<T> list, int a, int b)
         {
-            var temp = list[a];
+            T temp = list[a];
             list[a] = list[b];
             list[b] = temp;
         }

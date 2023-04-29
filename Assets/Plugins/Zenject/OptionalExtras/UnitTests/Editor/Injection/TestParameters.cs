@@ -21,12 +21,12 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestExtraParametersSameType()
         {
-            var test1 = Container.Instantiate<Test1>(new object[] { 5, 10 });
+            Test1 test1 = Container.Instantiate<Test1>(new object[] { 5, 10 });
 
             Assert.That(test1 != null);
             Assert.That(test1.f1 == 5 && test1.f2 == 10);
 
-            var test2 = Container.Instantiate<Test1>(new object[] { 10, 5 });
+            Test1 test2 = Container.Instantiate<Test1>(new object[] { 10, 5 });
 
             Assert.That(test2 != null);
             Assert.That(test2.f1 == 10 && test2.f2 == 5);

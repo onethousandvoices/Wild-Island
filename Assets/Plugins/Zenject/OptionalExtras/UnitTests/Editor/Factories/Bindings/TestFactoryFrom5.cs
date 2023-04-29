@@ -27,7 +27,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<string, int, string, float, int, IFoo, IFooFactory>().To<Foo>().NonLazy();
 
-            var ifoo = Container.Resolve<IFooFactory>().Create("asdf", 2, "a", 4.2f, 6);
+            IFoo ifoo = Container.Resolve<IFooFactory>().Create("asdf", 2, "a", 4.2f, 6);
 
             Assert.IsNotNull(ifoo);
             Assert.IsEqual(((Foo)ifoo).P1, "asdf");

@@ -91,20 +91,20 @@ namespace Pathfinding.Util {
 
 		/// <summary>Swaps between little and big endian</summary>
 		static ulong SwapEndianness (ulong value) {
-			var b1 = (value >> 0) & 0xff;
-			var b2 = (value >> 8) & 0xff;
-			var b3 = (value >> 16) & 0xff;
-			var b4 = (value >> 24) & 0xff;
-			var b5 = (value >> 32) & 0xff;
-			var b6 = (value >> 40) & 0xff;
-			var b7 = (value >> 48) & 0xff;
-			var b8 = (value >> 56) & 0xff;
+			ulong b1 = (value >> 0) & 0xff;
+			ulong b2 = (value >> 8) & 0xff;
+			ulong b3 = (value >> 16) & 0xff;
+			ulong b4 = (value >> 24) & 0xff;
+			ulong b5 = (value >> 32) & 0xff;
+			ulong b6 = (value >> 40) & 0xff;
+			ulong b7 = (value >> 48) & 0xff;
+			ulong b8 = (value >> 56) & 0xff;
 
 			return b1 << 56 | b2 << 48 | b3 << 40 | b4 << 32 | b5 << 24 | b6 << 16 | b7 << 8 | b8 << 0;
 		}
 
 		public byte[] ToByteArray () {
-			var bytes = new byte[16];
+			byte[] bytes = new byte[16];
 
 			byte[] ba = System.BitConverter.GetBytes(!System.BitConverter.IsLittleEndian ? SwapEndianness(_a) : _a);
 			byte[] bb = System.BitConverter.GetBytes(!System.BitConverter.IsLittleEndian ? SwapEndianness(_b) : _b);
@@ -119,7 +119,7 @@ namespace Pathfinding.Util {
 		private static System.Random random = new System.Random();
 
 		public static Guid NewGuid () {
-			var bytes = new byte[16];
+			byte[] bytes = new byte[16];
 
 			random.NextBytes(bytes);
 			return new Guid(bytes);
@@ -136,7 +136,7 @@ namespace Pathfinding.Util {
 		public override bool Equals (System.Object _rhs) {
 			if (!(_rhs is Guid)) return false;
 
-			var rhs = (Guid)_rhs;
+			Guid rhs = (Guid)_rhs;
 
 			return _a == rhs._a && _b == rhs._b;
 		}

@@ -57,7 +57,7 @@ namespace Zenject.Tests.Bindings
 
                 public override Bar Create()
                 {
-                    var bar = base.Create();
+                    Bar bar = base.Create();
                     bar.Value = _value;
                     return bar;
                 }

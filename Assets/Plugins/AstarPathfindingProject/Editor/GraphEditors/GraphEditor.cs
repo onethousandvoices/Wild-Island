@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -36,8 +37,8 @@ namespace Pathfinding {
 			if (obj != null) {
 				if (allowSceneObjects && !EditorUtility.IsPersistent(obj)) {
 					// Object is in the scene
-					var com = obj as Component;
-					var go = obj as GameObject;
+					Component com = obj as Component;
+					GameObject go = obj as GameObject;
 					if (com != null) {
 						go = com.gameObject;
 					}
@@ -49,7 +50,7 @@ namespace Pathfinding {
 				} else if (EditorUtility.IsPersistent(obj)) {
 					if (assetsMustBeInResourcesFolder) {
 						string path = AssetDatabase.GetAssetPath(obj).Replace("\\", "/");
-						var rg = new System.Text.RegularExpressions.Regex(@"Resources/.*$");
+						Regex rg = new System.Text.RegularExpressions.Regex(@"Resources/.*$");
 
 						if (!rg.IsMatch(path)) {
 							if (FixLabel("Object must be in the 'Resources' folder")) {
@@ -117,7 +118,7 @@ namespace Pathfinding {
 			GUILayout.Space(14*EditorGUI.indentLevel);
 			GUILayout.BeginHorizontal(AstarPathEditor.helpBox);
 			GUILayout.Label(label, EditorGUIUtility.isProSkin ? EditorStyles.whiteMiniLabel : EditorStyles.miniLabel, GUILayout.ExpandWidth(true));
-			var returnValue = GUILayout.Button(buttonLabel, EditorStyles.miniButton, GUILayout.Width(buttonWidth));
+			bool returnValue = GUILayout.Button(buttonLabel, EditorStyles.miniButton, GUILayout.Width(buttonWidth));
 			GUILayout.EndHorizontal();
 			GUILayout.EndHorizontal();
 			return returnValue;

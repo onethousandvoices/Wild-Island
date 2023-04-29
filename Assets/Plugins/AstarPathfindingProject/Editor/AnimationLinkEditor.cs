@@ -8,7 +8,7 @@ namespace Pathfinding {
 		public override void OnInspectorGUI () {
 			DrawDefaultInspector();
 
-			var script = target as AnimationLink;
+			AnimationLink script = target as AnimationLink;
 
 			EditorGUI.BeginDisabledGroup(script.EndTransform == null);
 			if (GUILayout.Button("Autoposition Endpoint")) {

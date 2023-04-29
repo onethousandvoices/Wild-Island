@@ -59,13 +59,13 @@ namespace Zenject.Asteroids
         {
             Assert.That(_cachedAttributes.Count == 0);
 
-            var speedTotal = 0.0f;
-            var sizeTotal = 0.0f;
+            float speedTotal = 0.0f;
+            float sizeTotal = 0.0f;
 
             for (int i = 0; i < _settings.maxSpawns; i++)
             {
-                var sizePx = Random.Range(0.0f, 1.0f);
-                var speed = Random.Range(_settings.minSpeed, _settings.maxSpeed);
+                float sizePx = Random.Range(0.0f, 1.0f);
+                float speed = Random.Range(_settings.minSpeed, _settings.maxSpeed);
 
                 _cachedAttributes.Enqueue(new AsteroidAttributes {
                     SizePx = sizePx,
@@ -76,16 +76,16 @@ namespace Zenject.Asteroids
                 sizeTotal += sizePx;
             }
 
-            var desiredAverageSpeed = (_settings.minSpeed + _settings.maxSpeed) * 0.5f;
-            var desiredAverageSize = 0.5f;
+            float desiredAverageSpeed = (_settings.minSpeed + _settings.maxSpeed) * 0.5f;
+            float desiredAverageSize = 0.5f;
 
-            var averageSize = sizeTotal / _settings.maxSpawns;
-            var averageSpeed = speedTotal / _settings.maxSpawns;
+            float averageSize = sizeTotal / _settings.maxSpawns;
+            float averageSpeed = speedTotal / _settings.maxSpawns;
 
-            var speedScaleFactor = desiredAverageSpeed / averageSpeed;
-            var sizeScaleFactor = desiredAverageSize / averageSize;
+            float speedScaleFactor = desiredAverageSpeed / averageSpeed;
+            float sizeScaleFactor = desiredAverageSize / averageSize;
 
-            foreach (var attributes in _cachedAttributes)
+            foreach (AsteroidAttributes attributes in _cachedAttributes)
             {
                 attributes.SizePx *= sizeScaleFactor;
                 attributes.InitialSpeed *= speedScaleFactor;
@@ -97,7 +97,7 @@ namespace Zenject.Asteroids
 
         void ResetAll()
         {
-            foreach (var asteroid in _asteroids)
+            foreach (Asteroid asteroid in _asteroids)
             {
                 GameObject.Destroy(asteroid.gameObject);
             }
@@ -141,9 +141,9 @@ namespace Zenject.Asteroids
 
         public void SpawnNext()
         {
-            var asteroid = _asteroidFactory.Create();
+            Asteroid asteroid = _asteroidFactory.Create();
 
-            var attributes = _cachedAttributes.Dequeue();
+            AsteroidAttributes attributes = _cachedAttributes.Dequeue();
 
             asteroid.Scale = Mathf.Lerp(_settings.minScale, _settings.maxScale, attributes.SizePx);
             asteroid.Mass = Mathf.Lerp(_settings.minMass, _settings.maxMass, attributes.SizePx);
@@ -155,14 +155,14 @@ namespace Zenject.Asteroids
 
         Vector3 GetRandomDirection()
         {
-            var theta = Random.Range(0, Mathf.PI * 2.0f);
+            float theta = Random.Range(0, Mathf.PI * 2.0f);
             return new Vector3(Mathf.Cos(theta), Mathf.Sin(theta), 0);
         }
 
         Vector3 GetRandomStartPosition(float scale)
         {
-            var side = (Side)Random.Range(0, (int)Side.Count);
-            var rand = Random.Range(0.0f, 1.0f);
+            Side side = (Side)Random.Range(0, (int)Side.Count);
+            float rand = Random.Range(0.0f, 1.0f);
 
             switch (side)
             {

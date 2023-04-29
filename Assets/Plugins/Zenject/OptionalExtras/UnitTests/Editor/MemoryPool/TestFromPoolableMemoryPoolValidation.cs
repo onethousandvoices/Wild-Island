@@ -54,7 +54,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestFailure()
         {
-            var container = new DiContainer(true);
+            DiContainer container = new DiContainer(true);
             container.Settings = new ZenjectSettings(
                 ValidationErrorResponses.Throw, RootResolveMethods.All);
 
@@ -67,7 +67,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSuccess()
         {
-            var container = new DiContainer(true);
+            DiContainer container = new DiContainer(true);
             container.Settings = new ZenjectSettings(
                 ValidationErrorResponses.Throw, RootResolveMethods.All);
 

@@ -30,12 +30,12 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
             Assert.That(foo.WasInjected);
 
             Assert.IsEqual(Foo.InstanceCount, 1);
 
-            var foo2 = Container.Resolve<Foo>();
+            Foo foo2 = Container.Resolve<Foo>();
             Assert.IsNotEqual(foo, foo2);
             Assert.IsEqual(Foo.InstanceCount, 2);
             yield break;

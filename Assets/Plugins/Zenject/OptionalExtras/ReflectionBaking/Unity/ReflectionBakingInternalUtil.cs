@@ -29,9 +29,9 @@ namespace Zenject.ReflectionBaking
 
             ZenjectReflectionBakingSettings enabledSettings = null;
 
-            foreach (var guid in guids)
+            foreach (string guid in guids)
             {
-                var candidate = AssetDatabase.LoadAssetAtPath<ZenjectReflectionBakingSettings>(
+                ZenjectReflectionBakingSettings candidate = AssetDatabase.LoadAssetAtPath<ZenjectReflectionBakingSettings>(
                     AssetDatabase.GUIDToAssetPath(guid));
 
                 if ((Application.isEditor && candidate.IsEnabledInEditor) || (BuildPipeline.isBuildingPlayer && candidate.IsEnabledInBuilds))
@@ -46,7 +46,7 @@ namespace Zenject.ReflectionBaking
 
         public static string ConvertAbsoluteToAssetPath(string systemPath)
         {
-            var projectPath = Application.dataPath;
+            string projectPath = Application.dataPath;
 
             // Remove 'Assets'
             projectPath = projectPath.Substring(0, projectPath.Length - /* Assets */ 6);
@@ -66,7 +66,7 @@ namespace Zenject.ReflectionBaking
 
             if (compInterface != null)
             {
-                var dirtyAllScriptsMethod = compInterface.GetMethod(
+                MethodInfo dirtyAllScriptsMethod = compInterface.GetMethod(
                     "DirtyAllScripts", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
                 dirtyAllScriptsMethod.Invoke(null, null);

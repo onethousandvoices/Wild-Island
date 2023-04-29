@@ -11,7 +11,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo }).AsSingle().NonLazy();
 
@@ -33,12 +33,12 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMisc()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
 
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo1, foo2 });
 
-            var foos = Container.ResolveAll<Foo>();
+            List<Foo> foos = Container.ResolveAll<Foo>();
             Assert.IsEqual(foos[0], foo1);
             Assert.IsEqual(foos[1], foo2);
         }
@@ -46,15 +46,15 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestMisc2()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
-            var foo3 = new Foo();
-            var foo4 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
+            Foo foo3 = new Foo();
+            Foo foo4 = new Foo();
 
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo1, foo2 });
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo3, foo4 });
 
-            var foos = Container.ResolveAll<Foo>();
+            List<Foo> foos = Container.ResolveAll<Foo>();
 
             Assert.IsEqual(foos[0], foo1);
             Assert.IsEqual(foos[1], foo2);
@@ -65,7 +65,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo }).AsTransient().NonLazy();
 
@@ -75,7 +75,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestCached()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<Foo>().FromMethodMultiple(ctx => new[] { foo }).AsSingle().NonLazy();
 

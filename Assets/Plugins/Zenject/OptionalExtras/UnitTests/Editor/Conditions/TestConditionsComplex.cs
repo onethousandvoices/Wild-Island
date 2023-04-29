@@ -24,8 +24,8 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestCorrespondingIdentifiers()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
 
             Container.Bind<Bar>().WithId("Bar1").AsTransient().NonLazy();
             Container.Bind<Bar>().WithId("Bar2").AsTransient().NonLazy();

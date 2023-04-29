@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pathfinding {
 	using Pathfinding.Util;
@@ -62,7 +63,7 @@ namespace Pathfinding {
 				throw new System.ArgumentException();
 
 			for (int i = 0; i < tree.Length; i++) {
-				var data = tree[i].data;
+				GraphNode[] data = tree[i].data;
 				if (data != null) {
 					for (int j = 0; j < LeafArraySize; j++) data[j] = null;
 					arrayCache.Push(data);
@@ -84,8 +85,8 @@ namespace Pathfinding {
 		}
 
 		void CollectAndClear (int index, List<GraphNode> buffer) {
-			var nodes = tree[index].data;
-			var count = tree[index].count;
+			GraphNode[] nodes = tree[index].data;
+			ushort count = tree[index].count;
 
 			if (nodes != null) {
 				tree[index] = new Node();
@@ -116,7 +117,7 @@ namespace Pathfinding {
 
 		void EnsureSize (int index) {
 			if (index >= tree.Length) {
-				var newLeaves = new Node[System.Math.Max(index + 1, tree.Length*2)];
+				Node[] newLeaves = new Node[System.Math.Max(index + 1, tree.Length*2)];
 				tree.CopyTo(newLeaves, 0);
 				tree = newLeaves;
 			}
@@ -125,7 +126,7 @@ namespace Pathfinding {
 		void Build (int index, List<GraphNode> nodes, int start, int end) {
 			EnsureSize(index);
 			if (end - start <= LeafSize) {
-				var leafData = tree[index].data = GetOrCreateList();
+				GraphNode[] leafData = tree[index].data = GetOrCreateList();
 				tree[index].count = (ushort)(end - start);
 				for (int i = start; i < end; i++)
 					leafData[i - start] = nodes[i];
@@ -133,12 +134,12 @@ namespace Pathfinding {
 				Int3 mn, mx;
 				mn = mx = nodes[start].position;
 				for (int i = start; i < end; i++) {
-					var p = nodes[i].position;
+					Int3 p = nodes[i].position;
 					mn = new Int3(System.Math.Min(mn.x, p.x), System.Math.Min(mn.y, p.y), System.Math.Min(mn.z, p.z));
 					mx = new Int3(System.Math.Max(mx.x, p.x), System.Math.Max(mx.y, p.y), System.Math.Max(mx.z, p.z));
 				}
 				Int3 diff = mx - mn;
-				var axis = diff.x > diff.y ? (diff.x > diff.z ? 0 : 2) : (diff.y > diff.z ? 1 : 2);
+				int axis = diff.x > diff.y ? (diff.x > diff.z ? 0 : 2) : (diff.y > diff.z ? 1 : 2);
 
 				nodes.Sort(start, end - start, comparers[axis]);
 				int mid = (start+end)/2;
@@ -184,19 +185,19 @@ namespace Pathfinding {
 		}
 
 		void GetNearestInternal (int index, Int3 point, NNConstraint constraint, ref GraphNode best, ref long bestSqrDist) {
-			var data = tree[index].data;
+			GraphNode[] data = tree[index].data;
 
 			if (data != null) {
 				for (int i = tree[index].count - 1; i >= 0; i--) {
-					var dist = (data[i].position - point).sqrMagnitudeLong;
+					long dist = (data[i].position - point).sqrMagnitudeLong;
 					if (dist < bestSqrDist && (constraint == null || constraint.Suitable(data[i]))) {
 						bestSqrDist = dist;
 						best = data[i];
 					}
 				}
 			} else {
-				var dist = (long)(point[tree[index].splitAxis] - tree[index].split);
-				var childIndex = 2 * index + (dist < 0 ? 0 : 1);
+				long dist = (long)(point[tree[index].splitAxis] - tree[index].split);
+				int childIndex = 2 * index + (dist < 0 ? 0 : 1);
 				GetNearestInternal(childIndex, point, constraint, ref best, ref bestSqrDist);
 
 				// Try the other one if it is possible to find a valid node on the other side
@@ -224,23 +225,23 @@ namespace Pathfinding {
 		}
 
 		void GetNearestConnectionInternal (int index, Int3 point, NNConstraint constraint, ref GraphNode best, ref long bestSqrDist, long distanceThresholdOffset) {
-			var data = tree[index].data;
+			GraphNode[] data = tree[index].data;
 
 			if (data != null) {
-				var pointv3 = (UnityEngine.Vector3)point;
+				Vector3 pointv3 = (UnityEngine.Vector3)point;
 				for (int i = tree[index].count - 1; i >= 0; i--) {
-					var dist = (data[i].position - point).sqrMagnitudeLong;
+					long dist = (data[i].position - point).sqrMagnitudeLong;
 					// Note: the subtraction is important. If we used an addition on the RHS instead the result might overflow as bestSqrDist starts as long.MaxValue
 					if (dist - distanceThresholdOffset < bestSqrDist && (constraint == null || constraint.Suitable(data[i]))) {
 						// This node may contains the closest connection
 						// Check all connections
-						var conns = (data[i] as PointNode).connections;
+						Connection[] conns = (data[i] as PointNode).connections;
 						if (conns != null) {
-							var nodePos = (UnityEngine.Vector3)data[i].position;
+							Vector3 nodePos = (UnityEngine.Vector3)data[i].position;
 							for (int j = 0; j < conns.Length; j++) {
 								// Find the closest point on the connection, but only on this node's side of the connection
 								// This ensures that we will find the closest node with the closest connection.
-								var connectionMidpoint = ((UnityEngine.Vector3)conns[j].node.position + nodePos) * 0.5f;
+								Vector3 connectionMidpoint = ((UnityEngine.Vector3)conns[j].node.position + nodePos) * 0.5f;
 								float sqrConnectionDistance = VectorMath.SqrDistancePointSegment(nodePos, connectionMidpoint, pointv3);
 								// Convert to Int3 space
 								long sqrConnectionDistanceInt = (long)(sqrConnectionDistance*Int3.FloatPrecision*Int3.FloatPrecision);
@@ -260,8 +261,8 @@ namespace Pathfinding {
 					}
 				}
 			} else {
-				var dist = (long)(point[tree[index].splitAxis] - tree[index].split);
-				var childIndex = 2 * index + (dist < 0 ? 0 : 1);
+				long dist = (long)(point[tree[index].splitAxis] - tree[index].split);
+				int childIndex = 2 * index + (dist < 0 ? 0 : 1);
 				GetNearestConnectionInternal(childIndex, point, constraint, ref best, ref bestSqrDist, distanceThresholdOffset);
 
 				// Try the other one if it is possible to find a valid node on the other side
@@ -283,19 +284,19 @@ namespace Pathfinding {
 		}
 
 		void GetInRangeInternal (int index, Int3 point, long sqrRadius, List<GraphNode> buffer) {
-			var data = tree[index].data;
+			GraphNode[] data = tree[index].data;
 
 			if (data != null) {
 				for (int i = tree[index].count - 1; i >= 0; i--) {
-					var dist = (data[i].position - point).sqrMagnitudeLong;
+					long dist = (data[i].position - point).sqrMagnitudeLong;
 					if (dist < sqrRadius) {
 						buffer.Add(data[i]);
 					}
 				}
 			} else {
-				var dist = (long)(point[tree[index].splitAxis] - tree[index].split);
+				long dist = (long)(point[tree[index].splitAxis] - tree[index].split);
 				// Pick the first child to enter based on which side of the splitting line the point is
-				var childIndex = 2 * index + (dist < 0 ? 0 : 1);
+				int childIndex = 2 * index + (dist < 0 ? 0 : 1);
 				GetInRangeInternal(childIndex, point, sqrRadius, buffer);
 
 				// Try the other one if it is possible to find a valid node on the other side

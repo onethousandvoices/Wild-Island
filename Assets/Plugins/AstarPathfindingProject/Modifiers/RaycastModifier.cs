@@ -135,7 +135,7 @@ namespace Pathfinding {
 		public override void Apply (Path p) {
 			if (!useRaycasting && !useGraphRaycasting) return;
 
-			var points = p.vectorPath;
+			List<Vector3> points = p.vectorPath;
 			cachedFilter.path = p;
 
 			// Use the same graph mask as the path.
@@ -144,8 +144,8 @@ namespace Pathfinding {
 
 			if (ValidateLine(null, null, p.vectorPath[0], p.vectorPath[p.vectorPath.Count-1], cachedFilter.cachedDelegate, cachedNNConstraint)) {
 				// A very common case is that there is a straight line to the target.
-				var s = p.vectorPath[0];
-				var e = p.vectorPath[p.vectorPath.Count-1];
+				Vector3 s = p.vectorPath[0];
+				Vector3 e = p.vectorPath[p.vectorPath.Count-1];
 				points.ClearFast();
 				points.Add(s);
 				points.Add(e);
@@ -173,7 +173,7 @@ namespace Pathfinding {
 
 			while (startIndex < points.Count) {
 				Vector3 start = points[startIndex];
-				var startNode = canBeOriginalNodes && points[startIndex] == (Vector3)p.path[startIndex].position ? p.path[startIndex] : null;
+				GraphNode startNode = canBeOriginalNodes && points[startIndex] == (Vector3)p.path[startIndex].position ? p.path[startIndex] : null;
 				buffer.Add(start);
 
 				// Do a binary search to find the furthest node we can see from this node
@@ -185,7 +185,7 @@ namespace Pathfinding {
 						break;
 					}
 					Vector3 end = points[endIndex];
-					var endNode = canBeOriginalNodes && end == (Vector3)p.path[endIndex].position ? p.path[endIndex] : null;
+					GraphNode endNode = canBeOriginalNodes && end == (Vector3)p.path[endIndex].position ? p.path[endIndex] : null;
 					if (!ValidateLine(startNode, endNode, start, end, filter, nnConstraint)) break;
 					mn = mx;
 					mx *= 2;
@@ -195,7 +195,7 @@ namespace Pathfinding {
 					int mid = (mn + mx)/2;
 					int endIndex = startIndex + mid;
 					Vector3 end = points[endIndex];
-					var endNode = canBeOriginalNodes && end == (Vector3)p.path[endIndex].position ? p.path[endIndex] : null;
+					GraphNode endNode = canBeOriginalNodes && end == (Vector3)p.path[endIndex].position ? p.path[endIndex] : null;
 
 					if (ValidateLine(startNode, endNode, start, end, filter, nnConstraint)) {
 						mn = mid;
@@ -222,14 +222,14 @@ namespace Pathfinding {
 			for (int i = 0; i < points.Count; i++) {
 				float d = DPCosts[i];
 				Vector3 start = points[i];
-				var startIsOriginalNode = canBeOriginalNodes && start == (Vector3)p.path[i].position;
+				bool startIsOriginalNode = canBeOriginalNodes && start == (Vector3)p.path[i].position;
 				for (int j = i+1; j < points.Count; j++) {
 					// Total distance from the start to this point using the best simplified path
 					// The small additive constant is to make sure that the number of points is kept as small as possible
 					// even when the total distance is the same (which can happen with e.g multiple colinear points).
 					float d2 = d + (points[j] - start).magnitude + 0.0001f;
 					if (DPParents[j] == -1 || d2 < DPCosts[j]) {
-						var endIsOriginalNode = canBeOriginalNodes && points[j] == (Vector3)p.path[j].position;
+						bool endIsOriginalNode = canBeOriginalNodes && points[j] == (Vector3)p.path[j].position;
 						if (j == i+1 || ValidateLine(startIsOriginalNode ? p.path[i] : null, endIsOriginalNode ? p.path[j] : null, start, points[j], filter, nnConstraint)) {
 							DPCosts[j] = d2;
 							DPParents[j] = i;
@@ -305,7 +305,7 @@ namespace Pathfinding {
 						return false;
 					}
 
-					var rayGraph = graph as IRaycastableGraph;
+					IRaycastableGraph rayGraph = graph as IRaycastableGraph;
 					if (rayGraph != null) {
 						return !rayGraph.Linecast(v1, v2, out GraphHitInfo _, null, filter);
 					}

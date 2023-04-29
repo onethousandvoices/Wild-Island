@@ -15,7 +15,7 @@ namespace ModestTree
             // passing an array
             for (int i = 0; i < args.Length; i++)
             {
-                var arg = args[i];
+                object arg = args[i];
 
                 if (arg == null)
                 {

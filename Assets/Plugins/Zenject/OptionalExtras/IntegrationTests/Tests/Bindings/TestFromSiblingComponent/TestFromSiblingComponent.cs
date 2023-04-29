@@ -36,7 +36,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestBasic2()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Test");
+            GameObject gameObject = Container.CreateEmptyGameObject("Test");
 
             Container.Bind<Gorp>().FromNewComponentOn(gameObject).AsSingle().NonLazy();
             Container.Bind<Bar>().FromNewComponentOn(gameObject).AsSingle().NonLazy();
@@ -45,8 +45,8 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var bar = Container.Resolve<Bar>();
-            var gorp = Container.Resolve<Gorp>();
+            Bar bar = Container.Resolve<Bar>();
+            Gorp gorp = Container.Resolve<Gorp>();
 
             Assert.IsEqual(bar.gameObject.GetComponents<Foo>().Length, 1);
             Assert.IsEqual(bar.Foo, gorp.Foo);
@@ -56,7 +56,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator TestOptional()
         {
-            var gameObject = new GameObject("Test");
+            GameObject gameObject = new GameObject("Test");
 
             PreInstall();
 
@@ -65,7 +65,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var qiv = Container.Resolve<Qiv>();
+            Qiv qiv = Container.Resolve<Qiv>();
             Assert.IsNull(qiv.Foo);
             yield break;
         }

@@ -14,13 +14,13 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>();
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo = pool.Spawn();
+            Foo foo = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
@@ -41,7 +41,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(foo.ResetCount, 2);
 
-            var foo2 = pool.Spawn();
+            Foo foo2 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -83,13 +83,13 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo>();
 
-            var pool = Container.Resolve<MemoryPool<Foo>>();
+            MemoryPool<Foo> pool = Container.Resolve<MemoryPool<Foo>>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo = pool.Spawn();
+            Foo foo = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
@@ -107,7 +107,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumTotal, 1);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo2 = pool.Spawn();
+            Foo foo2 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -131,25 +131,25 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().ExpandByDoubling();
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo = pool.Spawn();
+            Foo foo = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo2 = pool.Spawn();
+            Foo foo2 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 2);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo3 = pool.Spawn();
+            Foo foo3 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 3);
             Assert.IsEqual(pool.NumTotal, 4);
@@ -161,7 +161,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumTotal, 4);
             Assert.IsEqual(pool.NumInactive, 2);
 
-            var foo4 = pool.Spawn();
+            Foo foo4 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 3);
             Assert.IsEqual(pool.NumTotal, 4);
@@ -173,19 +173,19 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().WithFixedSize(2);
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 2);
             Assert.IsEqual(pool.NumInactive, 2);
 
-            var foo = pool.Spawn();
+            Foo foo = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 2);
             Assert.IsEqual(pool.NumInactive, 1);
 
-            var foo2 = pool.Spawn();
+            Foo foo2 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -199,7 +199,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().WithInitialSize(5);
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 5);
@@ -211,7 +211,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>();
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
@@ -223,7 +223,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumTotal, 2);
             Assert.IsEqual(pool.NumInactive, 2);
 
-            var foo = pool.Spawn();
+            Foo foo = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -235,13 +235,13 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumTotal, 5);
             Assert.IsEqual(pool.NumInactive, 4);
 
-            var foo2 = pool.Spawn();
+            Foo foo2 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 5);
             Assert.IsEqual(pool.NumInactive, 3);
 
-            var foo3 = pool.Spawn();
+            Foo foo3 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 3);
             Assert.IsEqual(pool.NumTotal, 5);
@@ -259,7 +259,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(pool.NumTotal, 6);
             Assert.IsEqual(pool.NumInactive, 4);
 
-            var foo4 = pool.Spawn();
+            Foo foo4 = pool.Spawn();
 
             Assert.IsEqual(pool.NumActive, 3);
             Assert.IsEqual(pool.NumTotal, 6);
@@ -292,9 +292,9 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().WithInitialSize(2).WithMaxSize(4);
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
-            var foos = new List<Foo>();
+            List<Foo> foos = new List<Foo>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -355,8 +355,8 @@ namespace Zenject.Tests.Bindings
             Container.BindMemoryPool<Qux, Qux.Pool>()
                 .FromSubContainerResolve().ByMethod(InstallQux).NonLazy();
 
-            var pool = Container.Resolve<Qux.Pool>();
-            var qux = pool.Spawn();
+            Qux.Pool pool = Container.Resolve<Qux.Pool>();
+            Qux qux = pool.Spawn();
         }
 
         void InstallQux(DiContainer subContainer)
@@ -377,7 +377,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindMemoryPool<Foo, Foo.Pool>().WithId("foo").WithInitialSize(5);
 
-            var pool = Container.ResolveId<Foo.Pool>("foo");
+            Foo.Pool pool = Container.ResolveId<Foo.Pool>("foo");
         }
     }
 }

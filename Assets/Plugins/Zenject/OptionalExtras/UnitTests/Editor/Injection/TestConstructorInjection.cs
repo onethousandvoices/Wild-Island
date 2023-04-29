@@ -37,7 +37,7 @@ namespace Zenject.Tests.Injection
             Container.Bind<Bar>().AsSingle().NonLazy();
             Container.Bind<Gorp>().AsSingle().NonLazy();
 
-            var gorp = Container.Resolve<Gorp>();
+            Gorp gorp = Container.Resolve<Gorp>();
 
             Assert.IsEqual(gorp.ChosenConstructor, 1);
         }

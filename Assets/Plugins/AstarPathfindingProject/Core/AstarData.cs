@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Pathfinding.WindowsStore;
 using Pathfinding.Serialization;
+using System;
+using System.Reflection;
 #if UNITY_WINRT && !UNITY_EDITOR
 //using MarkerMetro.Unity.WinLegacy.IO;
 //using MarkerMetro.Unity.WinLegacy.Reflection;
@@ -193,7 +195,7 @@ namespace Pathfinding {
 			}
 
 			// Pause the pathfinding threads
-			var graphLock = active.PausePathfinding();
+			PathProcessor.GraphUpdateLock graphLock = active.PausePathfinding();
 			if (!active.IsInsideWorkItem) {
 				// Make sure all graph updates and other callbacks are done
 				// Only do this if this code is not being called from a work item itself as that would cause a recursive wait that could never complete.
@@ -246,10 +248,10 @@ namespace Pathfinding {
 
 		/// <summary>Load from data from <see cref="file_cachedStartup"/></summary>
 		public void LoadFromCache () {
-			var graphLock = AssertSafe();
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe();
 
 			if (file_cachedStartup != null) {
-				var bytes = file_cachedStartup.bytes;
+				byte[] bytes = file_cachedStartup.bytes;
 				DeserializeGraphs(bytes);
 
 				GraphModifier.TriggerEvent(GraphModifier.EventType.PostCacheLoad);
@@ -286,8 +288,8 @@ namespace Pathfinding {
 		/// A similar function exists in the AstarPathEditor.cs script to save additional info
 		/// </summary>
 		public byte[] SerializeGraphs (SerializeSettings settings, out uint checksum) {
-			var graphLock = AssertSafe();
-			var sr = new AstarSerializer(this, settings, active.gameObject);
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe();
+			AstarSerializer sr = new AstarSerializer(this, settings, active.gameObject);
 
 			sr.OpenSerialize();
 			sr.SerializeGraphs(graphs);
@@ -330,7 +332,7 @@ namespace Pathfinding {
 		/// An error will be logged if deserialization fails.
 		/// </summary>
 		public void DeserializeGraphs (byte[] bytes) {
-			var graphLock = AssertSafe();
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe();
 
 			ClearGraphs();
 			DeserializeGraphsAdditive(bytes);
@@ -343,11 +345,11 @@ namespace Pathfinding {
 		/// This function will add loaded graphs to the current ones.
 		/// </summary>
 		public void DeserializeGraphsAdditive (byte[] bytes) {
-			var graphLock = AssertSafe();
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe();
 
 			try {
 				if (bytes != null) {
-					var sr = new AstarSerializer(this, active.gameObject);
+					AstarSerializer sr = new AstarSerializer(this, active.gameObject);
 
 					if (sr.OpenDeserialize(bytes)) {
 						DeserializeGraphsPartAdditive(sr);
@@ -372,7 +374,7 @@ namespace Pathfinding {
 		void DeserializeGraphsPartAdditive (AstarSerializer sr) {
 			if (graphs == null) graphs = new NavGraph[0];
 
-			var gr = new List<NavGraph>(graphs);
+			List<NavGraph> gr = new List<NavGraph>(graphs);
 
 			// Set an offset so that the deserializer will load
 			// the graphs with the correct graph indexes
@@ -413,8 +415,8 @@ namespace Pathfinding {
 		/// </summary>
 		public void FindGraphTypes () {
 #if !ASTAR_FAST_NO_EXCEPTIONS && !UNITY_WINRT && !UNITY_WEBGL
-			var graphList = new List<System.Type>();
-			foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies()) {
+			List<Type> graphList = new List<System.Type>();
+			foreach (Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies()) {
 				System.Type[] types = null;
 				try {
 					types = assembly.GetTypes();
@@ -424,11 +426,11 @@ namespace Pathfinding {
 					continue;
 				}
 
-				foreach (var type in types) {
+				foreach (Type type in types) {
 #if NETFX_CORE && !UNITY_EDITOR
 					System.Type baseType = type.GetTypeInfo().BaseType;
 #else
-					var baseType = type.BaseType;
+					Type baseType = type.BaseType;
 #endif
 					while (baseType != null) {
 						if (System.Type.Equals(baseType, typeof(NavGraph))) {
@@ -497,7 +499,7 @@ namespace Pathfinding {
 		/// See: <see cref="CreateGraph(string)"/>
 		/// </summary>
 		internal NavGraph CreateGraph (System.Type type) {
-			var graph = System.Activator.CreateInstance(type) as NavGraph;
+			NavGraph graph = System.Activator.CreateInstance(type) as NavGraph;
 
 			graph.active = active;
 			return graph;
@@ -554,7 +556,7 @@ namespace Pathfinding {
 		/// <summary>Adds the specified graph to the <see cref="graphs"/> array</summary>
 		void AddGraph (NavGraph graph) {
 			// Make sure to not interfere with pathfinding
-			var graphLock = AssertSafe(true);
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe(true);
 
 			// Try to fill in an empty position
 			bool foundEmpty = false;
@@ -574,7 +576,7 @@ namespace Pathfinding {
 				}
 
 				// Add a new entry to the list
-				var graphList = new List<NavGraph>(graphs ?? new NavGraph[0]);
+				List<NavGraph> graphList = new List<NavGraph>(graphs ?? new NavGraph[0]);
 				graphList.Add(graph);
 				graphs = graphList.ToArray();
 				graph.graphIndex = (uint)(graphs.Length-1);
@@ -600,7 +602,7 @@ namespace Pathfinding {
 			// Make sure the pathfinding threads are stopped
 			// If we don't wait until pathfinding that is potentially running on
 			// this graph right now we could end up with NullReferenceExceptions
-			var graphLock = AssertSafe();
+			PathProcessor.GraphUpdateLock graphLock = AssertSafe();
 
 			((IGraphInternals)graph).OnDestroy();
 			graph.active = null;
@@ -720,7 +722,7 @@ namespace Pathfinding {
 		public int GetGraphIndex (NavGraph graph) {
 			if (graph == null) throw new System.ArgumentNullException("graph");
 
-			var index = -1;
+			int index = -1;
 			if (graphs != null) {
 				index = System.Array.IndexOf(graphs, graph);
 				if (index == -1) Debug.LogError("Graph doesn't exist");

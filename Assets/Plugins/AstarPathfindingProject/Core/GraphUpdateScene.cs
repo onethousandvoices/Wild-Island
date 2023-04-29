@@ -201,9 +201,9 @@ namespace Pathfinding {
 		public Bounds GetBounds () {
 			if (points == null || points.Length == 0) {
 				Bounds bounds;
-				var coll = GetComponent<Collider>();
-				var coll2D = GetComponent<Collider2D>();
-				var rend = GetComponent<Renderer>();
+				Collider coll = GetComponent<Collider>();
+				Collider2D coll2D = GetComponent<Collider2D>();
+				Renderer rend = GetComponent<Renderer>();
 
 				if (coll != null) bounds = coll.bounds;
 				else if (coll2D != null) {
@@ -237,21 +237,21 @@ namespace Pathfinding {
 			GraphUpdateObject guo;
 
 			if (points == null || points.Length == 0) {
-				var polygonCollider = GetComponent<PolygonCollider2D>();
+				PolygonCollider2D polygonCollider = GetComponent<PolygonCollider2D>();
 				if (polygonCollider != null) {
-					var points2D = polygonCollider.points;
+					Vector2[] points2D = polygonCollider.points;
 					Vector3[] pts = new Vector3[points2D.Length];
 					for (int i = 0; i < pts.Length; i++) {
-						var p = points2D[i] + polygonCollider.offset;
+						Vector2 p = points2D[i] + polygonCollider.offset;
 						pts[i] = new Vector3(p.x, 0, p.y);
 					}
 
-					var mat = transform.localToWorldMatrix * Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-90, 0, 0), Vector3.one);
-					var shape = new GraphUpdateShape(pts, convex, mat, minBoundsHeight);
+					Matrix4x4 mat = transform.localToWorldMatrix * Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-90, 0, 0), Vector3.one);
+					GraphUpdateShape shape = new GraphUpdateShape(pts, convex, mat, minBoundsHeight);
 					guo = new GraphUpdateObject(GetBounds());
 					guo.shape = shape;
 				} else {
-					var bounds = GetBounds();
+					Bounds bounds = GetBounds();
 					if (bounds.center == Vector3.zero && bounds.size == Vector3.zero) {
 						Debug.LogError("Cannot apply GraphUpdateScene, no points defined and no renderer or collider attached", this);
 						return;
@@ -263,13 +263,13 @@ namespace Pathfinding {
 				GraphUpdateShape shape;
 				if (legacyMode && !legacyUseWorldSpace) {
 					// Used for compatibility with older versions
-					var worldPoints = new Vector3[points.Length];
+					Vector3[] worldPoints = new Vector3[points.Length];
 					for (int i = 0; i < points.Length; i++) worldPoints[i] = transform.TransformPoint(points[i]);
 					shape = new GraphUpdateShape(worldPoints, convex, Matrix4x4.identity, minBoundsHeight);
 				} else {
 					shape = new GraphUpdateShape(points, convex, legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix, minBoundsHeight);
 				}
-				var bounds = shape.GetBounds();
+				Bounds bounds = shape.GetBounds();
 				guo = new GraphUpdateObject(bounds);
 				guo.shape = shape;
 			}
@@ -344,7 +344,7 @@ namespace Pathfinding {
 			}
 
 			// Draw the full 3D shape
-			var pts = convex ? convexPoints : points;
+			Vector3[] pts = convex ? convexPoints : points;
 			if (selected && pts != null && pts.Length > 0) {
 				Gizmos.color = new Color(1, 1, 1, 0.2f);
 				float miny = pts[0].y, maxy = pts[0].y;
@@ -352,16 +352,16 @@ namespace Pathfinding {
 					miny = Mathf.Min(miny, pts[i].y);
 					maxy = Mathf.Max(maxy, pts[i].y);
 				}
-				var extraHeight = Mathf.Max(minBoundsHeight - (maxy - miny), 0) * 0.5f;
+				float extraHeight = Mathf.Max(minBoundsHeight - (maxy - miny), 0) * 0.5f;
 				miny -= extraHeight;
 				maxy += extraHeight;
 
 				for (int i = 0; i < pts.Length; i++) {
-					var next = (i+1) % pts.Length;
-					var p1 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(miny - pts[i].y));
-					var p2 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(maxy - pts[i].y));
-					var p1n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(miny - pts[next].y));
-					var p2n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(maxy - pts[next].y));
+					int next = (i+1) % pts.Length;
+					Vector3 p1 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(miny - pts[i].y));
+					Vector3 p2 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(maxy - pts[i].y));
+					Vector3 p1n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(miny - pts[next].y));
+					Vector3 p2n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(maxy - pts[next].y));
 					Gizmos.DrawLine(p1, p2);
 					Gizmos.DrawLine(p1, p1n);
 					Gizmos.DrawLine(p2, p2n);

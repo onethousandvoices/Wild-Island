@@ -52,8 +52,8 @@ namespace Zenject.Tests.Other
             Container.Bind<Bar>().AsSingle();
             Container.Bind<Foo>().AsSingle();
 
-            var foo = Container.Resolve<Foo>();
-            var bar = Container.Resolve<Bar>();
+            Foo foo = Container.Resolve<Foo>();
+            Bar bar = Container.Resolve<Bar>();
 
             Assert.IsEqual(foo.BarProperty, bar);
             Assert.IsEqual(foo.BarField, bar);

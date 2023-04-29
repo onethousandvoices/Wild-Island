@@ -37,7 +37,7 @@ namespace Zenject.SpaceFighter
         {
             _player.IsDead = true;
 
-            var explosion = _explosionFactory.Create();
+            Explosion explosion = _explosionFactory.Create();
             explosion.transform.position = _player.Position;
 
             _player.Renderer.enabled = false;

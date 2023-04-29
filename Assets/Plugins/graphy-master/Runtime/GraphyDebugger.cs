@@ -369,7 +369,7 @@ namespace Tayx.Graphy
         {
             if( GetAllDebugPacketsWithId( id ) != null )
             {
-                foreach( var debugPacket in GetAllDebugPacketsWithId( id ) )
+                foreach( DebugPacket debugPacket in GetAllDebugPacketsWithId( id ) )
                 {
                     if( callback != null )
                     {
@@ -408,7 +408,7 @@ namespace Tayx.Graphy
                             case ConditionEvaluation.All_conditions_must_be_met:
                                 int count = 0;
 
-                                foreach( var packetDebugCondition in packet.DebugConditions )
+                                foreach( DebugCondition packetDebugCondition in packet.DebugConditions )
                                 {
                                     if( CheckIfConditionIsMet( packetDebugCondition ) )
                                     {
@@ -429,7 +429,7 @@ namespace Tayx.Graphy
                                 break;
 
                             case ConditionEvaluation.Only_one_condition_has_to_be_met:
-                                foreach( var packetDebugCondition in packet.DebugConditions )
+                                foreach( DebugCondition packetDebugCondition in packet.DebugConditions )
                                 {
                                     if( CheckIfConditionIsMet( packetDebugCondition ) )
                                     {

@@ -76,9 +76,9 @@ namespace Graphy.Runtime.UI
 
         private static void SetTransform(Canvas canvas, RectTransform rectTransform)
         {
-            var scaleFactor = canvas.scaleFactor;
-            var position = Screen.safeArea.position / scaleFactor;
-            var size = Screen.safeArea.size / scaleFactor;
+            float scaleFactor = canvas.scaleFactor;
+            Vector2 position = Screen.safeArea.position / scaleFactor;
+            Vector2 size = Screen.safeArea.size / scaleFactor;
 
             rectTransform.anchorMin = Vector2.zero;
             rectTransform.anchorMax = Vector2.zero;

@@ -149,8 +149,8 @@ namespace NaughtyAttributes.Editor
 
         private void HandleDragAndDrop(Rect rect, ReorderableList list)
         {
-            var currentEvent = Event.current;
-            var usedEvent = false;
+            Event currentEvent = Event.current;
+            bool usedEvent = false;
 
             switch (currentEvent.type)
             {

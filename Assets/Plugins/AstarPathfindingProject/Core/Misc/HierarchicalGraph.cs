@@ -89,7 +89,7 @@ namespace Pathfinding {
 			// Cache this callback to avoid allocating a new one every time the FindHierarchicalNodeChildren method is called.
 			// It is a big ugly to have to use member variables for the state information in that method, but I see no better way.
 			connectionCallback = (GraphNode neighbour) => {
-				var hIndex = neighbour.HierarchicalNodeIndex;
+				int hIndex = neighbour.HierarchicalNodeIndex;
 				if (hIndex == 0) {
 					if (currentChildren.Count < MaxChildrenPerNode && neighbour.Walkable /* && (((GridNode)currentChildren[0]).XCoordinateInGrid/Tiling == ((GridNode)neighbour).XCoordinateInGrid/Tiling) && (((GridNode)currentChildren[0]).ZCoordinateInGrid/Tiling == ((GridNode)neighbour).ZCoordinateInGrid/Tiling)*/) {
 						neighbour.HierarchicalNodeIndex = currentHierarchicalNodeIndex;
@@ -108,10 +108,10 @@ namespace Pathfinding {
 		}
 
 		void Grow () {
-			var newChildren = new List<GraphNode>[System.Math.Max(64, children.Length*2)];
-			var newConnections = new List<int>[newChildren.Length];
-			var newAreas = new int[newChildren.Length];
-			var newDirty = new byte[newChildren.Length];
+			List<GraphNode>[] newChildren = new List<GraphNode>[System.Math.Max(64, children.Length*2)];
+			List<int>[] newConnections = new List<int>[newChildren.Length];
+			int[] newAreas = new int[newChildren.Length];
+			byte[] newDirty = new byte[newChildren.Length];
 
 			children.CopyTo(newChildren, 0);
 			connections.CopyTo(newConnections, 0);
@@ -137,7 +137,7 @@ namespace Pathfinding {
 
 		internal void OnCreatedNode (GraphNode node) {
 			if (node.NodeIndex >= dirtyNodes.Length) {
-				var newDirty = new GraphNode[System.Math.Max(node.NodeIndex + 1, dirtyNodes.Length*2)];
+				GraphNode[] newDirty = new GraphNode[System.Math.Max(node.NodeIndex + 1, dirtyNodes.Length*2)];
 				dirtyNodes.CopyTo(newDirty, 0);
 				dirtyNodes = newDirty;
 			}
@@ -181,10 +181,10 @@ namespace Pathfinding {
 
 		void RemoveHierarchicalNode (int hierarchicalNode, bool removeAdjacentSmallNodes) {
 			freeNodeIndices.Push(hierarchicalNode);
-			var conns = connections[hierarchicalNode];
+			List<int> conns = connections[hierarchicalNode];
 
 			for (int i = 0; i < conns.Count; i++) {
-				var adjacentHierarchicalNode = conns[i];
+				int adjacentHierarchicalNode = conns[i];
 				// If dirty, this node will be removed later anyway, so don't bother doing anything with it.
 				if (dirty[adjacentHierarchicalNode] != 0) continue;
 
@@ -198,7 +198,7 @@ namespace Pathfinding {
 			}
 			conns.Clear();
 
-			var nodeChildren = children[hierarchicalNode];
+			List<GraphNode> nodeChildren = children[hierarchicalNode];
 
 			for (int i = 0; i < nodeChildren.Count; i++) {
 				AddDirtyNode(nodeChildren[i]);
@@ -227,7 +227,7 @@ namespace Pathfinding {
 				}
 
 				for (int i = 0; i < numDirtyNodes; i++) {
-					var node = dirtyNodes[i];
+					GraphNode node = dirtyNodes[i];
 					// Be nice to the GC
 					dirtyNodes[i] = null;
 					node.IsHierarchicalNodeDirty = false;
@@ -271,9 +271,9 @@ namespace Pathfinding {
 				stack.Push(i);
 				while (stack.Count > 0) {
 					int node = stack.Pop();
-					var conns = connections[node];
+					List<int> conns = connections[node];
 					for (int j = conns.Count - 1; j >= 0; j--) {
-						var otherNode = conns[j];
+						int otherNode = conns[j];
 						// Note: slightly important that this is != currentArea and not != 0 in case there are some connected, but not stongly connected components in the graph (this will happen in only veeery few types of games)
 						if (areas[otherNode] != currentArea) {
 							areas[otherNode] = currentArea;
@@ -294,7 +294,7 @@ namespace Pathfinding {
 			currentConnections = connections[hierarchicalNode];
 			currentHierarchicalNodeIndex = hierarchicalNode;
 
-			var que = temporaryQueue;
+			Queue<GraphNode> que = temporaryQueue;
 			que.Enqueue(startNode);
 
 			startNode.HierarchicalNodeIndex = hierarchicalNode;
@@ -312,16 +312,16 @@ namespace Pathfinding {
 		}
 
 		public void OnDrawGizmos (Pathfinding.Util.RetainedGizmos gizmos) {
-			var hasher = new Pathfinding.Util.RetainedGizmos.Hasher(AstarPath.active);
+			RetainedGizmos.Hasher hasher = new Pathfinding.Util.RetainedGizmos.Hasher(AstarPath.active);
 
 			hasher.AddHash(gizmoVersion);
 
 			if (!gizmos.Draw(hasher)) {
-				var builder = ObjectPool<RetainedGizmos.Builder>.Claim();
-				var centers = ArrayPool<UnityEngine.Vector3>.Claim(areas.Length);
+				RetainedGizmos.Builder builder = ObjectPool<RetainedGizmos.Builder>.Claim();
+				Vector3[] centers = ArrayPool<UnityEngine.Vector3>.Claim(areas.Length);
 				for (int i = 0; i < areas.Length; i++) {
 					Int3 center = Int3.zero;
-					var childs = children[i];
+					List<GraphNode> childs = children[i];
 					if (childs.Count > 0) {
 						for (int j = 0; j < childs.Count; j++) center += childs[j].position;
 						center /= childs.Count;

@@ -17,7 +17,7 @@ namespace Zenject.Tests
         [Test]
         public void RunTest()
         {
-            var pool = Foo.Pool;
+            StaticMemoryPool<string, Foo> pool = Foo.Pool;
 
             pool.Clear();
             pool.ClearActiveCount();
@@ -26,7 +26,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
 
-            var foo = pool.Spawn("asdf");
+            Foo foo = pool.Spawn("asdf");
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumInactive, 0);
@@ -40,7 +40,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var foo2 = pool.Spawn("zxcv");
+            Foo foo2 = pool.Spawn("zxcv");
             Assert.That(ReferenceEquals(foo, foo2));
             Assert.IsEqual(foo2.Value, "zxcv");
 
@@ -48,7 +48,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var foo3 = pool.Spawn("bar");
+            Foo foo3 = pool.Spawn("bar");
             Assert.That(!ReferenceEquals(foo2, foo3));
 
             Assert.IsEqual(pool.NumActive, 2);
@@ -68,7 +68,7 @@ namespace Zenject.Tests
         [Test]
         public void TestListPool()
         {
-            var pool = ListPool<string>.Instance;
+            ListPool<string> pool = ListPool<string>.Instance;
 
             pool.Clear();
             pool.ClearActiveCount();
@@ -77,7 +77,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
 
-            var list = pool.Spawn();
+            List<string> list = pool.Spawn();
 
             list.Add("asdf");
             list.Add("zbx");
@@ -92,7 +92,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var list2 = pool.Spawn();
+            List<string> list2 = pool.Spawn();
 
             Assert.IsEqual(list2.Count, 0);
             Assert.IsEqual(list2, list);
@@ -101,7 +101,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 1);
 
-            var list3 = pool.Spawn();
+            List<string> list3 = pool.Spawn();
 
             Assert.IsNotEqual(list2, list3);
 
@@ -122,7 +122,7 @@ namespace Zenject.Tests
         [Test]
         public void TestPoolWrapper()
         {
-            var pool = Foo.Pool;
+            StaticMemoryPool<string, Foo> pool = Foo.Pool;
 
             pool.Clear();
             pool.ClearActiveCount();
@@ -131,7 +131,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumInactive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
 
-            using (var block = DisposeBlock.Spawn())
+            using (DisposeBlock block = DisposeBlock.Spawn())
             {
                 block.Spawn(pool, "asdf");
 
@@ -148,7 +148,7 @@ namespace Zenject.Tests
         [Test]
         public void TestResize()
         {
-            var pool = Bar.Pool;
+            StaticMemoryPool<Bar> pool = Bar.Pool;
 
             pool.Clear();
             pool.ClearActiveCount();
@@ -163,7 +163,7 @@ namespace Zenject.Tests
             Assert.IsEqual(pool.NumTotal, 2);
             Assert.IsEqual(pool.NumInactive, 2);
 
-            var bars = new List<Bar>();
+            List<Bar> bars = new List<Bar>();
 
             bars.Add(pool.Spawn());
             bars.Add(pool.Spawn());

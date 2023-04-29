@@ -40,7 +40,7 @@ namespace Zenject
 
         void FinalizeBindingConcrete(DiContainer container, List<Type> concreteTypes)
         {
-            var scope = GetScope();
+            ScopeTypes scope = GetScope();
 
             switch (scope)
             {
@@ -64,7 +64,7 @@ namespace Zenject
                 }
                 case ScopeTypes.Singleton:
                 {
-                    var argumentTarget = concreteTypes.OnlyOrDefault();
+                    Type argumentTarget = concreteTypes.OnlyOrDefault();
 
                     if (argumentTarget == null)
                     {
@@ -72,7 +72,7 @@ namespace Zenject
                             "Cannot provide arguments to prefab instantiator when using more than one concrete type");
                     }
 
-                    var prefabCreator = new PrefabInstantiatorCached(
+                    PrefabInstantiatorCached prefabCreator = new PrefabInstantiatorCached(
                         new PrefabInstantiator(
                             container,
                             _gameObjectBindInfo,
@@ -98,7 +98,7 @@ namespace Zenject
 
         void FinalizeBindingSelf(DiContainer container)
         {
-            var scope = GetScope();
+            ScopeTypes scope = GetScope();
 
             switch (scope)
             {
@@ -121,7 +121,7 @@ namespace Zenject
                 }
                 case ScopeTypes.Singleton:
                 {
-                    var argumentTarget = BindInfo.ContractTypes.OnlyOrDefault();
+                    Type argumentTarget = BindInfo.ContractTypes.OnlyOrDefault();
 
                     if (argumentTarget == null)
                     {
@@ -129,7 +129,7 @@ namespace Zenject
                             "Cannot provide arguments to prefab instantiator when using more than one concrete type");
                     }
 
-                    var prefabCreator = new PrefabInstantiatorCached(
+                    PrefabInstantiatorCached prefabCreator = new PrefabInstantiatorCached(
                         new PrefabInstantiator(
                             container,
                             _gameObjectBindInfo,

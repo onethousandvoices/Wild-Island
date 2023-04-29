@@ -13,7 +13,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestBasic()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
 
             Container.Bind<Foo>().FromComponentOn(gameObject).AsSingle().NonLazy();
@@ -29,7 +29,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestBasicMultiple()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
             gameObject.AddComponent<Foo>();
 
@@ -47,7 +47,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
 
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
 
             Container.Bind<Foo>().FromComponentOn(context => gameObject).AsSingle().NonLazy();
@@ -64,7 +64,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
 
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
             gameObject.AddComponent<Foo>();
 
@@ -81,7 +81,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestSingle()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
 
             Container.Bind(typeof(IFoo), typeof(Foo)).To<Foo>().FromComponentOn(gameObject).AsSingle().NonLazy();
@@ -98,7 +98,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestCachedMultipleConcrete()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
             gameObject.AddComponent<Foo>();
             gameObject.AddComponent<Bar>();
 

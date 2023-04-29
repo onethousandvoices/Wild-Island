@@ -6,7 +6,7 @@ namespace Pathfinding {
 	[CanEditMultipleObjects]
 	public class SmoothModifierEditor : EditorBase {
 		protected override void Inspector () {
-			var smoothType = FindProperty("smoothType");
+			SerializedProperty smoothType = FindProperty("smoothType");
 
 			PropertyField("smoothType");
 

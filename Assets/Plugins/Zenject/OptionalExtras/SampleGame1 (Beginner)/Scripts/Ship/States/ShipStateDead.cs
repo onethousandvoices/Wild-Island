@@ -41,10 +41,10 @@ namespace Zenject.Asteroids
             _shipBroken.transform.position = _ship.Position;
             _shipBroken.transform.rotation = _ship.Rotation;
 
-            foreach (var rigidBody in _shipBroken.GetComponentsInChildren<Rigidbody>())
+            foreach (Rigidbody rigidBody in _shipBroken.GetComponentsInChildren<Rigidbody>())
             {
-                var randomTheta = Random.Range(0, Mathf.PI * 2.0f);
-                var randomDir = new Vector3(Mathf.Cos(randomTheta), Mathf.Sin(randomTheta), 0);
+                float randomTheta = Random.Range(0, Mathf.PI * 2.0f);
+                Vector3 randomDir = new Vector3(Mathf.Cos(randomTheta), Mathf.Sin(randomTheta), 0);
                 rigidBody.AddForce(randomDir * _settings.explosionForce);
             }
 

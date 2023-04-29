@@ -59,7 +59,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestToMonoBehaviourSelf()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<double, int, float, string, char, Foo, Foo.Factory>().FromNewComponentOn(gameObject);
 
@@ -76,7 +76,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestToMonoBehaviourConcrete()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<double, int, float, string, char, IFoo, IFooFactory>().To<Foo>().FromNewComponentOn(gameObject);
 

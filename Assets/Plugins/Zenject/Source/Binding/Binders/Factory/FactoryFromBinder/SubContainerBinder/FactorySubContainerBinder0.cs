@@ -15,7 +15,7 @@ namespace Zenject
 
         public ScopeConcreteIdArgConditionCopyNonLazyBinder ByMethod(Action<DiContainer> installerMethod)
         {
-            var subcontainerBindInfo = new SubContainerCreatorBindInfo();
+            SubContainerCreatorBindInfo subcontainerBindInfo = new SubContainerCreatorBindInfo();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -30,7 +30,7 @@ namespace Zenject
 
         public NameTransformScopeConcreteIdArgConditionCopyNonLazyBinder ByNewGameObjectMethod(Action<DiContainer> installerMethod)
         {
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -44,7 +44,7 @@ namespace Zenject
         public NameTransformScopeConcreteIdArgConditionCopyNonLazyBinder ByNewPrefabMethod(
             Func<InjectContext, UnityEngine.Object> prefabGetter, Action<DiContainer> installerMethod)
         {
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -62,7 +62,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -80,7 +80,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -103,7 +103,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidPrefab(prefab);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(
@@ -126,7 +126,7 @@ namespace Zenject
         {
             BindingUtil.AssertIsValidResourcePath(resourcePath);
 
-            var gameObjectInfo = new GameObjectCreationParameters();
+            GameObjectCreationParameters gameObjectInfo = new GameObjectCreationParameters();
 
             ProviderFunc =
                 (container) => new SubContainerDependencyProvider(

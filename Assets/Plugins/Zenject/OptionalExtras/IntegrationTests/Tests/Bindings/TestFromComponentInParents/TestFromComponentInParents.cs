@@ -76,9 +76,9 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunMissingParentFailure()
         {
-            var root = new GameObject().AddComponent<Root>();
+            Root root = new GameObject().AddComponent<Root>();
 
-            var grandchild = new GameObject().AddComponent<Grandchild2>();
+            Grandchild2 grandchild = new GameObject().AddComponent<Grandchild2>();
             grandchild.transform.SetParent(root.transform);
 
             PreInstall();
@@ -108,7 +108,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestOptional()
         {
             new GameObject();
-            var child = new GameObject().AddComponent<ChildWithOptional>();
+            ChildWithOptional child = new GameObject().AddComponent<ChildWithOptional>();
 
             PreInstall();
 
@@ -157,9 +157,9 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunMissingParentFailureNonGeneric()
         {
-            var root = new GameObject().AddComponent<Root>();
+            Root root = new GameObject().AddComponent<Root>();
 
-            var grandchild = new GameObject().AddComponent<Grandchild2>();
+            Grandchild2 grandchild = new GameObject().AddComponent<Grandchild2>();
             grandchild.transform.SetParent(root.transform);
 
             PreInstall();
@@ -189,7 +189,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestOptionalNonGeneric()
         {
             new GameObject();
-            var child = new GameObject().AddComponent<ChildWithOptional>();
+            ChildWithOptional child = new GameObject().AddComponent<ChildWithOptional>();
 
             PreInstall();
 

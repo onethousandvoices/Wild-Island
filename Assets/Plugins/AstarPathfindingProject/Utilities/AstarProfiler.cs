@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System;
+using System.Text;
 using UnityEngine;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
@@ -134,7 +135,7 @@ namespace Pathfinding {
 			double avgOverhead = fastProfiles[fastProfiles.Length-2].watch.Elapsed.TotalMilliseconds / 1000.0;
 
 			TimeSpan endTime = DateTime.UtcNow - startTime;
-			var output = new System.Text.StringBuilder();
+			StringBuilder output = new System.Text.StringBuilder();
 			output.Append("============================\n\t\t\t\tProfile results:\n============================\n");
 			output.Append("Name		|	Total Time	|	Total Calls	|	Avg/Call	|	Bytes");
 			//foreach(KeyValuePair<string, ProfilePoint> pair in profiles)
@@ -175,7 +176,7 @@ namespace Pathfinding {
 		[System.Diagnostics.Conditional("ProfileAstar")]
 		public static void PrintResults () {
 			TimeSpan endTime = DateTime.UtcNow - startTime;
-			var output = new System.Text.StringBuilder();
+			StringBuilder output = new System.Text.StringBuilder();
 
 			output.Append("============================\n\t\t\t\tProfile results:\n============================\n");
 
@@ -191,7 +192,7 @@ namespace Pathfinding {
 
 
 
-			foreach (var pair in profiles) {
+			foreach (KeyValuePair<string, ProfilePoint> pair in profiles) {
 				double totalTime = pair.Value.watch.Elapsed.TotalMilliseconds;
 				int totalCalls = pair.Value.totalCalls;
 				if (totalCalls < 1) continue;

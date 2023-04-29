@@ -102,9 +102,9 @@ namespace Pathfinding.Util {
 			currentSegmentLength = (path[1] - path[0]).magnitude;
 			totalDistance = 0f;
 
-			var prev = path[0];
+			Vector3 prev = path[0];
 			for (int i = 1; i < path.Count; i++) {
-				var current = path[i];
+				Vector3 current = path[i];
 				totalDistance += (current - prev).magnitude;
 				prev = current;
 			}
@@ -178,7 +178,7 @@ namespace Pathfinding.Util {
 				NextSegment();
 			}
 
-			var circleCenter = transform.ToPlane(circleCenter3D);
+			Vector2 circleCenter = transform.ToPlane(circleCenter3D);
 
 			// Move forwards as long as the current segment endpoint is within the circle
 			while (segmentIndex < path.Count - 2 && (transform.ToPlane(path[segmentIndex+1]) - circleCenter).sqrMagnitude <= radius*radius) {
@@ -186,7 +186,7 @@ namespace Pathfinding.Util {
 			}
 
 			// Calculate the intersection with the circle. This involves some math.
-			var factor = VectorMath.LineCircleIntersectionFactor(circleCenter, transform.ToPlane(path[segmentIndex]), transform.ToPlane(path[segmentIndex+1]), radius);
+			float factor = VectorMath.LineCircleIntersectionFactor(circleCenter, transform.ToPlane(path[segmentIndex]), transform.ToPlane(path[segmentIndex+1]), radius);
 			// Move to the intersection point
 			MoveToSegment(segmentIndex, factor);
 		}

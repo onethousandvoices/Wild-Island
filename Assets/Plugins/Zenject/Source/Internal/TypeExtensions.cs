@@ -42,9 +42,9 @@ namespace ModestTree
         // TODO: Is it possible to do this on WSA?
         public static bool IsAssignableToGenericType(Type givenType, Type genericType)
         {
-            var interfaceTypes = givenType.Interfaces();
+            Type[] interfaceTypes = givenType.Interfaces();
 
-            foreach (var it in interfaceTypes)
+            foreach (Type it in interfaceTypes)
             {
                 if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
                 {
@@ -285,7 +285,7 @@ namespace ModestTree
 
             yield return type.BaseType();
 
-            foreach (var ancestor in type.BaseType().GetParentTypes())
+            foreach (Type ancestor in type.BaseType().GetParentTypes())
             {
                 yield return ancestor;
             }

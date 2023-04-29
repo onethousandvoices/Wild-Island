@@ -61,8 +61,8 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestAny()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             sub1.Bind<Test4>().AsSingle();
@@ -73,8 +73,8 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestLocal1()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             sub1.Bind<Test1>().AsSingle();
@@ -85,8 +85,8 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestLocal2()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
 
             sub1.Bind<Test0>().AsSingle();
             sub1.Bind<Test1>().AsSingle();
@@ -97,8 +97,8 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestParent1()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             sub1.Bind<Test2>().AsSingle();
@@ -109,9 +109,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestParent2()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
-            var sub2 = sub1.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
+            DiContainer sub2 = sub1.CreateSubContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             sub2.Bind<Test2>().AsSingle();
@@ -122,7 +122,7 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestParent3()
         {
-            var rootContainer = new DiContainer();
+            DiContainer rootContainer = new DiContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             rootContainer.Bind<Test2>().AsSingle();
@@ -133,9 +133,9 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestParentAny1()
         {
-            var rootContainer = new DiContainer();
-            var sub1 = rootContainer.CreateSubContainer();
-            var sub2 = sub1.CreateSubContainer();
+            DiContainer rootContainer = new DiContainer();
+            DiContainer sub1 = rootContainer.CreateSubContainer();
+            DiContainer sub2 = sub1.CreateSubContainer();
 
             rootContainer.Bind<Test0>().AsSingle();
             sub2.Bind<Test3>().AsSingle();

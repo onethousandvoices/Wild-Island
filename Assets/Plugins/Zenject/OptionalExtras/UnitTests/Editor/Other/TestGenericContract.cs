@@ -21,11 +21,11 @@ namespace Zenject.Tests.Other
         {
             Container.Bind(typeof(Test1<>)).AsSingle().NonLazy();
 
-            var test1 = Container.Resolve<Test1<int>>();
+            Test1<int> test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);
             test1.Data = 5;
 
-            var test2 = Container.Resolve<Test1<int>>();
+            Test1<int> test2 = Container.Resolve<Test1<int>>();
 
             Assert.That(test2 == test1);
             Assert.That(test1.Data == 5);
@@ -36,10 +36,10 @@ namespace Zenject.Tests.Other
         {
             Container.Bind(typeof(Test1<>)).AsTransient().NonLazy();
 
-            var test1 = Container.Resolve<Test1<int>>();
+            Test1<int> test1 = Container.Resolve<Test1<int>>();
             Assert.That(test1.Data == 0);
 
-            var test2 = Container.Resolve<Test1<int>>();
+            Test1<int> test2 = Container.Resolve<Test1<int>>();
             Assert.That(test2.Data == 0);
             Assert.That(test2 != test1);
 
@@ -65,10 +65,10 @@ namespace Zenject.Tests.Other
         {
             Container.Bind(typeof(IFoo<>), typeof(IBar<>)).To(typeof(Test2<>)).AsSingle();
 
-            var foo = Container.Resolve<IFoo<int>>();
+            IFoo<int> foo = Container.Resolve<IFoo<int>>();
             Assert.That(foo is Test2<int>);
 
-            var bar = Container.Resolve<IBar<int>>();
+            IBar<int> bar = Container.Resolve<IBar<int>>();
             Assert.That(bar is Test2<int>);
 
             Assert.IsEqual(foo, bar);
@@ -87,17 +87,17 @@ namespace Zenject.Tests.Other
         {
             Container.Bind(typeof(IQux), typeof(IFoo<>), typeof(IBar<>)).To(typeof(Test2<>), typeof(Qux)).AsSingle();
 
-            var foo = Container.Resolve<IFoo<int>>();
+            IFoo<int> foo = Container.Resolve<IFoo<int>>();
             Assert.That(foo is Test2<int>);
 
-            var bar = Container.Resolve<IBar<int>>();
+            IBar<int> bar = Container.Resolve<IBar<int>>();
             Assert.That(bar is Test2<int>);
 
             Assert.IsEqual(foo, bar);
             Assert.IsEqual(foo, Container.Resolve<IFoo<int>>());
             Assert.IsEqual(bar, Container.Resolve<IBar<int>>());
 
-            var qux = Container.Resolve<IQux>();
+            IQux qux = Container.Resolve<IQux>();
 
             Assert.IsEqual(qux, Container.Resolve<IQux>());
         }

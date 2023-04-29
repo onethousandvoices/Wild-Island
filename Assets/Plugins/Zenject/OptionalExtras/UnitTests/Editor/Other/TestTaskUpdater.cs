@@ -38,11 +38,11 @@ namespace Zenject.Tests.Other
             BindTickable<Tickable1>(0);
             BindTickable<Tickable2>(1);
 
-            var taskUpdater = _container.Resolve<TaskUpdater<ITickable>>();
+            TaskUpdater<ITickable> taskUpdater = _container.Resolve<TaskUpdater<ITickable>>();
 
-            var tick1 = _container.Resolve<Tickable1>();
-            var tick2 = _container.Resolve<Tickable2>();
-            var tick3 = _container.Resolve<Tickable3>();
+            Tickable1 tick1 = _container.Resolve<Tickable1>();
+            Tickable2 tick2 = _container.Resolve<Tickable2>();
+            Tickable3 tick3 = _container.Resolve<Tickable3>();
 
             int tickCount = 0;
 

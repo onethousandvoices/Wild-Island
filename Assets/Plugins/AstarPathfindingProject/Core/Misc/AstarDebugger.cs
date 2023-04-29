@@ -256,7 +256,7 @@ namespace Pathfinding {
 				if (showFPS) {
 					text.AppendLine();
 					text.AppendLine();
-					var delayedFPS = delayedDeltaTime > 0.00001f ? 1F/delayedDeltaTime : 0;
+					float delayedFPS = delayedDeltaTime > 0.00001f ? 1F/delayedDeltaTime : 0;
 					text.Append("FPS".PadRight(25)).Append(delayedFPS.ToString("0.0 fps"));
 
 

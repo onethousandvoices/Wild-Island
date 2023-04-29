@@ -45,7 +45,7 @@ namespace Zenject.SpaceFighter
         {
             _audioPlayer.Play(_settings.Laser, _settings.LaserVolume);
 
-            var bullet = _bulletFactory.Create(
+            Bullet bullet = _bulletFactory.Create(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromPlayer);
 
             bullet.transform.position = _player.Position + _player.LookDir * _settings.BulletOffsetDistance;

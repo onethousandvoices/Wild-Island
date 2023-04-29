@@ -70,7 +70,7 @@ namespace Pathfinding {
 			bool worked;
 
 			// Pause pathfinding while modifying the graphs
-			var graphLock = AstarPath.active.PausePathfinding();
+			PathProcessor.GraphUpdateLock graphLock = AstarPath.active.PausePathfinding();
 
 			try {
 				// Make sure any pending graph updates have been done before we start

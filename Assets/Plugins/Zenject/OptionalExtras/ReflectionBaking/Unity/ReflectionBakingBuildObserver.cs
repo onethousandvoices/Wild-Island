@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ModestTree;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 using Zenject.ReflectionBaking.Mono.Cecil;
+using Assembly = System.Reflection.Assembly;
 using Debug = UnityEngine.Debug;
 
 namespace Zenject.ReflectionBaking
@@ -40,7 +42,7 @@ namespace Zenject.ReflectionBaking
 
         static void TryWeaveAssembly(string assemblyAssetPath)
         {
-            var settings = ReflectionBakingInternalUtil.TryGetEnabledSettingsInstance();
+            ZenjectReflectionBakingSettings settings = ReflectionBakingInternalUtil.TryGetEnabledSettingsInstance();
 
             if (settings == null)
             {
@@ -57,21 +59,21 @@ namespace Zenject.ReflectionBaking
                 return;
             }
 
-            var stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var assemblyFullPath = ReflectionBakingInternalUtil.ConvertAssetPathToSystemPath(assemblyAssetPath);
+            string assemblyFullPath = ReflectionBakingInternalUtil.ConvertAssetPathToSystemPath(assemblyAssetPath);
 
-            var readerParameters = new ReaderParameters
+            ReaderParameters readerParameters = new ReaderParameters
             {
                 AssemblyResolver = new UnityAssemblyResolver(),
                 // Is this necessary?
                 //ReadSymbols = true,
             };
 
-            var module = ModuleDefinition.ReadModule(assemblyFullPath, readerParameters);
+            ModuleDefinition module = ModuleDefinition.ReadModule(assemblyFullPath, readerParameters);
 
-            var assemblyRefNames = module.AssemblyReferences.Select(x => x.Name.ToLower()).ToList();
+            List<string> assemblyRefNames = module.AssemblyReferences.Select(x => x.Name.ToLower()).ToList();
 
             if (!assemblyRefNames.Contains("zenject-usage"))
             {
@@ -80,9 +82,9 @@ namespace Zenject.ReflectionBaking
                 return;
             }
 
-            var assemblyName = Path.GetFileNameWithoutExtension(assemblyAssetPath);
-            var assembly = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(x => x.GetName().Name == assemblyName).OnlyOrDefault();
+            string assemblyName = Path.GetFileNameWithoutExtension(assemblyAssetPath);
+            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies()
+                                         .Where(x => x.GetName().Name == assemblyName).OnlyOrDefault();
 
             Assert.IsNotNull(assembly, "Could not find unique assembly '{0}' in currently loaded list of assemblies", assemblyName);
 
@@ -91,7 +93,7 @@ namespace Zenject.ReflectionBaking
 
             if (numTypesChanged > 0)
             {
-                var writerParams = new WriterParameters()
+                WriterParameters writerParams = new WriterParameters()
                 {
                     // Is this necessary?
                     //WriteSymbols = true

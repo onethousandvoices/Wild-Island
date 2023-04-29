@@ -19,13 +19,13 @@ namespace Zenject
         {
             _renderables = new List<RenderableInfo>();
 
-            foreach (var renderable in renderables)
+            foreach (IGuiRenderable renderable in renderables)
             {
                 // Note that we use zero for unspecified priority
                 // This is nice because you can use negative or positive for before/after unspecified
-                var matches = priorities
-                    .Where(x => renderable.GetType().DerivesFromOrEqual(x.First))
-                    .Select(x => x.Second).ToList();
+                List<int> matches = priorities
+                                   .Where(x => renderable.GetType().DerivesFromOrEqual(x.First))
+                                   .Select(x => x.Second).ToList();
 
                 int priority = matches.IsEmpty() ? 0 : matches.Distinct().Single();
 
@@ -36,7 +36,7 @@ namespace Zenject
             _renderables = _renderables.OrderBy(x => x.Priority).ToList();
 
 #if UNITY_EDITOR
-            foreach (var renderable in _renderables.Select(x => x.Renderable).GetDuplicates())
+            foreach (IGuiRenderable renderable in _renderables.Select(x => x.Renderable).GetDuplicates())
             {
                 Assert.That(false, "Found duplicate IGuiRenderable with type '{0}'".Fmt(renderable.GetType()));
             }
@@ -45,7 +45,7 @@ namespace Zenject
 
         public void OnGui()
         {
-            foreach (var renderable in _renderables)
+            foreach (RenderableInfo renderable in _renderables)
             {
                 try
                 {

@@ -91,7 +91,7 @@ namespace Zenject.Tests.Factories
 
             public void Initialize()
             {
-                var foo = _fooFactory.Create(_prefab);
+                Foo foo = _fooFactory.Create(_prefab);
 
                 Assert.That(foo.WasInitialized);
             }
@@ -112,7 +112,7 @@ namespace Zenject.Tests.Factories
 
             public void Initialize()
             {
-                var foo = _fooFactory.Create(_prefab, "asdf");
+                Foo2 foo = _fooFactory.Create(_prefab, "asdf");
 
                 Assert.IsEqual(foo.Value, "asdf");
             }
@@ -133,7 +133,7 @@ namespace Zenject.Tests.Factories
 
             public void Initialize()
             {
-                var foo = _fooFactory.Create(_prefabPath);
+                Foo foo = _fooFactory.Create(_prefabPath);
                 Assert.That(foo.WasInitialized);
             }
         }
@@ -153,7 +153,7 @@ namespace Zenject.Tests.Factories
 
             public void Initialize()
             {
-                var foo = _fooFactory.Create(_prefabPath, "asdf");
+                Foo2 foo = _fooFactory.Create(_prefabPath, "asdf");
 
                 Assert.IsEqual(foo.Value, "asdf");
             }

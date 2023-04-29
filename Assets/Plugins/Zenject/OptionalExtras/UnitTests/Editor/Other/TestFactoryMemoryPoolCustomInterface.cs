@@ -9,7 +9,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void Test1()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindFactoryCustomInterface<Foo, Foo.Factory, Foo.IFooFactory>().FromInstance(foo);
 
@@ -19,7 +19,7 @@ namespace Zenject.Tests.Other
         [Test]
         public void Test2()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindMemoryPoolCustomInterface<Foo, Foo.Pool, Foo.IFooPool>().FromInstance(foo);
 

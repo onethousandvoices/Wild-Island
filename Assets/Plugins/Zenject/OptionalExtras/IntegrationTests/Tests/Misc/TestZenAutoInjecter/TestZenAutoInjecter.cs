@@ -22,7 +22,7 @@ namespace Zenject.Tests.AutoInjecter
 
             PostInstall();
 
-            var bar = new GameObject("bar").AddComponent<Bar>();
+            Bar bar = new GameObject("bar").AddComponent<Bar>();
 
             Assert.That(!bar.ConstructCalled);
             Assert.IsNull(bar.Foo);
@@ -43,8 +43,8 @@ namespace Zenject.Tests.AutoInjecter
             PostInstall();
             yield return null;
 
-            var barGameObject = GameObject.Instantiate(GetPrefab("Bar"));
-            var bar = barGameObject.GetComponentInChildren<Bar>();
+            GameObject barGameObject = GameObject.Instantiate(GetPrefab("Bar"));
+            Bar bar = barGameObject.GetComponentInChildren<Bar>();
 
             Assert.IsEqual(bar.Foo, Container.Resolve<Foo>());
             Assert.That(bar.ConstructCalled);
@@ -58,11 +58,11 @@ namespace Zenject.Tests.AutoInjecter
             PostInstall();
             yield return null;
 
-            var gorp = Container.Resolve<Gorp>();
+            Gorp gorp = Container.Resolve<Gorp>();
 
-            var qux = GameObject.Instantiate(
-                GetPrefab("QuxSearch"), Vector3.zero, Quaternion.identity, gorp.transform)
-                .GetComponentInChildren<Qux>();
+            Qux qux = GameObject.Instantiate(
+                                     GetPrefab("QuxSearch"), Vector3.zero, Quaternion.identity, gorp.transform)
+                                .GetComponentInChildren<Qux>();
 
             Assert.IsEqual(qux.Container, gorp.Container);
             Assert.IsEqual(qux.Container.ParentContainers.Single(), Container);
@@ -74,7 +74,7 @@ namespace Zenject.Tests.AutoInjecter
             SkipInstall();
             yield return null;
 
-            var qux = GameObject.Instantiate(GetPrefab("QuxSearch")).GetComponentInChildren<Qux>();
+            Qux qux = GameObject.Instantiate(GetPrefab("QuxSearch")).GetComponentInChildren<Qux>();
 
             Assert.IsEqual(qux.Container, Container);
             Assert.IsEqual(qux.Container, Container.Resolve<SceneContext>().Container);
@@ -86,9 +86,9 @@ namespace Zenject.Tests.AutoInjecter
             SkipInstall();
             yield return null;
 
-            var qux = GameObject.Instantiate(
-                GetPrefab("QuxSearch"), Vector3.zero, Quaternion.identity, ProjectContext.Instance.transform)
-                .GetComponentInChildren<Qux>();
+            Qux qux = GameObject.Instantiate(
+                                     GetPrefab("QuxSearch"), Vector3.zero, Quaternion.identity, ProjectContext.Instance.transform)
+                                .GetComponentInChildren<Qux>();
 
             Assert.IsEqual(qux.Container, ProjectContext.Instance.Container);
         }
@@ -99,7 +99,7 @@ namespace Zenject.Tests.AutoInjecter
             SkipInstall();
             yield return null;
 
-            var qux = GameObject.Instantiate(GetPrefab("QuxProject")).GetComponentInChildren<Qux>();
+            Qux qux = GameObject.Instantiate(GetPrefab("QuxProject")).GetComponentInChildren<Qux>();
 
             Assert.IsEqual(qux.Container, ProjectContext.Instance.Container);
         }
@@ -110,7 +110,7 @@ namespace Zenject.Tests.AutoInjecter
             SkipInstall();
             yield return null;
 
-            var qux = GameObject.Instantiate(GetPrefab("QuxScene")).GetComponentInChildren<Qux>();
+            Qux qux = GameObject.Instantiate(GetPrefab("QuxScene")).GetComponentInChildren<Qux>();
 
             Assert.IsEqual(qux.Container, Container);
             Assert.IsEqual(qux.Container, Container.Resolve<SceneContext>().Container);
@@ -122,7 +122,7 @@ namespace Zenject.Tests.AutoInjecter
             SkipInstall();
             yield return null;
 
-            var qux = GameObject.Instantiate(
+            Qux qux = GameObject.Instantiate(
                 GetPrefab("QuxScene"), Vector3.zero, Quaternion.identity,
                 ProjectContext.Instance.transform).GetComponentInChildren<Qux>();
 

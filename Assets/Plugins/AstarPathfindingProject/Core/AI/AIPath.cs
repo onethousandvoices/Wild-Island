@@ -188,7 +188,7 @@ namespace Pathfinding {
 					// Check if the destination is above the head of the character or far below the feet of it
 					float yDifference;
 					movementPlane.ToPlane(destination - position, out yDifference);
-					var h = tr.localScale.y * height;
+					float h = tr.localScale.y * height;
 					if (yDifference > h || yDifference < -h*0.5) return false;
 				}
 
@@ -305,7 +305,7 @@ namespace Pathfinding {
 			if (path.vectorPath.Count == 1) path.vectorPath.Add(path.vectorPath[0]);
 			interpolator.SetPath(path.vectorPath);
 
-			var graph = path.path.Count > 0 ? AstarData.GetGraph(path.path[0]) as ITransformedGraph : null;
+			ITransformedGraph graph = path.path.Count > 0 ? AstarData.GetGraph(path.path[0]) as ITransformedGraph : null;
 			movementPlane = graph != null ? graph.transform : (orientation == OrientationMode.YAxisForward ? new GraphTransform(Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-90, 270, 90), Vector3.one)) : GraphTransform.identityTransform);
 
 			// Reset some variables
@@ -324,7 +324,7 @@ namespace Pathfinding {
 			// (due to interpolator.remainingDistance being incorrect).
 			interpolator.MoveToCircleIntersection2D(position, pickNextWaypointDist, movementPlane);
 
-			var distanceToEnd = remainingDistance;
+			float distanceToEnd = remainingDistance;
 			if (distanceToEnd <= endReachedDistance) {
 				reachedEndOfPath = true;
 				OnTargetReached();
@@ -353,23 +353,23 @@ namespace Pathfinding {
 			}
 			if (updateRotation) simulatedRotation = tr.rotation;
 
-			var currentPosition = simulatedPosition;
+			Vector3 currentPosition = simulatedPosition;
 
 			// Update which point we are moving towards
 			interpolator.MoveToCircleIntersection2D(currentPosition, pickNextWaypointDist, movementPlane);
-			var dir = movementPlane.ToPlane(steeringTarget - currentPosition);
+			Vector2 dir = movementPlane.ToPlane(steeringTarget - currentPosition);
 
 			// Calculate the distance to the end of the path
 			float distanceToEnd = dir.magnitude + Mathf.Max(0, interpolator.remainingDistance);
 
 			// Check if we have reached the target
-			var prevTargetReached = reachedEndOfPath;
+			bool prevTargetReached = reachedEndOfPath;
 			reachedEndOfPath = distanceToEnd <= endReachedDistance && interpolator.valid;
 			if (!prevTargetReached && reachedEndOfPath) OnTargetReached();
 			float slowdown;
 
 			// Normalized direction of where the agent is looking
-			var forwards = movementPlane.ToPlane(simulatedRotation * (orientation == OrientationMode.YAxisForward ? Vector3.up : Vector3.forward));
+			Vector2 forwards = movementPlane.ToPlane(simulatedRotation * (orientation == OrientationMode.YAxisForward ? Vector3.up : Vector3.forward));
 
 			// Check if we have a valid path to follow and some other script has not stopped the character
 			bool stopped = isStopped || (reachedDestination && whenCloseToDestination == CloseToDestinationMode.Stop);
@@ -397,7 +397,7 @@ namespace Pathfinding {
 
 
 			// Set how much the agent wants to move during this frame
-			var delta2D = lastDeltaPosition = CalculateDeltaToMoveThisFrame(movementPlane.ToPlane(currentPosition), distanceToEnd, deltaTime);
+			Vector2 delta2D = lastDeltaPosition = CalculateDeltaToMoveThisFrame(movementPlane.ToPlane(currentPosition), distanceToEnd, deltaTime);
 			nextPosition = currentPosition + movementPlane.ToWorld(delta2D, verticalVelocity * lastDeltaTime);
 			CalculateNextRotation(slowdown, out nextRotation);
 		}
@@ -409,7 +409,7 @@ namespace Pathfinding {
 
 				// Rotate towards the direction we are moving in.
 				// Don't rotate when we are very close to the target.
-				var currentRotationSpeed = rotationSpeed * Mathf.Max(0, (slowdown - 0.3f) / 0.7f);
+				float currentRotationSpeed = rotationSpeed * Mathf.Max(0, (slowdown - 0.3f) / 0.7f);
 				nextRotation = SimulateRotationTowards(desiredRotationDirection, currentRotationSpeed * lastDeltaTime);
 			} else {
 				// TODO: simulatedRotation
@@ -423,11 +423,11 @@ namespace Pathfinding {
 				cachedNNConstraint.tags = seeker.traversableTags;
 				cachedNNConstraint.graphMask = seeker.graphMask;
 				cachedNNConstraint.distanceXZ = true;
-				var clampedPosition = AstarPath.active.GetNearest(position, cachedNNConstraint).position;
+				Vector3 clampedPosition = AstarPath.active.GetNearest(position, cachedNNConstraint).position;
 
 				// We cannot simply check for equality because some precision may be lost
 				// if any coordinate transformations are used.
-				var difference = movementPlane.ToPlane(clampedPosition - position);
+				Vector2 difference = movementPlane.ToPlane(clampedPosition - position);
 				float sqrDifference = difference.sqrMagnitude;
 				if (sqrDifference > 0.001f*0.001f) {
 					// The agent was outside the navmesh. Remove that component of the velocity
@@ -464,7 +464,7 @@ namespace Pathfinding {
 		}
 
 		void OnDrawGizmosInternal () {
-			var newGizmoHash = pickNextWaypointDist.GetHashCode() ^ slowdownDistance.GetHashCode() ^ endReachedDistance.GetHashCode();
+			int newGizmoHash = pickNextWaypointDist.GetHashCode() ^ slowdownDistance.GetHashCode() ^ endReachedDistance.GetHashCode();
 
 			if (newGizmoHash != gizmoHash && gizmoHash != 0) lastChangedTime = Time.realtimeSinceStartup;
 			gizmoHash = newGizmoHash;

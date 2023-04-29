@@ -74,7 +74,7 @@ namespace Pathfinding.Util {
 
 			for (int i = 0; i < pool.Count && i < MaxCapacitySearchLength; i++) {
 				// ith last item
-				var candidate = pool[pool.Count-1-i];
+				List<T> candidate = pool[pool.Count-1-i];
 
 				// Find the largest list that is not too large (arbitrary decision to try to prevent some memory bloat if the list was not just a temporary list).
 				if ((list == null || candidate.Capacity > list.Capacity) && candidate.Capacity < capacity*16) {
@@ -103,11 +103,11 @@ namespace Pathfinding.Util {
 			return new List<T>(capacity);
 #else
 			lock (pool) {
-				var currentPool = pool;
-				var listIndex = FindCandidate(pool, capacity);
+				List<List<T>> currentPool = pool;
+				int listIndex = FindCandidate(pool, capacity);
 
 				if (capacity > LargeThreshold) {
-					var largeListIndex = FindCandidate(largePool, capacity);
+					int largeListIndex = FindCandidate(largePool, capacity);
 					if (largeListIndex != -1) {
 						currentPool = largePool;
 						listIndex = largeListIndex;
@@ -117,7 +117,7 @@ namespace Pathfinding.Util {
 				if (listIndex == -1) {
 					return new List<T>(capacity);
 				} else {
-					var list = currentPool[listIndex];
+					List<T> list = currentPool[listIndex];
 					// Swap current item and last item to enable a more efficient removal
 					inPool.Remove(list);
 					currentPool[listIndex] = currentPool[currentPool.Count-1];
@@ -134,7 +134,7 @@ namespace Pathfinding.Util {
 		/// </summary>
 		public static void Warmup (int count, int size) {
 			lock (pool) {
-				var tmp = new List<T>[count];
+				List<T>[] tmp = new List<T>[count];
 				for (int i = 0; i < count; i++) tmp[i] = Claim(size);
 				for (int i = 0; i < count; i++) Release(tmp[i]);
 			}

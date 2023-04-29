@@ -204,7 +204,7 @@ namespace Pathfinding {
 				}
 				Path p = head;
 
-				var newHead = head.next;
+				Path newHead = head.next;
 				if (newHead == null) {
 					tail = null;
 				}
@@ -276,7 +276,7 @@ namespace Pathfinding {
 
 				Path p = head;
 
-				var newHead = head.next;
+				Path newHead = head.next;
 				if (newHead == null) {
 					tail = null;
 				}

@@ -41,8 +41,8 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test1>().AsSingle();
             Container.Bind<Test2>().AsSingle();
 
-            var test1 = Container.Resolve<Test1>();
-            var test2 = Container.Resolve<Test2>();
+            Test1 test1 = Container.Resolve<Test1>();
+            Test2 test2 = Container.Resolve<Test2>();
 
             Assert.IsEqual(Test2.CreateCount, 1);
             Assert.IsEqual(Test1.CreateCount, 1);
@@ -95,8 +95,8 @@ namespace Zenject.Tests.Injection
             Container.Bind<Test3>().AsSingle();
             Container.Bind<Test4>().AsSingle();
 
-            var test1 = Container.Resolve<Test3>();
-            var test2 = Container.Resolve<Test4>();
+            Test3 test1 = Container.Resolve<Test3>();
+            Test4 test2 = Container.Resolve<Test4>();
 
             Assert.IsEqual(Test4.CreateCount, 1);
             Assert.IsEqual(Test3.CreateCount, 1);

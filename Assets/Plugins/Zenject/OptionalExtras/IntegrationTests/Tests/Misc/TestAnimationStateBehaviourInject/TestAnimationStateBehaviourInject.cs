@@ -1,6 +1,7 @@
 ﻿
 using System.Collections;
 using ModestTree;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Zenject.Tests.TestAnimationStateBehaviourInject
@@ -13,7 +14,7 @@ namespace Zenject.Tests.TestAnimationStateBehaviourInject
         public IEnumerator Test1()
         {
             PreInstall();
-            var prefab = FixtureUtil.GetPrefab(ResourcePrefix + "Foo");
+            GameObject prefab = FixtureUtil.GetPrefab(ResourcePrefix + "Foo");
 
             StateBehaviour1.OnStateEnterCalls = 0;
 

@@ -53,7 +53,7 @@ namespace Zenject.Tests.Bindings
 
             Assert.IsNull(Container.TryResolve<Foo>());
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
 
             Assert.IsEqual(subContainer.Resolve<Foo>(), StaticFoo);
 

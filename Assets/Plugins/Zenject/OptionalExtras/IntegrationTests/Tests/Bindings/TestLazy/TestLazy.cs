@@ -18,7 +18,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(Bar.InstanceCount, 0);
 
@@ -36,7 +36,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
             Assert.Throws(() => foo.DoIt());
             yield break;
         }
@@ -95,7 +95,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Gorp>().AsSingle();
             PostInstall();
 
-            var gorp = Container.Resolve<Gorp>();
+            Gorp gorp = Container.Resolve<Gorp>();
             object temp;
             Assert.Throws(() => temp = gorp.Bar.Value);
             yield break;

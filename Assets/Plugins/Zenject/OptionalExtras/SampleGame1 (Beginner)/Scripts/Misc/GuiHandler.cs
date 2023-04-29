@@ -80,7 +80,7 @@ namespace Zenject.Asteroids
 
             if (_gameOverElapsed > _gameOverStartFadeTime)
             {
-                var px = Mathf.Min(1.0f, (_gameOverElapsed - _gameOverStartFadeTime) / _gameOverFadeInTime);
+                float px = Mathf.Min(1.0f, (_gameOverElapsed - _gameOverStartFadeTime) / _gameOverFadeInTime);
                 _titleStyle.normal.textColor = new Color(1, 1, 1, px);
             }
             else
@@ -90,7 +90,7 @@ namespace Zenject.Asteroids
 
             if (_gameOverElapsed > _restartTextStartFadeTime)
             {
-                var px = Mathf.Min(1.0f, (_gameOverElapsed - _restartTextStartFadeTime) / _restartTextFadeInTime);
+                float px = Mathf.Min(1.0f, (_gameOverElapsed - _restartTextStartFadeTime) / _restartTextFadeInTime);
                 _instructionsStyle.normal.textColor = new Color(1, 1, 1, px);
             }
             else

@@ -11,7 +11,7 @@ using Pathfinding;
 public class SnapToNode : MonoBehaviour {
 	void Update () {
 		if (transform.hasChanged && AstarPath.active != null) {
-			var node = AstarPath.active.GetNearest(transform.position, NNConstraint.None).node;
+			GraphNode node = AstarPath.active.GetNearest(transform.position, NNConstraint.None).node;
 			if (node != null) {
 				transform.position = (Vector3)node.position;
 				transform.hasChanged = false;

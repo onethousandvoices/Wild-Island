@@ -88,8 +88,8 @@ namespace Pathfinding {
 			if (graph == null) return;
 
 			// Calculate where the graph center and the target position is in graph space
-			var graphCenterInGraphSpace = PointToGraphSpace(graph.center);
-			var targetPositionInGraphSpace = PointToGraphSpace(target.position);
+			Vector3 graphCenterInGraphSpace = PointToGraphSpace(graph.center);
+			Vector3 targetPositionInGraphSpace = PointToGraphSpace(target.position);
 
 			// Check the distance in graph space
 			// We only care about the X and Z axes since the Y axis is the "height" coordinate of the nodes (in graph space)
@@ -220,7 +220,7 @@ namespace Pathfinding {
 				}
 
 				// Connections need to be recalculated for the neighbours as well, so we need to expand the rect by 1
-				var connectionRect = recalculateRect.Expand(1);
+				IntRect connectionRect = recalculateRect.Expand(1);
 
 				// Makes sure the rect stays inside the grid
 				connectionRect = IntRect.Intersection(connectionRect, new IntRect(0, 0, width, depth));
@@ -246,7 +246,7 @@ namespace Pathfinding {
 						int pz = z*width;
 						for (int x = 0; x < width; x++) {
 							int newIndex = pz + x;
-							var node = buffer[newIndex];
+							GridNodeBase node = buffer[newIndex];
 							if (node != null) node.NodeInGridIndex = newIndex;
 							nodes[layerOffset + newIndex] = node;
 						}
@@ -263,7 +263,7 @@ namespace Pathfinding {
 						}
 
 						for (int x = xmin; x < xmax; x++) {
-							var node = buffer[pz + x];
+							GridNodeBase node = buffer[pz + x];
 							if (node != null) {
 								// Clear connections on all nodes that are wrapped and placed on the other side of the graph.
 								// This is both to clear any custom connections (which do not really make sense after moving the node)

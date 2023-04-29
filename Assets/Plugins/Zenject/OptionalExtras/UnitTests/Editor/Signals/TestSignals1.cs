@@ -12,7 +12,7 @@ namespace Zenject.Tests.Signals
         {
             SignalBusInstaller.Install(Container);
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             Assert.Throws(() => signalBus.Fire<FooSignal>());
         }
@@ -24,7 +24,7 @@ namespace Zenject.Tests.Signals
 
             Container.DeclareSignal<FooSignal>();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             bool received = false;
 
@@ -53,13 +53,13 @@ namespace Zenject.Tests.Signals
 
             Container.DeclareSignal<FooSignal>();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             FooSignal received = null;
 
             signalBus.Subscribe<FooSignal>(x => received = x);
 
-            var sent = new FooSignal();
+            FooSignal sent = new FooSignal();
 
             signalBus.Fire(sent);
 
@@ -73,7 +73,7 @@ namespace Zenject.Tests.Signals
 
             Container.DeclareSignal<FooSignal>();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             Action callback = () => {};
 
@@ -93,7 +93,7 @@ namespace Zenject.Tests.Signals
             Container.DeclareSignal<FooSignal>();
             Container.DeclareSignal<BarSignal>();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             object received = null;
 
@@ -103,7 +103,7 @@ namespace Zenject.Tests.Signals
                     received = x;
                 });
 
-            var data = new FooSignal();
+            FooSignal data = new FooSignal();
 
             signalBus.Fire(data);
 

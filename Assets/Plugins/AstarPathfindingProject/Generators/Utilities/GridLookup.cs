@@ -57,7 +57,7 @@ namespace Pathfinding.Util {
 		public void Clear () {
 			rootLookup.Clear();
 			all.next = null;
-			foreach (var item in cells) item.next = null;
+			foreach (Item item in cells) item.next = null;
 		}
 
 		public Root GetRoot (T item) {
@@ -72,7 +72,7 @@ namespace Pathfinding.Util {
 		/// Returns: A handle which can be used for Move operations
 		/// </summary>
 		public Root Add (T item, IntRect bounds) {
-			var root = new Root {
+			Root root = new Root {
 				obj = item,
 				prev = all,
 				next = all.next
@@ -109,7 +109,7 @@ namespace Pathfinding.Util {
 				throw new System.ArgumentException("The item has not been added to this object");
 			}
 
-			var prev = root.previousBounds;
+			IntRect prev = root.previousBounds;
 			if (prev == bounds) return;
 
 			// Remove all
@@ -159,13 +159,13 @@ namespace Pathfinding.Util {
 
 			// Loop through tiles and check which objects are inside them
 			for (int z = r.ymin; z <= r.ymax; z++) {
-				var zs = z*size.x;
+				int zs = z*size.x;
 				for (int x = r.xmin; x <= r.xmax; x++) {
 					Item c = cells[x + zs];
 					// Note, first item is a dummy, so it is ignored
 					while (c.next != null) {
 						c = c.next;
-						var obj = c.root.obj as U;
+						U obj = c.root.obj as U;
 						if (!c.root.flag && obj != null) {
 							c.root.flag = true;
 							result.Add(obj);
@@ -176,7 +176,7 @@ namespace Pathfinding.Util {
 
 			// Reset flags
 			for (int z = r.ymin; z <= r.ymax; z++) {
-				var zs = z*size.x;
+				int zs = z*size.x;
 				for (int x = r.xmin; x <= r.xmax; x++) {
 					Item c = cells[x + zs];
 					while (c.next != null) {

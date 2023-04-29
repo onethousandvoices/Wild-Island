@@ -60,7 +60,7 @@ namespace Zenject
 
             Assert.That(!ProjectContext.HasInstance);
 
-            var shouldValidate = CurrentTestHasAttribute<ValidateOnlyAttribute>();
+            bool shouldValidate = CurrentTestHasAttribute<ValidateOnlyAttribute>();
             ProjectContext.ValidateOnNextRun = shouldValidate;
 
             Assert.That(_sceneContext == null);

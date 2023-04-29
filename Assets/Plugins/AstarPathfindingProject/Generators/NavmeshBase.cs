@@ -221,7 +221,7 @@ namespace Pathfinding {
 
 		/// <summary>Returns an XZ bounds object with the bounds of a group of tiles in graph space</summary>
 		public Bounds GetTileBoundsInGraphSpace (int x, int z, int width = 1, int depth = 1) {
-			var b = new Bounds();
+			Bounds b = new Bounds();
 
 			b.SetMinMax(
 				new Vector3(x*TileWorldSizeX, 0, z*TileWorldSizeZ),
@@ -284,7 +284,7 @@ namespace Pathfinding {
 			if (tiles != null) {
 				// Move all the vertices in each tile
 				for (int tileIndex = 0; tileIndex < tiles.Length; tileIndex++) {
-					var tile = tiles[tileIndex];
+					NavmeshTile tile = tiles[tileIndex];
 					if (tile != null) {
 						tile.vertsInGraphSpace.CopyTo(tile.verts, 0);
 						// Transform the graph space vertices to world space
@@ -336,7 +336,7 @@ namespace Pathfinding {
 			bounds = transform.InverseTransform(bounds);
 
 			// Calculate world bounds of all affected tiles
-			var r = new IntRect(Mathf.FloorToInt((bounds.min.x - margin) / TileWorldSizeX), Mathf.FloorToInt((bounds.min.z - margin) / TileWorldSizeZ), Mathf.FloorToInt((bounds.max.x + margin) / TileWorldSizeX), Mathf.FloorToInt((bounds.max.z + margin) / TileWorldSizeZ));
+			IntRect r = new IntRect(Mathf.FloorToInt((bounds.min.x - margin) / TileWorldSizeX), Mathf.FloorToInt((bounds.min.z - margin) / TileWorldSizeZ), Mathf.FloorToInt((bounds.max.x + margin) / TileWorldSizeX), Mathf.FloorToInt((bounds.max.z + margin) / TileWorldSizeZ));
 			// Clamp to bounds
 			r = IntRect.Intersection(r, new IntRect(0, 0, tileXCount-1, tileZCount-1));
 			return r;
@@ -346,7 +346,7 @@ namespace Pathfinding {
 		/// <param name="rect">Graph space rectangle (in graph space all tiles are on the XZ plane regardless of graph rotation and other transformations, the first tile has a corner at the origin)</param>
 		public IntRect GetTouchingTilesInGraphSpace (Rect rect) {
 			// Calculate world bounds of all affected tiles
-			var r = new IntRect(Mathf.FloorToInt(rect.xMin / TileWorldSizeX), Mathf.FloorToInt(rect.yMin / TileWorldSizeZ), Mathf.FloorToInt(rect.xMax / TileWorldSizeX), Mathf.FloorToInt(rect.yMax / TileWorldSizeZ));
+			IntRect r = new IntRect(Mathf.FloorToInt(rect.xMin / TileWorldSizeX), Mathf.FloorToInt(rect.yMin / TileWorldSizeZ), Mathf.FloorToInt(rect.xMax / TileWorldSizeX), Mathf.FloorToInt(rect.yMax / TileWorldSizeZ));
 
 			// Clamp to bounds
 			r = IntRect.Intersection(r, new IntRect(0, 0, tileXCount-1, tileZCount-1));
@@ -362,7 +362,7 @@ namespace Pathfinding {
 			bounds = transform.InverseTransform(bounds);
 
 			//Calculate world bounds of all affected tiles
-			var r = new IntRect(Mathf.RoundToInt(bounds.min.x / TileWorldSizeX), Mathf.RoundToInt(bounds.min.z / TileWorldSizeZ), Mathf.RoundToInt(bounds.max.x / TileWorldSizeX)-1, Mathf.RoundToInt(bounds.max.z / TileWorldSizeZ)-1);
+			IntRect r = new IntRect(Mathf.RoundToInt(bounds.min.x / TileWorldSizeX), Mathf.RoundToInt(bounds.min.z / TileWorldSizeZ), Mathf.RoundToInt(bounds.max.x / TileWorldSizeX)-1, Mathf.RoundToInt(bounds.max.z / TileWorldSizeZ)-1);
 			//Clamp to bounds
 			r = IntRect.Intersection(r, new IntRect(0, 0, tileXCount-1, tileZCount-1));
 			return r;
@@ -378,17 +378,17 @@ namespace Pathfinding {
 			// x _ x
 			// _ x _
 			for (int zo = -1; zo <= 1; zo++) {
-				var z = tile.z + zo;
+				int z = tile.z + zo;
 				if (z < 0 || z >= tileZCount) continue;
 
 				for (int xo = -1; xo <= 1; xo++) {
-					var x = tile.x + xo;
+					int x = tile.x + xo;
 					if (x < 0 || x >= tileXCount) continue;
 
 					// Ignore diagonals and the tile itself
 					if ((xo == 0) == (zo == 0)) continue;
 
-					var otherTile = tiles[x + z*tileXCount];
+					NavmeshTile otherTile = tiles[x + z*tileXCount];
 					if (!onlyUnflagged || !otherTile.flag) {
 						ConnectTiles(otherTile, tile);
 					}
@@ -429,7 +429,7 @@ namespace Pathfinding {
 					//Length will not be constant if connections are removed
 					if (j >= node.connections.Length) break;
 
-					var other = node.connections[j].node as TriangleMeshNode;
+					TriangleMeshNode other = node.connections[j].node as TriangleMeshNode;
 
 					//Only evaluate TriangleMeshNodes
 					if (other == null) continue;
@@ -455,7 +455,7 @@ namespace Pathfinding {
 		public override NNInfoInternal GetNearestForce (Vector3 position, NNConstraint constraint) {
 			if (tiles == null) return new NNInfoInternal();
 
-			var tileCoords = GetTileCoordinates(position);
+			Int2 tileCoords = GetTileCoordinates(position);
 
 			// Clamp to graph borders
 			tileCoords.x = Mathf.Clamp(tileCoords.x, 0, tileXCount-1);
@@ -463,7 +463,7 @@ namespace Pathfinding {
 
 			int wmax = Math.Max(tileXCount, tileZCount);
 
-			var best = new NNInfoInternal();
+			NNInfoInternal best = new NNInfoInternal();
 			float bestDistance = float.PositiveInfinity;
 
 			bool xzSearch = nearestSearchOnlyXZ || (constraint != null && constraint.distanceXZ);
@@ -483,7 +483,7 @@ namespace Pathfinding {
 					// Solve for z such that abs(x-tx) + abs(z-tx) == w
 					// Delta X coordinate
 					int originalDx = Math.Abs(w - Math.Abs(z-tileCoords.y));
-					var dx = originalDx;
+					int dx = originalDx;
 					// Solution is dx + tx and -dx + tx
 					// This loop will first check +dx and then -dx
 					// If dx happens to be zero, then it will not run twice
@@ -532,7 +532,7 @@ namespace Pathfinding {
 		public GraphNode PointOnNavmesh (Vector3 position, NNConstraint constraint) {
 			if (tiles == null) return null;
 
-			var tileCoords = GetTileCoordinates(position);
+			Int2 tileCoords = GetTileCoordinates(position);
 
 			// Graph borders
 			if (tileCoords.x < 0 || tileCoords.y < 0 || tileCoords.x >= tileXCount || tileCoords.y >= tileZCount) return null;
@@ -563,7 +563,7 @@ namespace Pathfinding {
 		protected static void CreateNodeConnections (TriangleMeshNode[] nodes) {
 			List<Connection> connections = ListPool<Connection>.Claim();
 
-			var nodeRefs = ObjectPoolSimple<Dictionary<Int2, int> >.Claim();
+			Dictionary<Int2, int> nodeRefs = ObjectPoolSimple<Dictionary<Int2, int> >.Claim();
 
 			nodeRefs.Clear();
 
@@ -577,7 +577,7 @@ namespace Pathfinding {
 					// Recast can in some very special cases generate degenerate triangles which are simply lines
 					// In that case, duplicate keys might be added and thus an exception will be thrown
 					// It is safe to ignore the second edge though... I think (only found one case where this happens)
-					var key = new Int2(node.GetVertexIndex(a), node.GetVertexIndex((a+1) % av));
+					Int2 key = new Int2(node.GetVertexIndex(a), node.GetVertexIndex((a+1) % av));
 					if (!nodeRefs.ContainsKey(key)) {
 						nodeRefs.Add(key, i);
 					}
@@ -776,9 +776,9 @@ namespace Pathfinding {
 			}
 
 			for (int i = 0; i < batchNodesToDestroy.Count; i++) {
-				var node = batchNodesToDestroy[i];
+				MeshNode node = batchNodesToDestroy[i];
 				for (int j = 0; j < node.connections.Length; j++) {
-					var neighbour = node.connections[j].node;
+					GraphNode neighbour = node.connections[j].node;
 					if (!neighbour.TemporaryFlag1) {
 						neighbour.RemoveConnection(node);
 					}
@@ -833,9 +833,9 @@ namespace Pathfinding {
 		/// </summary>
 		protected void ClearTile (int x, int z) {
 			if (!batchTileUpdate) throw new System.Exception("Must be called during a batch update. See StartBatchTileUpdate");
-			var tile = GetTile(x, z);
+			NavmeshTile tile = GetTile(x, z);
 			if (tile == null) return;
-			var nodes = tile.nodes;
+			TriangleMeshNode[] nodes = tile.nodes;
 			for (int i = 0; i < nodes.Length; i++) {
 				if (nodes[i] != null) batchNodesToDestroy.Add(nodes[i]);
 			}
@@ -861,18 +861,18 @@ namespace Pathfinding {
 			NavmeshTile tile = GetTile(x, z);
 
 			if (tile == null || tile.nodes.Length == 0) return;
-			var nodes = tile.nodes;
-			var recycling = nodeRecyclingHashBuffer;
+			TriangleMeshNode[] nodes = tile.nodes;
+			Dictionary<int, int> recycling = nodeRecyclingHashBuffer;
 			for (int i = 0, j = 0; i < tris.Length; i += 3, j++) {
 				recycling[verts[tris[i+0]].GetHashCode() + verts[tris[i+1]].GetHashCode() + verts[tris[i+2]].GetHashCode()] = j;
 			}
-			var connectionsToKeep = ListPool<Connection>.Claim();
+			List<Connection> connectionsToKeep = ListPool<Connection>.Claim();
 
 			for (int i = 0; i < nodes.Length; i++) {
-				var node = nodes[i];
+				TriangleMeshNode node = nodes[i];
 				Int3 v0, v1, v2;
 				node.GetVerticesInGraphSpace(out v0, out v1, out v2);
-				var hash = v0.GetHashCode() + v1.GetHashCode() + v2.GetHashCode();
+				int hash = v0.GetHashCode() + v1.GetHashCode() + v2.GetHashCode();
 				int newNodeIndex;
 				if (recycling.TryGetValue(hash, out newNodeIndex)) {
 					// Technically we should check for a cyclic permutations of the vertices (e.g node a,b,c could become node b,c,a)
@@ -928,12 +928,12 @@ namespace Pathfinding {
 				tris = new int[0];
 			}
 
-			var wasNotBatching = !batchTileUpdate;
+			bool wasNotBatching = !batchTileUpdate;
 			if (wasNotBatching) StartBatchTileUpdate();
 			Profiler.BeginSample("Tile Initialization");
 
 			//Create a new navmesh tile and assign its settings
-			var tile = new NavmeshTile {
+			NavmeshTile tile = new NavmeshTile {
 				x = x,
 				z = z,
 				w = w,
@@ -946,7 +946,7 @@ namespace Pathfinding {
 			if (!Mathf.Approximately(x*TileWorldSizeX*Int3.FloatPrecision, (float)Math.Round(x*TileWorldSizeX*Int3.FloatPrecision))) Debug.LogWarning("Possible numerical imprecision. Consider adjusting tileSize and/or cellSize");
 			if (!Mathf.Approximately(z*TileWorldSizeZ*Int3.FloatPrecision, (float)Math.Round(z*TileWorldSizeZ*Int3.FloatPrecision))) Debug.LogWarning("Possible numerical imprecision. Consider adjusting tileSize and/or cellSize");
 
-			var offset = (Int3) new Vector3((x * TileWorldSizeX), 0, (z * TileWorldSizeZ));
+			Int3 offset = (Int3) new Vector3((x * TileWorldSizeX), 0, (z * TileWorldSizeZ));
 
 			for (int i = 0; i < verts.Length; i++) {
 				verts[i] += offset;
@@ -958,7 +958,7 @@ namespace Pathfinding {
 			Profiler.BeginSample("Clear Previous Tiles");
 
 			// Create a backing array for the new nodes
-			var nodes = tile.nodes = new TriangleMeshNode[tris.Length/3];
+			TriangleMeshNode[] nodes = tile.nodes = new TriangleMeshNode[tris.Length/3];
 			// Recycle any nodes that are in the exact same spot after replacing the tile.
 			// This also keeps e.g penalties and tags and other connections which might be useful.
 			// It also avoids trashing the paths for the RichAI component (as it will have to immediately recalculate its path
@@ -1001,7 +1001,7 @@ namespace Pathfinding {
 
 			// Create nodes and assign vertex indices
 			for (int i = 0; i < buffer.Length; i++) {
-				var node = buffer[i];
+				TriangleMeshNode node = buffer[i];
 				// Allow the buffer to be partially filled in already to allow for recycling nodes
 				if (node == null) node = buffer[i] = new TriangleMeshNode(active);
 
@@ -1037,8 +1037,8 @@ namespace Pathfinding {
 				return;
 			}
 
-			using (var helper = gizmos.GetSingleFrameGizmoHelper(active)) {
-				var bounds = new Bounds();
+			using (GraphGizmoHelper helper = gizmos.GetSingleFrameGizmoHelper(active)) {
+				Bounds bounds = new Bounds();
 				bounds.SetMinMax(Vector3.zero, forcedBoundsSize);
 				// Draw a write cube using the latest transform
 				// (this makes the bounds update immediately if some field is changed in the editor)
@@ -1046,14 +1046,14 @@ namespace Pathfinding {
 			}
 
 			if (tiles != null && (showMeshSurface || showMeshOutline || showNodeConnections)) {
-				var baseHasher = new RetainedGizmos.Hasher(active);
+				RetainedGizmos.Hasher baseHasher = new RetainedGizmos.Hasher(active);
 				baseHasher.AddHash(showMeshOutline ? 1 : 0);
 				baseHasher.AddHash(showMeshSurface ? 1 : 0);
 				baseHasher.AddHash(showNodeConnections ? 1 : 0);
 
 				int startTileIndex = 0;
-				var hasher = baseHasher;
-				var hashedNodes = 0;
+				RetainedGizmos.Hasher hasher = baseHasher;
+				int hashedNodes = 0;
 
 				// Update navmesh vizualizations for
 				// the tiles that have been changed
@@ -1064,7 +1064,7 @@ namespace Pathfinding {
 					if (tiles[i] == null) continue;
 
 					// Calculate a hash of the tile
-					var nodes = tiles[i].nodes;
+					TriangleMeshNode[] nodes = tiles[i].nodes;
 					for (int j = 0; j < nodes.Length; j++) {
 						hasher.HashNode(nodes[j]);
 					}
@@ -1078,7 +1078,7 @@ namespace Pathfinding {
 					// will never invalidate the cache in another row.
 					if (hashedNodes > 1024 || (i % tileXCount) == tileXCount - 1 || i == tiles.Length - 1) {
 						if (!gizmos.Draw(hasher)) {
-							using (var helper = gizmos.GetGizmoHelper(active, hasher)) {
+							using (GraphGizmoHelper helper = gizmos.GetGizmoHelper(active, hasher)) {
 								if (showMeshSurface || showMeshOutline) {
 									CreateNavmeshSurfaceVisualization(tiles, startTileIndex, i + 1, helper);
 									CreateNavmeshOutlineVisualization(tiles, startTileIndex, i + 1, helper);
@@ -1088,7 +1088,7 @@ namespace Pathfinding {
 									for (int ti = startTileIndex; ti <= i; ti++) {
 										if (tiles[ti] == null) continue;
 
-										var tileNodes = tiles[ti].nodes;
+										TriangleMeshNode[] tileNodes = tiles[ti].nodes;
 										for (int j = 0; j < tileNodes.Length; j++) {
 											helper.DrawConnections(tileNodes[j]);
 										}
@@ -1115,15 +1115,15 @@ namespace Pathfinding {
 			for (int i = startTile; i < endTile; i++) if (tiles[i] != null) numNodes += tiles[i].nodes.Length;
 
 			// Vertex array might be a bit larger than necessary, but that's ok
-			var vertices = ArrayPool<Vector3>.Claim(numNodes*3);
-			var colors = ArrayPool<Color>.Claim(numNodes*3);
+			Vector3[] vertices = ArrayPool<Vector3>.Claim(numNodes*3);
+			Color[] colors = ArrayPool<Color>.Claim(numNodes*3);
 			int offset = 0;
 			for (int i = startTile; i < endTile; i++) {
-				var tile = tiles[i];
+				NavmeshTile tile = tiles[i];
 				if (tile == null) continue;
 
 				for (int j = 0; j < tile.nodes.Length; j++) {
-					var node = tile.nodes[j];
+					TriangleMeshNode node = tile.nodes[j];
 					Int3 v0, v1, v2;
 					node.GetVertices(out v0, out v1, out v2);
 					int index = offset + j*3;
@@ -1131,7 +1131,7 @@ namespace Pathfinding {
 					vertices[index + 1] = (Vector3)v1;
 					vertices[index + 2] = (Vector3)v2;
 
-					var color = helper.NodeColor(node);
+					Color color = helper.NodeColor(node);
 					colors[index + 0] = colors[index + 1] = colors[index + 2] = color;
 				}
 				offset += tile.nodes.Length * 3;
@@ -1147,18 +1147,18 @@ namespace Pathfinding {
 
 		/// <summary>Creates an outline of the navmesh for use in OnDrawGizmos in the editor</summary>
 		static void CreateNavmeshOutlineVisualization (NavmeshTile[] tiles, int startTile, int endTile, GraphGizmoHelper helper) {
-			var sharedEdges = new bool[3];
+			bool[] sharedEdges = new bool[3];
 
 			for (int i = startTile; i < endTile; i++) {
-				var tile = tiles[i];
+				NavmeshTile tile = tiles[i];
 				if (tile == null) continue;
 
 				for (int j = 0; j < tile.nodes.Length; j++) {
 					sharedEdges[0] = sharedEdges[1] = sharedEdges[2] = false;
 
-					var node = tile.nodes[j];
+					TriangleMeshNode node = tile.nodes[j];
 					for (int c = 0; c < node.connections.Length; c++) {
-						var other = node.connections[c].node as TriangleMeshNode;
+						TriangleMeshNode other = node.connections[c].node as TriangleMeshNode;
 
 						// Loop through neighbours to figure out which edges are shared
 						if (other != null && other.GraphIndex == node.GraphIndex) {
@@ -1175,7 +1175,7 @@ namespace Pathfinding {
 						}
 					}
 
-					var color = helper.NodeColor(node);
+					Color color = helper.NodeColor(node);
 					for (int v = 0; v < 3; v++) {
 						if (!sharedEdges[v]) {
 							helper.builder.DrawLine((Vector3)node.GetVertex(v), (Vector3)node.GetVertex((v+1)%3), color);
@@ -1281,7 +1281,7 @@ namespace Pathfinding {
 						continue;
 					}
 
-					var tile = tiles[tileIndex] = new NavmeshTile {
+					NavmeshTile tile = tiles[tileIndex] = new NavmeshTile {
 						x = tx,
 						z = tz,
 						w = reader.ReadInt32(),
@@ -1322,7 +1322,7 @@ namespace Pathfinding {
 					tileIndex <<= TileIndexOffset;
 
 					for (int i = 0; i < tile.nodes.Length; i++) {
-						var node = new TriangleMeshNode(active);
+						TriangleMeshNode node = new TriangleMeshNode(active);
 						tile.nodes[i] = node;
 
 						node.DeserializeNode(ctx);
@@ -1345,13 +1345,13 @@ namespace Pathfinding {
 				// We need to recalculate all connections when upgrading data from earlier than 4.1.0
 				// as the connections now need information about which edge was used.
 				// This may remove connections for e.g off-mesh links.
-				foreach (var tile in tiles) CreateNodeConnections(tile.nodes);
-				foreach (var tile in tiles) ConnectTileWithNeighbours(tile);
+				foreach (NavmeshTile tile in tiles) CreateNodeConnections(tile.nodes);
+				foreach (NavmeshTile tile in tiles) ConnectTileWithNeighbours(tile);
 
 				// Restore any connections that were contained in the serialized file but didn't get added by the method calls above
 				GetNodes(node => {
-					var triNode = node as TriangleMeshNode;
-					foreach (var conn in conns[triNode].Where(conn => !triNode.ContainsConnection(conn.node)).ToList()) {
+					TriangleMeshNode triNode = node as TriangleMeshNode;
+					foreach (Connection conn in conns[triNode].Where(conn => !triNode.ContainsConnection(conn.node)).ToList()) {
 						triNode.AddConnection(conn.node, conn.cost, conn.shapeEdge);
 					}
 				});

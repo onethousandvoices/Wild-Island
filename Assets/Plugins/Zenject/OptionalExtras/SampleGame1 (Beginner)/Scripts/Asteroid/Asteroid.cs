@@ -38,7 +38,7 @@ namespace Zenject.Asteroids
         {
             get
             {
-                var scale = transform.localScale;
+                Vector3 scale = transform.localScale;
                 // We assume scale is uniform
                 Assert.That(scale[0] == scale[1] && scale[1] == scale[2]);
 
@@ -60,11 +60,11 @@ namespace Zenject.Asteroids
         public void FixedTick()
         {
             // Limit speed to a maximum
-            var speed = _rigidBody.velocity.magnitude;
+            float speed = _rigidBody.velocity.magnitude;
 
             if (speed > _settings.maxSpeed)
             {
-                var dir = _rigidBody.velocity / speed;
+                Vector3 dir = _rigidBody.velocity / speed;
                 _rigidBody.velocity = dir * _settings.maxSpeed;
             }
         }

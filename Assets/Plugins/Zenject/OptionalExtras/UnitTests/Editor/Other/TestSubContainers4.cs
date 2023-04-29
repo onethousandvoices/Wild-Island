@@ -14,11 +14,11 @@ namespace Zenject.Tests.Other
         {
             SetupContainer();
 
-            var view1 = Container.Resolve<RotorView>();
+            RotorView view1 = Container.Resolve<RotorView>();
 
             Assert.IsEqual(view1.Controller.Model, view1.Model);
 
-            var view2 = Container.Resolve<RotorView>();
+            RotorView view2 = Container.Resolve<RotorView>();
 
             Assert.IsEqual(view2.Controller.Model, view2.Model);
 

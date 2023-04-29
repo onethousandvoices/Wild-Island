@@ -44,7 +44,7 @@ namespace Pathfinding {
 		private static Color[] AreaColors = new Color[1];
 
 		public static int ColorHash () {
-			var hash = SolidColor.GetHashCode() ^ UnwalkableNode.GetHashCode() ^ BoundsHandles.GetHashCode() ^ ConnectionLowLerp.GetHashCode() ^ ConnectionHighLerp.GetHashCode() ^ MeshEdgeColor.GetHashCode();
+			int hash = SolidColor.GetHashCode() ^ UnwalkableNode.GetHashCode() ^ BoundsHandles.GetHashCode() ^ ConnectionLowLerp.GetHashCode() ^ ConnectionHighLerp.GetHashCode() ^ MeshEdgeColor.GetHashCode();
 
 			for (int i = 0; i < AreaColors.Length; i++) hash = 7*hash ^ AreaColors[i].GetHashCode();
 			return hash;
@@ -638,7 +638,7 @@ namespace Pathfinding {
 				backupData.Add(node.Penalty);
 				backupData.Add(node.Flags);
 #if !ASTAR_NO_GRID_GRAPH
-				var gridNode = node as GridNode;
+				GridNode gridNode = node as GridNode;
 				if (gridNode != null) backupData.Add(gridNode.InternalGridFlags);
 #endif
 			}
@@ -666,12 +666,12 @@ namespace Pathfinding {
 					changedNodes[i].Penalty = backupData[counter];
 					counter++;
 					// Restore the flags, but not the HierarchicalNodeIndex as that could screw up some internal datastructures
-					var tmp = changedNodes[i].HierarchicalNodeIndex;
+					int tmp = changedNodes[i].HierarchicalNodeIndex;
 					changedNodes[i].Flags = backupData[counter];
 					changedNodes[i].HierarchicalNodeIndex = tmp;
 					counter++;
 #if !ASTAR_NO_GRID_GRAPH
-					var gridNode = changedNodes[i] as GridNode;
+					GridNode gridNode = changedNodes[i] as GridNode;
 					if (gridNode != null) {
 						gridNode.InternalGridFlags = (ushort)backupData[counter];
 						counter++;
@@ -783,7 +783,7 @@ namespace Pathfinding {
 		}
 
 		public override bool Equals (System.Object obj) {
-			var rect = (IntRect)obj;
+			IntRect rect = (IntRect)obj;
 
 			return xmin == rect.xmin && xmax == rect.xmax && ymin == rect.ymin && ymax == rect.ymax;
 		}
@@ -947,7 +947,7 @@ namespace Pathfinding {
 		/// </code>
 		/// </summary>
 		public static GraphMask FromGraphName (string graphName) {
-			var graph = AstarData.active.data.FindGraph(g => g.name == graphName);
+			NavGraph graph = AstarData.active.data.FindGraph(g => g.name == graphName);
 
 			if (graph == null) throw new System.ArgumentException("Could not find any graph with the name '" + graphName + "'");
 			return FromGraph(graph);

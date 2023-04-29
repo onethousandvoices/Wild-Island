@@ -61,8 +61,8 @@ namespace Zenject.SpaceFighter
 
         void KeepPlayerOnScreen()
         {
-            var extentLeft = (_levelBoundary.Left + _settings.BoundaryBuffer) - _player.Position.x;
-            var extentRight = _player.Position.x - (_levelBoundary.Right - _settings.BoundaryBuffer);
+            float extentLeft = (_levelBoundary.Left + _settings.BoundaryBuffer) - _player.Position.x;
+            float extentRight = _player.Position.x - (_levelBoundary.Right - _settings.BoundaryBuffer);
 
             if (extentLeft > 0)
             {
@@ -75,8 +75,8 @@ namespace Zenject.SpaceFighter
                     Vector3.left * _settings.BoundaryAdjustForce * extentRight);
             }
 
-            var extentTop = _player.Position.y - (_levelBoundary.Top - _settings.BoundaryBuffer);
-            var extentBottom = (_levelBoundary.Bottom + _settings.BoundaryBuffer) - _player.Position.y;
+            float extentTop = _player.Position.y - (_levelBoundary.Top - _settings.BoundaryBuffer);
+            float extentBottom = (_levelBoundary.Bottom + _settings.BoundaryBuffer) - _player.Position.y;
 
             if (extentTop > 0)
             {

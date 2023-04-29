@@ -39,7 +39,7 @@ namespace Zenject.Tests.Other
                     f.Value = "asdf";
                 });
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, "asdf");
         }
@@ -55,7 +55,7 @@ namespace Zenject.Tests.Other
                     f.Value = "asdf";
                 });
 
-            var foo = Container.Resolve<Foo.Factory>().Create();
+            Foo foo = Container.Resolve<Foo.Factory>().Create();
 
             Assert.IsEqual(foo.Value, "asdf");
         }
@@ -71,7 +71,7 @@ namespace Zenject.Tests.Other
                     f.Value = "asdf";
                 });
 
-            var foo = Container.Resolve<Foo.Pool>().Spawn();
+            Foo foo = Container.Resolve<Foo.Pool>().Spawn();
 
             Assert.IsEqual(foo.Value, "asdf");
         }

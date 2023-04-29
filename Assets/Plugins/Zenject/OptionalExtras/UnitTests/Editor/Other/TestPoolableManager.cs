@@ -47,7 +47,7 @@ namespace Zenject.Tests.Other
             Container.Bind<IPoolable>().To<Foo>().AsSingle();
             Container.Bind<IPoolable>().To<Bar>().AsSingle();
 
-            var poolManager = Container.Resolve<PoolableManager>();
+            PoolableManager poolManager = Container.Resolve<PoolableManager>();
 
             CallCount = 1;
             Foo.SpawnCallCount = 0;
@@ -80,7 +80,7 @@ namespace Zenject.Tests.Other
             Container.BindExecutionOrder<Foo>(2);
             Container.BindExecutionOrder<Bar>(1);
 
-            var poolManager = Container.Resolve<PoolableManager>();
+            PoolableManager poolManager = Container.Resolve<PoolableManager>();
 
             CallCount = 1;
             Foo.SpawnCallCount = 0;

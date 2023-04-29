@@ -35,7 +35,7 @@ namespace Zenject.Tests.Bindings.FromComponentInHierarchyGameObjectContext
 
             PostInstall();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsNotNull(foo.Gorp);
             Assert.IsEqual(foo.gameObject.GetComponentsInChildren<Gorp>().Single(), foo.Gorp);

@@ -276,8 +276,8 @@ namespace Pathfinding {
 
 				// Sample points every [maxSegmentLength] world units along the path
 				for (int i = 0; i < path.Count-1; i++) {
-					var start = path[i];
-					var end = path[i+1];
+					Vector3 start = path[i];
+					Vector3 end = path[i+1];
 
 					float length = Vector3.Distance(start, end);
 

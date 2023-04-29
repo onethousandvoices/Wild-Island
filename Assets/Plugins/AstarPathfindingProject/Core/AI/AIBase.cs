@@ -298,12 +298,12 @@ namespace Pathfinding {
 		[System.Obsolete("Use the destination property or the AIDestinationSetter component instead")]
 		public Transform target {
 			get {
-				var setter = GetComponent<AIDestinationSetter>();
+				AIDestinationSetter setter = GetComponent<AIDestinationSetter>();
 				return setter != null ? setter.target : null;
 			}
 			set {
 				targetCompatibility = null;
-				var setter = GetComponent<AIDestinationSetter>();
+				AIDestinationSetter setter = GetComponent<AIDestinationSetter>();
 				if (setter == null) setter = gameObject.AddComponent<AIDestinationSetter>();
 				setter.target = value;
 				destination = value != null ? value.position : new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
@@ -665,7 +665,7 @@ namespace Pathfinding {
 		}
 
 		protected void UpdateVelocity () {
-			var currentFrame = Time.frameCount;
+			int currentFrame = Time.frameCount;
 
 			if (currentFrame != prevFrame) prevPosition2 = prevPosition1;
 			prevPosition1 = position;
@@ -729,7 +729,7 @@ namespace Pathfinding {
 		protected virtual void OnDrawGizmos () {
 			if (!Application.isPlaying || !enabled) FindComponents();
 
-			var color = ShapeGizmoColor;
+			Color color = ShapeGizmoColor;
 			if (orientation == OrientationMode.YAxisForward) {
 				Draw.Gizmos.Cylinder(position, Vector3.forward, 0, radius * tr.localScale.x, color);
 			} else {
@@ -747,7 +747,7 @@ namespace Pathfinding {
 		}
 
 		void ResetShape () {
-			var cc = GetComponent<CharacterController>();
+			CharacterController cc = GetComponent<CharacterController>();
 
 			if (cc != null) {
 				radius = cc.radius;

@@ -43,7 +43,7 @@ namespace Pathfinding.Util {
 		}
 
 		public void Cylinder (Vector3 position, Vector3 up, float height, float radius, Color color) {
-			var tangent = Vector3.Cross(up, Vector3.one).normalized;
+			Vector3 tangent = Vector3.Cross(up, Vector3.one).normalized;
 
 			matrix = Matrix4x4.TRS(position, Quaternion.LookRotation(tangent, up), new Vector3(radius, height, radius));
 			CircleXZ(Vector3.zero, 1, color);

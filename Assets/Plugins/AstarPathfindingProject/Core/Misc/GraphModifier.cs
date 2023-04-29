@@ -27,11 +27,11 @@ namespace Pathfinding {
 		protected static Dictionary<ulong, GraphModifier> usedIDs = new Dictionary<ulong, GraphModifier>();
 
 		protected static List<T> GetModifiersOfType<T>() where T : GraphModifier {
-			var current = root;
-			var result = new List<T>();
+			GraphModifier current = root;
+			List<T> result = new List<T>();
 
 			while (current != null) {
-				var cast = current as T;
+				T cast = current as T;
 				if (cast != null) result.Add(cast);
 				current = current.next;
 			}
@@ -39,7 +39,7 @@ namespace Pathfinding {
 		}
 
 		public static void FindAllModifiers () {
-			var allModifiers = FindObjectsOfType(typeof(GraphModifier)) as GraphModifier[];
+			GraphModifier[] allModifiers = FindObjectsOfType(typeof(GraphModifier)) as GraphModifier[];
 
 			for (int i = 0; i < allModifiers.Length; i++) {
 				if (allModifiers[i].enabled) allModifiers[i].OnEnable();
@@ -194,8 +194,8 @@ namespace Pathfinding {
 		protected override void Reset () {
 			base.Reset();
 			// Create a new random 64 bit value (62 bit actually because we skip negative numbers, but that's still enough by a huge margin)
-			var rnd1 = (ulong)Random.Range(0, int.MaxValue);
-			var rnd2 = ((ulong)Random.Range(0, int.MaxValue) << 32);
+			ulong rnd1 = (ulong)Random.Range(0, int.MaxValue);
+			ulong rnd2 = ((ulong)Random.Range(0, int.MaxValue) << 32);
 
 			uniqueID = rnd1 | rnd2;
 			usedIDs[uniqueID] = this;

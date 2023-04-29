@@ -28,7 +28,7 @@ namespace NaughtyAttributes.Editor
                     {
                         float totalHeight = EditorGUIUtility.singleLineHeight;
 
-                        using (var iterator = serializedObject.GetIterator())
+                        using (SerializedProperty iterator = serializedObject.GetIterator())
                         {
                             if (iterator.NextVisible(true))
                             {
@@ -151,7 +151,7 @@ namespace NaughtyAttributes.Editor
                 SerializedObject serializedObject = new SerializedObject(scriptableObject);
                 serializedObject.Update();
 
-                using (var iterator = serializedObject.GetIterator())
+                using (SerializedProperty iterator = serializedObject.GetIterator())
                 {
                     float yOffset = EditorGUIUtility.singleLineHeight;
 

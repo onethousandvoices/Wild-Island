@@ -689,7 +689,7 @@ namespace Pathfinding {
 			// Reverse
 			int half = count/2;
 			for (int i = 0; i < half; i++) {
-				var tmp = path[i];
+				GraphNode tmp = path[i];
 				path[i] = path[count-i-1];
 				path[count - i - 1] = tmp;
 			}

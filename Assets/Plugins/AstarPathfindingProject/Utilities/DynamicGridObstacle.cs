@@ -63,7 +63,7 @@ namespace Pathfinding {
 				if (coll != null) {
 					return coll.bounds;
 				} else {
-					var b = coll2D.bounds;
+					Bounds b = coll2D.bounds;
 					// Make sure the bounding box stretches close to infinitely along the Z axis (which is the axis perpendicular to the 2D plane).
 					// We don't want any change along the Z axis to make a difference.
 					b.extents += new Vector3(0, 0, 10000);
@@ -128,15 +128,15 @@ namespace Pathfinding {
 			if (colliderEnabled) {
 				// The current bounds of the collider
 				Bounds newBounds = bounds;
-				var newRotation = tr.rotation;
+				Quaternion newRotation = tr.rotation;
 
 				Vector3 minDiff = prevBounds.min - newBounds.min;
 				Vector3 maxDiff = prevBounds.max - newBounds.max;
 
-				var extents = newBounds.extents.magnitude;
+				float extents = newBounds.extents.magnitude;
 				// This is the distance that a point furthest out on the bounding box
 				// would have moved due to the changed rotation of the object
-				var errorFromRotation = extents*Quaternion.Angle(prevRotation, newRotation)*Mathf.Deg2Rad;
+				float errorFromRotation = extents*Quaternion.Angle(prevRotation, newRotation)*Mathf.Deg2Rad;
 
 				// If the difference between the previous bounds and the new bounds is greater than some value, update the graphs
 				if (minDiff.sqrMagnitude > updateError*updateError || maxDiff.sqrMagnitude > updateError*updateError ||
@@ -159,7 +159,7 @@ namespace Pathfinding {
 		protected override void OnDisable () {
 			base.OnDisable();
 			if (AstarPath.active != null && Application.isPlaying) {
-				var guo = new GraphUpdateObject(prevBounds);
+				GraphUpdateObject guo = new GraphUpdateObject(prevBounds);
 				pendingGraphUpdates.Enqueue(guo);
 				AstarPath.active.UpdateGraphs(guo);
 				prevEnabled = false;
@@ -187,7 +187,7 @@ namespace Pathfinding {
 			if (!colliderEnabled) {
 				// If the collider is not enabled, then col.bounds will empty
 				// so just update prevBounds
-				var guo = new GraphUpdateObject(prevBounds);
+				GraphUpdateObject guo = new GraphUpdateObject(prevBounds);
 				pendingGraphUpdates.Enqueue(guo);
 				AstarPath.active.UpdateGraphs(guo);
 			} else {
@@ -200,13 +200,13 @@ namespace Pathfinding {
 				// or to update them separately, the smallest volume is usually the fastest
 				if (BoundsVolume(merged) < BoundsVolume(newBounds) + BoundsVolume(prevBounds)) {
 					// Send an update request to update the nodes inside the 'merged' volume
-					var guo = new GraphUpdateObject(merged);
+					GraphUpdateObject guo = new GraphUpdateObject(merged);
 					pendingGraphUpdates.Enqueue(guo);
 					AstarPath.active.UpdateGraphs(guo);
 				} else {
 					// Send two update request to update the nodes inside the 'prevBounds' and 'newBounds' volumes
-					var guo1 = new GraphUpdateObject(prevBounds);
-					var guo2 = new GraphUpdateObject(newBounds);
+					GraphUpdateObject guo1 = new GraphUpdateObject(prevBounds);
+					GraphUpdateObject guo2 = new GraphUpdateObject(newBounds);
 					pendingGraphUpdates.Enqueue(guo1);
 					pendingGraphUpdates.Enqueue(guo2);
 					AstarPath.active.UpdateGraphs(guo1);

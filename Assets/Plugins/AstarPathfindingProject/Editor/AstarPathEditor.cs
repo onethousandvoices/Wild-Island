@@ -1,7 +1,11 @@
+using Pathfinding.Serialization;
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Pathfinding {
 	[CustomEditor(typeof(AstarPath))]
@@ -302,13 +306,13 @@ namespace Pathfinding {
 			if (stylesLoaded) return true;
 
 			// Dummy styles in case the loading fails
-			var inspectorSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
+			GUISkin inspectorSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);
 
 			if (!EditorResourceHelper.LocateEditorAssets()) {
 				return false;
 			}
 
-			var skinPath = EditorResourceHelper.editorAssets + "/AstarEditorSkin" + (EditorGUIUtility.isProSkin ? "Dark" : "Light") + ".guiskin";
+			string skinPath = EditorResourceHelper.editorAssets + "/AstarEditorSkin" + (EditorGUIUtility.isProSkin ? "Dark" : "Light") + ".guiskin";
 			astarSkin = AssetDatabase.LoadAssetAtPath(skinPath, typeof(GUISkin)) as GUISkin;
 
 			if (astarSkin != null) {
@@ -501,7 +505,7 @@ namespace Pathfinding {
 		GraphEditor graphNameFocused;
 
 		void DrawGraphHeader (GraphEditor graphEditor) {
-			var graph = graphEditor.target;
+			NavGraph graph = graphEditor.target;
 
 			// Graph guid, just used to get a unique value
 			string graphGUIDString = graph.guid.ToString();
@@ -531,8 +535,8 @@ namespace Pathfinding {
 			}
 
 			if (script.prioritizeGraphs) {
-				var moveUp = GUILayout.Button(new GUIContent("Up", "Increase the graph priority"), GUILayout.Width(40));
-				var moveDown = GUILayout.Button(new GUIContent("Down", "Decrease the graph priority"), GUILayout.Width(40));
+				bool moveUp = GUILayout.Button(new GUIContent("Up", "Increase the graph priority"), GUILayout.Width(40));
+				bool moveDown = GUILayout.Button(new GUIContent("Down", "Decrease the graph priority"), GUILayout.Width(40));
 
 				if (moveUp || moveDown) {
 					int index = script.data.GetGraphIndex(graph);
@@ -683,14 +687,14 @@ namespace Pathfinding {
 		}
 
 		void DrawSceneGUISettings () {
-			var darkSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+			GUISkin darkSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
 
 			Handles.BeginGUI();
 			float width = 180;
 			float height = 76;
 			float margin = 10;
 
-			var origWidth = EditorGUIUtility.labelWidth;
+			float origWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = 144;
 			GUILayout.BeginArea(new Rect(Camera.current.pixelWidth - width, Camera.current.pixelHeight - height, width - margin, height - margin), "Graph Display", astarSkin.FindStyle("SceneBoxDark"));
 			EditorGUILayout.BeginHorizontal();
@@ -729,7 +733,7 @@ namespace Pathfinding {
 
 			string fullPath = projectPath + path;
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
-			var fileInfo = new System.IO.FileInfo(fullPath);
+			FileInfo fileInfo = new System.IO.FileInfo(fullPath);
 			// Make sure we can write to the file
 			if (fileInfo.Exists && fileInfo.IsReadOnly)
 				fileInfo.IsReadOnly = false;
@@ -773,7 +777,7 @@ namespace Pathfinding {
 				GUILayout.BeginHorizontal();
 
 				if (GUILayout.Button("Generate cache")) {
-					var serializationSettings = new Pathfinding.Serialization.SerializeSettings();
+					SerializeSettings serializationSettings = new Pathfinding.Serialization.SerializeSettings();
 					serializationSettings.nodes = true;
 
 					if (EditorUtility.DisplayDialog("Scan before generating cache?", "Do you want to scan the graphs before saving the cache.\n" +
@@ -782,7 +786,7 @@ namespace Pathfinding {
 					}
 
 					// Save graphs
-					var bytes = script.data.SerializeGraphs(serializationSettings);
+					byte[] bytes = script.data.SerializeGraphs(serializationSettings);
 
 					// Store it in a file
 					script.data.file_cachedStartup = SaveGraphData(bytes, script.data.file_cachedStartup);
@@ -814,7 +818,7 @@ namespace Pathfinding {
 					string path = EditorUtility.SaveFilePanel("Save Graphs", "", "graph.bytes", "bytes");
 
 					if (path != "") {
-						var serializationSettings = Pathfinding.Serialization.SerializeSettings.Settings;
+						SerializeSettings serializationSettings = Pathfinding.Serialization.SerializeSettings.Settings;
 						if (EditorUtility.DisplayDialog("Include node data?", "Do you want to include node data in the save file. " +
 							"If node data is included the graph can be restored completely without having to scan it first.", "Include node data", "Only settings")) {
 							serializationSettings.nodes = true;
@@ -826,7 +830,7 @@ namespace Pathfinding {
 						}
 
 						uint checksum;
-						var bytes = SerializeGraphs(serializationSettings, out checksum);
+						byte[] bytes = SerializeGraphs(serializationSettings, out checksum);
 						Pathfinding.Serialization.AstarSerializer.SaveToFile(path, bytes);
 
 						EditorUtility.DisplayDialog("Done Saving", "Done saving graph data.", "Ok");
@@ -1078,13 +1082,13 @@ namespace Pathfinding {
 
 				if (EditorResourceHelper.GizmoSurfaceMaterial != null && EditorResourceHelper.GizmoLineMaterial != null) {
 					EditorGUI.BeginChangeCheck();
-					var col1 = EditorResourceHelper.GizmoSurfaceMaterial.color;
+					Color col1 = EditorResourceHelper.GizmoSurfaceMaterial.color;
 					col1.a = EditorGUILayout.Slider("Navmesh Surface Opacity", col1.a, 0, 1);
 
-					var col2 = EditorResourceHelper.GizmoLineMaterial.color;
+					Color col2 = EditorResourceHelper.GizmoLineMaterial.color;
 					col2.a = EditorGUILayout.Slider("Navmesh Outline Opacity", col2.a, 0, 1);
 
-					var fade = EditorResourceHelper.GizmoSurfaceMaterial.GetColor("_FadeColor");
+					Color fade = EditorResourceHelper.GizmoSurfaceMaterial.GetColor("_FadeColor");
 					fade.a = EditorGUILayout.Slider("Opacity Behind Objects", fade.a, 0, 1);
 
 					if (EditorGUI.EndChangeCheck()) {
@@ -1116,7 +1120,7 @@ namespace Pathfinding {
 					EditorGUI.BeginDisabledGroup(colors._AreaColors.Length > 255);
 
 					if (GUILayout.Button("Add New")) {
-						var newcols = new Color[colors._AreaColors.Length+1];
+						Color[] newcols = new Color[colors._AreaColors.Length+1];
 						colors._AreaColors.CopyTo(newcols, 0);
 						newcols[newcols.Length-1] = AstarMath.IntToColor(newcols.Length-1, 1F);
 						colors._AreaColors = newcols;
@@ -1126,7 +1130,7 @@ namespace Pathfinding {
 					EditorGUI.BeginDisabledGroup(colors._AreaColors.Length == 0);
 
 					if (GUILayout.Button("Remove last") && colors._AreaColors.Length > 0) {
-						var newcols = new Color[colors._AreaColors.Length-1];
+						Color[] newcols = new Color[colors._AreaColors.Length-1];
 						for (int i = 0; i < colors._AreaColors.Length-1; i++) {
 							newcols[i] = colors._AreaColors[i];
 						}
@@ -1200,7 +1204,7 @@ namespace Pathfinding {
 
 		/// <summary>Creates a GraphEditor for a graph</summary>
 		GraphEditor CreateGraphEditor (NavGraph graph) {
-			var graphType = graph.GetType().Name;
+			string graphType = graph.GetType().Name;
 			GraphEditor result;
 
 			if (graphEditorTypes.ContainsKey(graphType)) {
@@ -1310,7 +1314,7 @@ namespace Pathfinding {
 		}
 
 		public byte[] SerializeGraphs (out uint checksum) {
-			var settings = Pathfinding.Serialization.SerializeSettings.Settings;
+			SerializeSettings settings = Pathfinding.Serialization.SerializeSettings.Settings;
 
 			settings.editorSettings = true;
 			return SerializeGraphs(settings, out checksum);
@@ -1321,7 +1325,7 @@ namespace Pathfinding {
 			uint tmpChecksum = 0;
 
 			// Serialize all graph editors
-			var output = new System.Text.StringBuilder();
+			StringBuilder output = new System.Text.StringBuilder();
 			for (int i = 0; i < graphEditors.Length; i++) {
 				if (graphEditors[i] == null) continue;
 				output.Length = 0;
@@ -1352,7 +1356,7 @@ namespace Pathfinding {
 				CheckGraphEditors();
 				// Deserialize editor settings
 				for (int i = 0; i < graphEditors.Length; i++) {
-					var data = (graphEditors[i].target as IGraphInternals).SerializedEditorSettings;
+					string data = (graphEditors[i].target as IGraphInternals).SerializedEditorSettings;
 					if (data != null) Pathfinding.Serialization.TinyJsonDeserializer.Deserialize(data, graphEditors[i].GetType(), graphEditors[i], script.gameObject);
 				}
 			} catch (System.Exception e) {
@@ -1377,8 +1381,8 @@ namespace Pathfinding {
 			}
 
 			try {
-				var lastMessageTime = Time.realtimeSinceStartup;
-				foreach (var p in AstarPath.active.ScanAsync()) {
+				float lastMessageTime = Time.realtimeSinceStartup;
+				foreach (Progress p in AstarPath.active.ScanAsync()) {
 					// Displaying the progress bar is pretty slow, so don't do it too often
 					if (Time.realtimeSinceStartup - lastMessageTime > 0.2f) {
 						// Display a progress bar of the scan
@@ -1399,8 +1403,8 @@ namespace Pathfinding {
 		void FindGraphTypes () {
 			graphEditorTypes = new Dictionary<string, CustomGraphEditorAttribute>();
 
-			var graphList = new List<System.Type>();
-			foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies()) {
+			List<Type> graphList = new List<System.Type>();
+			foreach (Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies()) {
 				System.Type[] types = null;
 				try {
 					types = assembly.GetTypes();
@@ -1411,7 +1415,7 @@ namespace Pathfinding {
 				}
 
 				// Iterate through the assembly for classes which inherit from GraphEditor
-				foreach (var type in types) {
+				foreach (Type type in types) {
 					System.Type baseType = type.BaseType;
 					while (!System.Type.Equals(baseType, null)) {
 						if (System.Type.Equals(baseType, typeof(GraphEditor))) {
@@ -1419,7 +1423,7 @@ namespace Pathfinding {
 
 							// Loop through the attributes for the CustomGraphEditorAttribute attribute
 							foreach (System.Object attribute in att) {
-								var cge = attribute as CustomGraphEditorAttribute;
+								CustomGraphEditorAttribute cge = attribute as CustomGraphEditorAttribute;
 
 								if (cge != null && !System.Type.Equals(cge.graphType, null)) {
 									cge.editorType = type;

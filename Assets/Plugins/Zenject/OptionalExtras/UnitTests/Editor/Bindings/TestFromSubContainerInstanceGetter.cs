@@ -110,7 +110,7 @@ namespace Zenject.Tests.Bindings
 
         DiContainer CreateFooSubContainer()
         {
-            var subContainer = new DiContainer();
+            DiContainer subContainer = new DiContainer();
 
             subContainer.Bind<Foo>().AsSingle();
             subContainer.Bind<Bar>().AsSingle();

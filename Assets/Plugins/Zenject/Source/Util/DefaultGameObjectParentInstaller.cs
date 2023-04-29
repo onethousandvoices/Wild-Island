@@ -17,7 +17,7 @@ namespace Zenject
         public override void InstallBindings()
         {
 #if !ZEN_TESTS_OUTSIDE_UNITY
-            var defaultParent = new GameObject(_name);
+            GameObject defaultParent = new GameObject(_name);
 
             defaultParent.transform.SetParent(
                 Container.InheritedDefaultParent, false);

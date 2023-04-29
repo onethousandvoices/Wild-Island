@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using Assert = ModestTree.Assert;
 
 namespace Zenject.Tests.BindFeatures
@@ -25,7 +26,7 @@ namespace Zenject.Tests.BindFeatures
         [Test]
         public void Test1()
         {
-            var types = new[]
+            Type[] types = new[]
             {
                 typeof(Bar),
                 typeof(Foo)

@@ -236,7 +236,7 @@ namespace Pathfinding {
 				}
 			});
 
-			var nnInfo = new NNInfoInternal(minNode);
+			NNInfoInternal nnInfo = new NNInfoInternal(minNode);
 
 			nnInfo.constrainedNode = minConstNode;
 
@@ -354,12 +354,12 @@ namespace Pathfinding {
 			// subclasses of the base graph class may override
 			// this method to draw gizmos in a more optimized way
 
-			var hasher = new RetainedGizmos.Hasher(active);
+			RetainedGizmos.Hasher hasher = new RetainedGizmos.Hasher(active);
 			GetNodes(node => hasher.HashNode(node));
 
 			// Update the gizmo mesh if necessary
 			if (!gizmos.Draw(hasher)) {
-				using (var helper = gizmos.GetGizmoHelper(active, hasher)) {
+				using (GraphGizmoHelper helper = gizmos.GetGizmoHelper(active, hasher)) {
 					GetNodes((System.Action<GraphNode>)helper.DrawConnections);
 				}
 			}
@@ -602,7 +602,7 @@ namespace Pathfinding {
 			}
 
 			if (thickRaycast) {
-				var ray = new Ray(position+up*fromHeight, -up);
+				Ray ray = new Ray(position+up*fromHeight, -up);
 				if (Physics.SphereCast(ray, finalRaycastRadius, out hit, fromHeight+0.005F, heightMask, QueryTriggerInteraction.Ignore)) {
 					return VectorMath.ClosestPointOnLine(ray.origin, ray.origin+ray.direction, hit.point);
 				}

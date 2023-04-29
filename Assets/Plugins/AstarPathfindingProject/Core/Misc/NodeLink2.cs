@@ -79,7 +79,7 @@ namespace Pathfinding {
 			throw new System.Exception("Point graph is not included. Check your A* optimization settings.");
 #else
 			if (AstarPath.active.data.pointGraph == null) {
-				var graph = AstarPath.active.data.AddGraph(typeof(PointGraph)) as PointGraph;
+				PointGraph graph = AstarPath.active.data.AddGraph(typeof(PointGraph)) as PointGraph;
 				graph.name = "PointGraph (used for node links)";
 			}
 
@@ -197,13 +197,13 @@ namespace Pathfinding {
 			endNode.AddConnection(startNode, cost);
 
 			if (connectedNode1 == null || forceNewCheck) {
-				var info = AstarPath.active.GetNearest(StartTransform.position, nn);
+				NNInfo info = AstarPath.active.GetNearest(StartTransform.position, nn);
 				connectedNode1 = info.node;
 				clamped1 = info.position;
 			}
 
 			if (connectedNode2 == null || forceNewCheck) {
-				var info = AstarPath.active.GetNearest(EndTransform.position, nn);
+				NNInfo info = AstarPath.active.GetNearest(EndTransform.position, nn);
 				connectedNode2 = info.node;
 				clamped2 = info.position;
 			}
@@ -250,10 +250,10 @@ namespace Pathfinding {
 		}
 
 		internal static void SerializeReferences (Pathfinding.Serialization.GraphSerializationContext ctx) {
-			var links = GetModifiersOfType<NodeLink2>();
+			List<NodeLink2> links = GetModifiersOfType<NodeLink2>();
 
 			ctx.writer.Write(links.Count);
-			foreach (var link in links) {
+			foreach (NodeLink2 link in links) {
 				ctx.writer.Write(link.uniqueID);
 				ctx.SerializeNodeReference(link.startNode);
 				ctx.SerializeNodeReference(link.endNode);
@@ -269,18 +269,18 @@ namespace Pathfinding {
 			int count = ctx.reader.ReadInt32();
 
 			for (int i = 0; i < count; i++) {
-				var linkID = ctx.reader.ReadUInt64();
-				var startNode = ctx.DeserializeNodeReference();
-				var endNode = ctx.DeserializeNodeReference();
-				var connectedNode1 = ctx.DeserializeNodeReference();
-				var connectedNode2 = ctx.DeserializeNodeReference();
-				var clamped1 = ctx.DeserializeVector3();
-				var clamped2 = ctx.DeserializeVector3();
-				var postScanCalled = ctx.reader.ReadBoolean();
+				ulong linkID = ctx.reader.ReadUInt64();
+				GraphNode startNode = ctx.DeserializeNodeReference();
+				GraphNode endNode = ctx.DeserializeNodeReference();
+				GraphNode connectedNode1 = ctx.DeserializeNodeReference();
+				GraphNode connectedNode2 = ctx.DeserializeNodeReference();
+				Vector3 clamped1 = ctx.DeserializeVector3();
+				Vector3 clamped2 = ctx.DeserializeVector3();
+				bool postScanCalled = ctx.reader.ReadBoolean();
 
 				GraphModifier link;
 				if (usedIDs.TryGetValue(linkID, out link)) {
-					var link2 = link as NodeLink2;
+					NodeLink2 link2 = link as NodeLink2;
 					if (link2 != null) {
 						if (startNode != null) reference[startNode] = link2;
 						if (endNode != null) reference[endNode] = link2;

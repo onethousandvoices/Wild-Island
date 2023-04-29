@@ -70,9 +70,9 @@ namespace Zenject
             {
                 for (int i = 0; i < buffer.Count; i++)
                 {
-                    var obj = buffer[i];
+                    object obj = buffer[i];
 
-                    var extraArgs = ZenPools.SpawnList<TypeValuePair>();
+                    List<TypeValuePair> extraArgs = ZenPools.SpawnList<TypeValuePair>();
 
                     extraArgs.AllocFreeAddRange(_extraArguments);
                     extraArgs.AllocFreeAddRange(args);

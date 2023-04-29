@@ -14,8 +14,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestResolveAmbiguousBindings1()
         {
-            var f1 = new Foo();
-            var f2 = new Foo();
+            Foo f1 = new Foo();
+            Foo f2 = new Foo();
 
             // Should always choose the binding with condition when forced to choose
             Container.BindInstance(f1);
@@ -28,8 +28,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestResolveAmbiguousBindings2()
         {
-            var f1 = new Foo();
-            var f2 = new Foo();
+            Foo f1 = new Foo();
+            Foo f2 = new Foo();
 
             // Order shouldn't matter
             Container.BindInstance(f2).When(_ => true);
@@ -41,13 +41,13 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestDirectListBindings1()
         {
-            var f1 = new Foo();
+            Foo f1 = new Foo();
 
             Container.BindInstance(f1);
 
             Assert.IsEqual(Container.Instantiate<Bar>().Foos[0], f1);
 
-            var l1 = new List<Foo>();
+            List<Foo> l1 = new List<Foo>();
 
             Container.BindInstance(l1);
 

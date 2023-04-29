@@ -27,12 +27,12 @@ namespace Zenject.Tests.Injection
         [Test]
         public void TestPublicPrivate()
         {
-            var test1 = new Test1();
+            Test1 test1 = new Test1();
 
             Container.Bind<Test2>().AsSingle().NonLazy();
             Container.Bind<Test1>().FromInstance(test1).NonLazy();
 
-            var test2 = Container.Resolve<Test2>();
+            Test2 test2 = Container.Resolve<Test2>();
 
             Assert.IsEqual(test2.val2, test1);
             Assert.IsEqual(test2.GetVal4(), test1);

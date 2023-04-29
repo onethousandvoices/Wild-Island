@@ -128,7 +128,7 @@ namespace Pathfinding {
 
 			int connLength = connections != null ? connections.Length : 0;
 
-			var newconns = new Connection[connLength+1];
+			Connection[] newconns = new Connection[connLength+1];
 			for (int i = 0; i < connLength; i++) {
 				newconns[i] = connections[i];
 			}
@@ -173,7 +173,7 @@ namespace Pathfinding {
 				if (connections[i].node == node) {
 					int connLength = connections.Length;
 
-					var newconns = new Connection[connLength-1];
+					Connection[] newconns = new Connection[connLength-1];
 					for (int j = 0; j < i; j++) {
 						newconns[j] = connections[j];
 					}
@@ -223,7 +223,7 @@ namespace Pathfinding {
 		}
 
 		public override int GetGizmoHashCode () {
-			var hash = base.GetGizmoHashCode();
+			int hash = base.GetGizmoHashCode();
 
 			if (connections != null) {
 				for (int i = 0; i < connections.Length; i++) {

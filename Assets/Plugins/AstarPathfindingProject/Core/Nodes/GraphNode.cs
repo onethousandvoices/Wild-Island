@@ -43,7 +43,7 @@ namespace Pathfinding {
 
 		public override bool Equals (object obj) {
 			if (obj == null) return false;
-			var conn = (Connection)obj;
+			Connection conn = (Connection)obj;
 			return conn.node == node && conn.cost == cost && conn.shapeEdge == shapeEdge;
 		}
 	}
@@ -687,7 +687,7 @@ namespace Pathfinding {
 			// Create new arrays which include the new connection
 			int connLength = connections != null ? connections.Length : 0;
 
-			var newconns = ArrayPool<Connection>.ClaimWithExactLength(connLength+1);
+			Connection[] newconns = ArrayPool<Connection>.ClaimWithExactLength(connLength+1);
 			for (int i = 0; i < connLength; i++) {
 				newconns[i] = connections[i];
 			}
@@ -719,7 +719,7 @@ namespace Pathfinding {
 					// Create new arrays which have the specified node removed
 					int connLength = connections.Length;
 
-					var newconns = ArrayPool<Connection>.ClaimWithExactLength(connLength-1);
+					Connection[] newconns = ArrayPool<Connection>.ClaimWithExactLength(connLength-1);
 					for (int j = 0; j < i; j++) {
 						newconns[j] = connections[j];
 					}
@@ -767,7 +767,7 @@ namespace Pathfinding {
 		public abstract bool ContainsPointInGraphSpace(Int3 point);
 
 		public override int GetGizmoHashCode () {
-			var hash = base.GetGizmoHashCode();
+			int hash = base.GetGizmoHashCode();
 
 			if (connections != null) {
 				for (int i = 0; i < connections.Length; i++) {

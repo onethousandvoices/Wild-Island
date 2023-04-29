@@ -19,7 +19,7 @@ namespace Zenject.Tests.BindFeatures
         {
             Container.Bind<Foo>().AsSingle().WithArguments(3, (string)null);
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(foo.Value, 3);
             Assert.IsEqual(foo.Value2, null);

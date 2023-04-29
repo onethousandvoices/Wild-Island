@@ -10,7 +10,7 @@ namespace Zenject.Internal
 
         public static void DestroyEverythingExceptTestRunner(bool immediate)
         {
-            var testRunner = GameObject.Find(UnitTestRunnerGameObjectName);
+            GameObject testRunner = GameObject.Find(UnitTestRunnerGameObjectName);
             Assert.IsNotNull(testRunner);
             GameObject.DontDestroyOnLoad(testRunner);
 
@@ -18,7 +18,7 @@ namespace Zenject.Internal
             // at all by previous tests
             for (int i = 0; i < SceneManager.sceneCount; i++)
             {
-                foreach (var obj in SceneManager.GetSceneAt(i).GetRootGameObjects())
+                foreach (GameObject obj in SceneManager.GetSceneAt(i).GetRootGameObjects())
                 {
                     GameObject.DestroyImmediate(obj);
                 }
@@ -26,10 +26,10 @@ namespace Zenject.Internal
 
             if (ProjectContext.HasInstance)
             {
-                var dontDestroyOnLoadRoots = ProjectContext.Instance.gameObject.scene
-                    .GetRootGameObjects();
+                GameObject[] dontDestroyOnLoadRoots = ProjectContext.Instance.gameObject.scene
+                                                                    .GetRootGameObjects();
 
-                foreach (var rootObj in dontDestroyOnLoadRoots)
+                foreach (GameObject rootObj in dontDestroyOnLoadRoots)
                 {
                     if (rootObj.name != UnitTestRunnerGameObjectName)
                     {

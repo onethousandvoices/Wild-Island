@@ -35,11 +35,11 @@ namespace Zenject.Tests.Injection
             Container.Instantiate<T>();
             Container.Instantiate<T>();
 
-            var measurements = new List<double>();
+            List<double> measurements = new List<double>();
 
             for (int k = 0; k < 10; k++)
             {
-                var stopwatch = new Stopwatch();
+                Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 for (int i = 0; i < 10000; i++)
                 {

@@ -1,3 +1,4 @@
+using System.Reflection;
 using UnityEngine;
 
 namespace Pathfinding.Examples {
@@ -30,12 +31,12 @@ namespace Pathfinding.Examples {
 #if UNITY_EDITOR
 		protected override int OnUpgradeSerializedData (int version, bool unityThread) {
 			if (unityThread) {
-				var components = gameObject.GetComponents<Component>();
+				Component[] components = gameObject.GetComponents<Component>();
 				int index = System.Array.IndexOf(components, this);
 				foreach (System.Type newType in new [] { typeof(AIPath), typeof(MineBotAnimation) }) {
-					var newComp = gameObject.AddComponent(newType);
-					foreach (var field in newComp.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)) {
-						var oldField = this.GetType().GetField(field.Name);
+					Component newComp = gameObject.AddComponent(newType);
+					foreach (FieldInfo field in newComp.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)) {
+						FieldInfo oldField = this.GetType().GetField(field.Name);
 						try {
 							if (oldField != null) field.SetValue(newComp, oldField.GetValue(this));
 						} catch (System.Exception e) {

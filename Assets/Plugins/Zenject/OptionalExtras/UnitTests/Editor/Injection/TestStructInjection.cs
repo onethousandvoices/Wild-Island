@@ -25,7 +25,7 @@ namespace Zenject.Tests.Injection
 
             Container.ResolveRoots();
 
-            var t2 = Container.Resolve<Test2>();
+            Test2 t2 = Container.Resolve<Test2>();
 
             Assert.That(t2 != null);
         }
@@ -56,7 +56,7 @@ namespace Zenject.Tests.Injection
             Container.BindInstance(5);
             Container.Bind<Test3>().AsSingle();
 
-            var test3 = Container.Instantiate<Test3>();
+            Test3 test3 = Container.Instantiate<Test3>();
 
             Assert.IsEqual(test3.ValueProperty, "asdf");
             Assert.IsEqual(test3.ValueField, 5);
@@ -81,7 +81,7 @@ namespace Zenject.Tests.Injection
             Container.BindInstance("asdf");
             Container.Bind<Test4>().AsSingle();
 
-            var test4 = Container.Instantiate<Test4>();
+            Test4 test4 = Container.Instantiate<Test4>();
 
             Assert.IsEqual(test4.Value, "asdf");
         }

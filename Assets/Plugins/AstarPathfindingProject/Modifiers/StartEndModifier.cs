@@ -122,7 +122,7 @@ namespace Pathfinding {
 		System.Action<GraphNode> connectionBufferAddDelegate;
 
 		public override void Apply (Path _p) {
-			var p = _p as ABPath;
+			ABPath p = _p as ABPath;
 
 			// This modifier only supports ABPaths (doesn't make much sense for other paths anyway)
 			if (p == null || p.vectorPath.Count == 0) return;
@@ -181,9 +181,9 @@ namespace Pathfinding {
 		}
 
 		Vector3 Snap (ABPath path, Exactness mode, bool start, out bool forceAddPoint, out int closestConnectionIndex) {
-			var index = start ? 0 : path.path.Count - 1;
-			var node = path.path[index];
-			var nodePos = (Vector3)node.position;
+			int index = start ? 0 : path.path.Count - 1;
+			GraphNode node = path.path[index];
+			Vector3 nodePos = (Vector3)node.position;
 
 			closestConnectionIndex = 0;
 
@@ -209,7 +209,7 @@ namespace Pathfinding {
 					return GetClampedPoint(nodePos, relevantPoint, node);
 				case Exactness.Interpolate:
 					// Adjacent node to either the start node or the end node in the path
-					var adjacentNode = path.path[Mathf.Clamp(index + (start ? 1 : -1), 0, path.path.Count-1)];
+					GraphNode adjacentNode = path.path[Mathf.Clamp(index + (start ? 1 : -1), 0, path.path.Count-1)];
 					return VectorMath.ClosestPointOnSegment(nodePos, (Vector3)adjacentNode.position, relevantPoint);
 				case Exactness.NodeConnection:
 					// This code uses some tricks to avoid allocations
@@ -224,21 +224,21 @@ namespace Pathfinding {
 
 					// Add all neighbours of #node to the connectionBuffer
 					node.GetConnections(connectionBufferAddDelegate);
-					var bestPos = nodePos;
-					var bestDist = float.PositiveInfinity;
+					Vector3 bestPos = nodePos;
+					float bestDist = float.PositiveInfinity;
 
 					// Loop through all neighbours
 					// Do it in reverse order because the length of the connectionBuffer
 					// will change during iteration
 					for (int i = connectionBuffer.Count - 1; i >= 0; i--) {
-						var neighbour = connectionBuffer[i];
+						GraphNode neighbour = connectionBuffer[i];
 						if (!path.CanTraverse(neighbour)) continue;
 
 						// Find the closest point on the connection between the nodes
 						// and check if the distance to that point is lower than the previous best
-						var closest = VectorMath.ClosestPointOnSegment(nodePos, (Vector3)neighbour.position, relevantPoint);
+						Vector3 closest = VectorMath.ClosestPointOnSegment(nodePos, (Vector3)neighbour.position, relevantPoint);
 
-						var dist = (closest - relevantPoint).sqrMagnitude;
+						float dist = (closest - relevantPoint).sqrMagnitude;
 						if (dist < bestDist) {
 							bestPos = closest;
 							bestDist = dist;
@@ -269,7 +269,7 @@ namespace Pathfinding {
 			}
 
 			if (useGraphRaycasting && hint != null) {
-				var rayGraph = AstarData.GetGraph(hint) as IRaycastableGraph;
+				IRaycastableGraph rayGraph = AstarData.GetGraph(hint) as IRaycastableGraph;
 
 				if (rayGraph != null) {
 					GraphHitInfo graphHit;

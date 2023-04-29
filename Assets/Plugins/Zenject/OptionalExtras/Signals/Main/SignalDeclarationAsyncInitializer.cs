@@ -26,7 +26,7 @@ namespace Zenject
         {
             for (int i = 0; i < _declarations.Count; i++)
             {
-                var declaration = _declarations[i];
+                SignalDeclaration declaration = _declarations[i];
 
                 if (declaration.IsAsync)
                 {

@@ -66,7 +66,7 @@ namespace Pathfinding.Util {
 				if (includeAreaInfo) AddHash((int)node.Area);
 
 				if (includePathSearchInfo) {
-					var pathNode = debugData.GetPathNode(node.NodeIndex);
+					PathNode pathNode = debugData.GetPathNode(node.NodeIndex);
 					AddHash((int)pathNode.pathID);
 					AddHash(pathNode.pathID == debugData.PathID ? 1 : 0);
 					AddHash((int)pathNode.F);
@@ -87,7 +87,7 @@ namespace Pathfinding.Util {
 			List<Mesh> meshes = new List<Mesh>();
 
 			public void DrawMesh (RetainedGizmos gizmos, Vector3[] vertices, List<int> triangles, Color[] colors) {
-				var mesh = gizmos.GetMesh();
+				Mesh mesh = gizmos.GetMesh();
 
 				// Set all data on the mesh
 				mesh.vertices = vertices;
@@ -101,8 +101,8 @@ namespace Pathfinding.Util {
 
 			/// <summary>Draws a wire cube after being transformed the specified transformation</summary>
 			public void DrawWireCube (GraphTransform tr, Bounds bounds, Color color) {
-				var min = bounds.min;
-				var max = bounds.max;
+				Vector3 min = bounds.min;
+				Vector3 max = bounds.max;
 
 				DrawLine(tr.Transform(new Vector3(min.x, min.y, min.z)), tr.Transform(new Vector3(max.x, min.y, min.z)), color);
 				DrawLine(tr.Transform(new Vector3(max.x, min.y, min.z)), tr.Transform(new Vector3(max.x, min.y, max.z)), color);
@@ -123,7 +123,7 @@ namespace Pathfinding.Util {
 			public void DrawLine (Vector3 start, Vector3 end, Color color) {
 				lines.Add(start);
 				lines.Add(end);
-				var col32 = (Color32)color;
+				Color32 col32 = (Color32)color;
 				lineColors.Add(col32);
 				lineColors.Add(col32);
 			}
@@ -152,19 +152,19 @@ namespace Pathfinding.Util {
 					UnityEngine.Assertions.Assert.IsTrue(lineEndPointCount % 2 == 0);
 
 					// Use pooled lists to avoid excessive allocations
-					var vertices = ListPool<Vector3>.Claim(lineEndPointCount*2);
-					var colors = ListPool<Color32>.Claim(lineEndPointCount*2);
-					var normals = ListPool<Vector3>.Claim(lineEndPointCount*2);
-					var uv = ListPool<Vector2>.Claim(lineEndPointCount*2);
-					var tris = ListPool<int>.Claim(lineEndPointCount*3);
+					List<Vector3> vertices = ListPool<Vector3>.Claim(lineEndPointCount*2);
+					List<Color32> colors = ListPool<Color32>.Claim(lineEndPointCount*2);
+					List<Vector3> normals = ListPool<Vector3>.Claim(lineEndPointCount*2);
+					List<Vector2> uv = ListPool<Vector2>.Claim(lineEndPointCount*2);
+					List<int> tris = ListPool<int>.Claim(lineEndPointCount*3);
 					// Loop through each endpoint of the lines
 					// and add 2 vertices for each
 					for (int j = startIndex; j < endIndex; j++) {
-						var vertex = (Vector3)lines[j];
+						Vector3 vertex = (Vector3)lines[j];
 						vertices.Add(vertex);
 						vertices.Add(vertex);
 
-						var color = (Color32)lineColors[j];
+						Color32 color = (Color32)lineColors[j];
 						colors.Add(color);
 						colors.Add(color);
 						uv.Add(new Vector2(0, 0));
@@ -174,7 +174,7 @@ namespace Pathfinding.Util {
 					// Loop through each line and add
 					// one normal for each vertex
 					for (int j = startIndex; j < endIndex; j += 2) {
-						var lineDir = (Vector3)(lines[j+1] - lines[j]);
+						Vector3 lineDir = (Vector3)(lines[j+1] - lines[j]);
 						// Store the line direction in the normals.
 						// A line consists of 4 vertices. The line direction will be used to
 						// offset the vertices to create a line with a fixed pixel thickness
@@ -199,7 +199,7 @@ namespace Pathfinding.Util {
 						tris.Add(v+2);
 					}
 
-					var mesh = gizmos.GetMesh();
+					Mesh mesh = gizmos.GetMesh();
 
 					// Set all data on the mesh
 					mesh.SetVertices(vertices);
@@ -242,7 +242,7 @@ namespace Pathfinding.Util {
 		Stack<Mesh> cachedMeshes = new Stack<Mesh>();
 
 		public GraphGizmoHelper GetSingleFrameGizmoHelper (AstarPath active) {
-			var uniqHash = new RetainedGizmos.Hasher();
+			Hasher uniqHash = new RetainedGizmos.Hasher();
 
 			uniqHash.AddHash(Time.realtimeSinceStartup.GetHashCode());
 			Draw(uniqHash);
@@ -250,7 +250,7 @@ namespace Pathfinding.Util {
 		}
 
 		public GraphGizmoHelper GetGizmoHelper (AstarPath active, Hasher hasher) {
-			var helper = ObjectPool<GraphGizmoHelper>.Claim();
+			GraphGizmoHelper helper = ObjectPool<GraphGizmoHelper>.Claim();
 
 			helper.Init(active, hasher, this);
 			return helper;
@@ -312,8 +312,8 @@ namespace Pathfinding.Util {
 			if (lineMaterial == null) lineMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath(EditorResourceHelper.editorAssets + "/Materials/NavmeshOutline.mat", typeof(Material)) as Material;
 #endif
 
-			var cam = Camera.current;
-			var planes = GeometryUtility.CalculateFrustumPlanes(cam);
+			Camera cam = Camera.current;
+			Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
 
 			// Silently do nothing if the materials are not set
 			if (surfaceMaterial == null || lineMaterial == null) return;
@@ -321,7 +321,7 @@ namespace Pathfinding.Util {
 			Profiler.BeginSample("Draw Retained Gizmos");
 			// First surfaces, then lines
 			for (int matIndex = 0; matIndex <= 1; matIndex++) {
-				var mat = matIndex == 0 ? surfaceMaterial : lineMaterial;
+				Material mat = matIndex == 0 ? surfaceMaterial : lineMaterial;
 				for (int pass = 0; pass < mat.passCount; pass++) {
 					mat.SetPass(pass);
 					for (int i = 0; i < meshes.Count; i++) {

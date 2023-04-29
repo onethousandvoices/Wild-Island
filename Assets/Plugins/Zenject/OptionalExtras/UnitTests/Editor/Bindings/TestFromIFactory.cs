@@ -15,8 +15,8 @@ namespace Zenject.Tests.Bindings
             Container.BindFactory<Foo, Foo.Factory>().WithId("foo2")
                 .FromIFactory(x => x.To<FooFactory>().AsCached().WithArguments("zxcv"));
 
-            var factory1 = Container.ResolveId<Foo.Factory>("foo1");
-            var factory2 = Container.ResolveId<Foo.Factory>("foo2");
+            Foo.Factory factory1 = Container.ResolveId<Foo.Factory>("foo1");
+            Foo.Factory factory2 = Container.ResolveId<Foo.Factory>("foo2");
 
             Assert.IsEqual(factory1.Create().Value, "asdf");
             Assert.IsEqual(factory2.Create().Value, "zxcv");

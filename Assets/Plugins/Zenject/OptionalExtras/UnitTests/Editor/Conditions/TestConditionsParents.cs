@@ -71,7 +71,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test1>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(Test1)));
 
-            var test1 = Container.Resolve<Test1>();
+            Test1 test1 = Container.Resolve<Test1>();
             Assert.That(test1 != null);
         }
 
@@ -79,8 +79,8 @@ namespace Zenject.Tests.Conditions
         [Test]
         public void TestCase3()
         {
-            var t0a = new Test0();
-            var t0b = new Test0();
+            Test0 t0a = new Test0();
+            Test0 t0b = new Test0();
 
             Container.Bind<Test3>().AsSingle();
             Container.Bind<Test4>().AsSingle();
@@ -89,9 +89,9 @@ namespace Zenject.Tests.Conditions
             Container.Bind<Test0>().FromInstance(t0a).When(c => c.AllObjectTypes.Contains(typeof(Test3)));
             Container.Bind<Test0>().FromInstance(t0b).When(c => c.AllObjectTypes.Contains(typeof(Test4)));
 
-            var test3 = Container.Resolve<Test3>();
+            Test3 test3 = Container.Resolve<Test3>();
 
-            var test4 = Container.Resolve<Test4>();
+            Test4 test4 = Container.Resolve<Test4>();
 
             Assert.That(ReferenceEquals(test3.test1.test0, t0a));
             Assert.That(ReferenceEquals(test4.test1.test0, t0b));
@@ -113,7 +113,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<ITest1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Contains(typeof(Test2)));
 
-            var test1 = Container.Resolve<ITest1>();
+            ITest1 test1 = Container.Resolve<ITest1>();
             Assert.That(test1 != null);
         }
 
@@ -123,7 +123,7 @@ namespace Zenject.Tests.Conditions
             Container.Bind<ITest1>().To<Test2>().AsSingle().NonLazy();
             Container.Bind<Test0>().AsSingle().When(c => c.AllObjectTypes.Where(x => typeof(ITest1).IsAssignableFrom(x)).Any());
 
-            var test1 = Container.Resolve<ITest1>();
+            ITest1 test1 = Container.Resolve<ITest1>();
             Assert.That(test1 != null);
         }
     }

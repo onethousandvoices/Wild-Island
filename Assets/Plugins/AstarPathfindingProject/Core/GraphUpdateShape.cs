@@ -86,10 +86,10 @@ namespace Pathfinding {
 		}
 
 		public static Bounds GetBounds (Vector3[] points, Matrix4x4 matrix, float minimumHeight) {
-			var origin = matrix.MultiplyPoint3x4(Vector3.zero);
-			var right = matrix.MultiplyPoint3x4(Vector3.right) - origin;
-			var up = matrix.MultiplyPoint3x4(Vector3.up) - origin;
-			var forward = matrix.MultiplyPoint3x4(Vector3.forward) - origin;
+			Vector3 origin = matrix.MultiplyPoint3x4(Vector3.zero);
+			Vector3 right = matrix.MultiplyPoint3x4(Vector3.right) - origin;
+			Vector3 up = matrix.MultiplyPoint3x4(Vector3.up) - origin;
+			Vector3 forward = matrix.MultiplyPoint3x4(Vector3.forward) - origin;
 
 			return GetBounds(points, right, up, forward, origin, minimumHeight);
 		}
@@ -101,16 +101,16 @@ namespace Pathfinding {
 				miny = Mathf.Min(miny, points[i].y);
 				maxy = Mathf.Max(maxy, points[i].y);
 			}
-			var extraHeight = Mathf.Max(minimumHeight - (maxy - miny), 0) * 0.5f;
+			float extraHeight = Mathf.Max(minimumHeight - (maxy - miny), 0) * 0.5f;
 			miny -= extraHeight;
 			maxy += extraHeight;
 
 			Vector3 min = right * points[0].x + up * points[0].y + forward * points[0].z;
 			Vector3 max = min;
 			for (int i = 0; i < points.Length; i++) {
-				var p = right * points[i].x + forward * points[i].z;
-				var p1 = p + up * miny;
-				var p2 = p + up * maxy;
+				Vector3 p = right * points[i].x + forward * points[i].z;
+				Vector3 p1 = p + up * miny;
+				Vector3 p2 = p + up * maxy;
 				min = Vector3.Min(min, p1);
 				min = Vector3.Min(min, p2);
 				max = Vector3.Max(max, p1);
@@ -126,7 +126,7 @@ namespace Pathfinding {
 		public bool Contains (Vector3 point) {
 			// Transform to local space (shape in the XZ plane)
 			point -= origin;
-			var localSpacePoint = new Vector3(Vector3.Dot(point, right)/right.sqrMagnitude, 0, Vector3.Dot(point, forward)/forward.sqrMagnitude);
+			Vector3 localSpacePoint = new Vector3(Vector3.Dot(point, right)/right.sqrMagnitude, 0, Vector3.Dot(point, forward)/forward.sqrMagnitude);
 
 			if (convex) {
 				if (_convexPoints == null) return false;

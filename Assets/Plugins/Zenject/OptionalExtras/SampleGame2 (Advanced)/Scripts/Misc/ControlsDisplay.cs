@@ -20,7 +20,7 @@ namespace Zenject.SpaceFighter
 
         public void OnGUI()
         {
-            var bounds = new Rect(_leftPadding, _topPadding, _width, _height);
+            Rect bounds = new Rect(_leftPadding, _topPadding, _width, _height);
             GUI.Label(bounds, "CONTROLS:  WASD to move, Mouse to aim, Left Mouse to fire");
         }
     }

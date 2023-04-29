@@ -184,7 +184,7 @@ namespace Pathfinding {
 
 			public void Enqueue (T item) {
 				if (Count == buffer.Length) {
-					var newBuffer = new T[buffer.Length*2];
+					T[] newBuffer = new T[buffer.Length*2];
 					for (int i = 0; i < Count; i++) {
 						newBuffer[i] = this[i];
 					}
@@ -198,7 +198,7 @@ namespace Pathfinding {
 
 			public T Dequeue () {
 				if (Count == 0) throw new System.InvalidOperationException();
-				var item = buffer[start];
+				T item = buffer[start];
 				start = (start + 1) % buffer.Length;
 				Count--;
 				return item;

@@ -74,7 +74,7 @@ namespace Pathfinding {
 			if (!IsPathPossible(nodes)) return false;
 
 			// Make sure that the first node can reach all other nodes
-			var reachable = GetReachableNodes(nodes[0], tagMask);
+			List<GraphNode> reachable = GetReachableNodes(nodes[0], tagMask);
 			bool result = true;
 
 			// Make sure that the first node can reach all other nodes
@@ -118,7 +118,7 @@ namespace Pathfinding {
 			List<GraphNode> reachable = ListPool<GraphNode>.Claim();
 
 			/// <summary>TODO: Pool</summary>
-			var map = new HashSet<GraphNode>();
+			HashSet<GraphNode> map = new HashSet<GraphNode>();
 
 			System.Action<GraphNode> callback;
 			// Check if we can use the fast path
@@ -188,10 +188,10 @@ namespace Pathfinding {
 #endif
 
 			BFSQueue = BFSQueue ?? new Queue<GraphNode>();
-			var que = BFSQueue;
+			Queue<GraphNode> que = BFSQueue;
 
 			BFSMap = BFSMap ?? new Dictionary<GraphNode, int>();
-			var map = BFSMap;
+			Dictionary<GraphNode, int> map = BFSMap;
 
 			// Even though we clear at the end of this function, it is good to
 			// do it here as well in case the previous invocation of the method
@@ -349,7 +349,7 @@ namespace Pathfinding {
 		public static void GetPointsAroundPoint (Vector3 center, IRaycastableGraph g, List<Vector3> previousPoints, float radius, float clearanceRadius) {
 			if (g == null) throw new System.ArgumentNullException("g");
 
-			var graph = g as NavGraph;
+			NavGraph graph = g as NavGraph;
 
 			if (graph == null) throw new System.ArgumentException("g is not a NavGraph");
 
@@ -465,7 +465,7 @@ namespace Pathfinding {
 				float tot = 0;
 
 				for (int i = 0; i < nodes.Count; i++) {
-					var surfaceArea = nodes[i].SurfaceArea();
+					float surfaceArea = nodes[i].SurfaceArea();
 					// Ensures that even if the nodes have a surface area of 0, a random one will still be picked
 					// instead of e.g always picking the first or the last one.
 					surfaceArea += 0.001f;
@@ -501,8 +501,8 @@ namespace Pathfinding {
 							continue;
 						}
 
-						var node = nodes[v];
-						var p = node.RandomPointOnSurface();
+						GraphNode node = nodes[v];
+						Vector3 p = node.RandomPointOnSurface();
 
 						// Test if it is some distance away from the other points
 						if (clearanceRadius > 0) {

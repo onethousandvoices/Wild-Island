@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Collections.Generic;
 using Assert = ModestTree.Assert;
 
 namespace Zenject.Tests.BindFeatures
@@ -15,7 +16,7 @@ namespace Zenject.Tests.BindFeatures
             Container.BindInstance("a").When(x => Equals(x.ConcreteIdentifier, "asdf") && x.ObjectType == typeof(Foo));
             Container.BindInstance("b").When(x => x.ConcreteIdentifier == null && x.ObjectType == typeof(Foo));
 
-            var foos = Container.ResolveAll<IFoo>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
 
             Assert.IsEqual(foos[0].Value, "a");
             Assert.IsEqual(foos[1].Value, "b");

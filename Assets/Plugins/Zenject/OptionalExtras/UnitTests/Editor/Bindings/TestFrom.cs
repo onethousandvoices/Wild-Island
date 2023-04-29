@@ -104,13 +104,13 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsTransient().NonLazy();
 
-            var foos = Container.ResolveAll<IFoo>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
 
             Assert.IsEqual(foos.Count, 2);
             Assert.That(foos[0] is Foo);
             Assert.That(foos[1] is Bar);
 
-            var foos2 = Container.ResolveAll<IFoo>();
+            List<IFoo> foos2 = Container.ResolveAll<IFoo>();
 
             Assert.IsNotEqual(foos[0], foos2[0]);
             Assert.IsNotEqual(foos[1], foos2[1]);
@@ -121,13 +121,13 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<IFoo>().To(typeof(Foo), typeof(Bar)).AsSingle().NonLazy();
 
-            var foos = Container.ResolveAll<IFoo>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
 
             Assert.IsEqual(foos.Count, 2);
             Assert.That(foos[0] is Foo);
             Assert.That(foos[1] is Bar);
 
-            var foos2 = Container.ResolveAll<IFoo>();
+            List<IFoo> foos2 = Container.ResolveAll<IFoo>();
 
             Assert.IsEqual(foos[0], foos2[0]);
             Assert.IsEqual(foos[1], foos2[1]);
@@ -183,8 +183,8 @@ namespace Zenject.Tests.Bindings
             Container.Bind(typeof(IFoo), typeof(IBar))
                 .To(new List<Type> {typeof(Foo), typeof(Bar)}).AsSingle().NonLazy();
 
-            var foos = Container.ResolveAll<IFoo>();
-            var bars = Container.ResolveAll<IBar>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
+            List<IBar> bars = Container.ResolveAll<IBar>();
 
             Assert.IsEqual(foos.Count, 2);
             Assert.IsEqual(bars.Count, 2);
@@ -201,8 +201,8 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type> {typeof(Foo), typeof(Bar)}).AsTransient().NonLazy();
 
-            var foos = Container.ResolveAll<IFoo>();
-            var bars = Container.ResolveAll<IBar>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
+            List<IBar> bars = Container.ResolveAll<IBar>();
 
             Assert.IsEqual(foos.Count, 2);
             Assert.IsEqual(bars.Count, 2);
@@ -221,8 +221,8 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsCached().NonLazy();
             Container.Bind<Bar>().AsCached().NonLazy();
 
-            var foos = Container.ResolveAll<IFoo>();
-            var bars = Container.ResolveAll<IBar>();
+            List<IFoo> foos = Container.ResolveAll<IFoo>();
+            List<IBar> bars = Container.ResolveAll<IBar>();
 
             Assert.IsEqual(foos.Count, 2);
             Assert.IsEqual(bars.Count, 2);

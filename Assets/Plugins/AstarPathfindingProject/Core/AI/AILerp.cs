@@ -135,7 +135,7 @@ namespace Pathfinding {
 			get {
 				if (!reachedEndOfPath || !interpolator.valid) return false;
 				// Note: distanceToSteeringTarget is the distance to the end of the path when approachingPathEndpoint is true
-				var dir = destination - interpolator.endPoint;
+				Vector3 dir = destination - interpolator.endPoint;
 				// Ignore either the y or z coordinate depending on if we are using 2D mode or not
 				if (orientation == OrientationMode.YAxisForward) dir.z = 0;
 				else dir.y = 0;
@@ -183,12 +183,12 @@ namespace Pathfinding {
 		[System.Obsolete("Use the destination property or the AIDestinationSetter component instead")]
 		public Transform target {
 			get {
-				var setter = GetComponent<AIDestinationSetter>();
+				AIDestinationSetter setter = GetComponent<AIDestinationSetter>();
 				return setter != null ? setter.target : null;
 			}
 			set {
 				targetCompatibility = null;
-				var setter = GetComponent<AIDestinationSetter>();
+				AIDestinationSetter setter = GetComponent<AIDestinationSetter>();
 				if (setter == null) setter = gameObject.AddComponent<AIDestinationSetter>();
 				setter.target = value;
 				destination = value != null ? value.position : new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
@@ -446,7 +446,7 @@ namespace Pathfinding {
 			if (onSearchPath != null) onSearchPath();
 
 			// This is where the path should start to search from
-			var currentPosition = GetFeetPosition();
+			Vector3 currentPosition = GetFeetPosition();
 
 			// If we are following a path, start searching from the node we will
 			// reach next this can prevent odd turns right at the start of the path
@@ -505,7 +505,7 @@ namespace Pathfinding {
 
 
 			// Replace the old path
-			var oldPath = path;
+			ABPath oldPath = path;
 			path = p;
 			reachedEndOfPath = false;
 
@@ -595,14 +595,14 @@ namespace Pathfinding {
 
 		/// <summary>Finds the closest point on the current path and configures the <see cref="interpolator"/></summary>
 		protected virtual void ConfigureNewPath () {
-			var hadValidPath = interpolator.valid;
-			var prevTangent = hadValidPath ? interpolator.tangent : Vector3.zero;
+			bool hadValidPath = interpolator.valid;
+			Vector3 prevTangent = hadValidPath ? interpolator.tangent : Vector3.zero;
 
 			interpolator.SetPath(path.vectorPath);
 			interpolator.MoveToClosestPoint(GetFeetPosition());
 
 			if (interpolatePathSwitches && switchPathInterpolationSpeed > 0.01f && hadValidPath) {
-				var correctionFactor = Mathf.Max(-Vector3.Dot(prevTangent.normalized, interpolator.tangent.normalized), 0);
+				float correctionFactor = Mathf.Max(-Vector3.Dot(prevTangent.normalized, interpolator.tangent.normalized), 0);
 				interpolator.distance -= speed*correctionFactor*(1f/switchPathInterpolationSpeed);
 			}
 		}
@@ -667,7 +667,7 @@ namespace Pathfinding {
 
 			direction = interpolator.tangent;
 			pathSwitchInterpolationTime += deltaTime;
-			var alpha = switchPathInterpolationSpeed * pathSwitchInterpolationTime;
+			float alpha = switchPathInterpolationSpeed * pathSwitchInterpolationTime;
 			if (interpolatePathSwitches && alpha < 1f) {
 				// Find the approximate position we would be at if we
 				// would have continued to follow the previous path

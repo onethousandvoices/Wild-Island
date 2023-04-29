@@ -13,8 +13,8 @@ namespace Zenject.Tests.Other
         [Test]
         public void TestIsRemoved()
         {
-            var subContainer = Container.CreateSubContainer();
-            var test1 = new Test0();
+            DiContainer subContainer = Container.CreateSubContainer();
+            Test0 test1 = new Test0();
 
             subContainer.Bind<Test0>().FromInstance(test1);
 
@@ -36,8 +36,8 @@ namespace Zenject.Tests.Other
             Test0 test0;
             Test1 test1;
 
-            var subContainer = Container.CreateSubContainer();
-            var test0Local = new Test0();
+            DiContainer subContainer = Container.CreateSubContainer();
+            Test0 test0Local = new Test0();
 
             subContainer.Bind<Test0>().FromInstance(test0Local);
             subContainer.Bind<Test1>().AsSingle();
@@ -78,13 +78,13 @@ namespace Zenject.Tests.Other
         {
             IFoo foo1;
 
-            var subContainer1 = Container.CreateSubContainer();
+            DiContainer subContainer1 = Container.CreateSubContainer();
             subContainer1.Bind<IFoo>().To<Foo>().AsSingle();
             foo1 = subContainer1.Resolve<IFoo>();
 
-            var subContainer2 = Container.CreateSubContainer();
+            DiContainer subContainer2 = Container.CreateSubContainer();
             subContainer2.Bind<IFoo>().To<Foo>().AsSingle();
-            var foo2 = subContainer2.Resolve<IFoo>();
+            IFoo foo2 = subContainer2.Resolve<IFoo>();
 
             Assert.That(foo2 != foo1);
         }

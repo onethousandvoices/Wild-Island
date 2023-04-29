@@ -24,7 +24,7 @@ namespace Pathfinding {
 				if (count == 0) {
 					return new Rect(0, 0, 0, 0);
 				} else {
-					var rect = tree[0].rect;
+					IntRect rect = tree[0].rect;
 					return Rect.MinMaxRect(rect.xmin*Int3.PrecisionFactor, rect.ymin*Int3.PrecisionFactor, rect.xmax*Int3.PrecisionFactor, rect.ymax*Int3.PrecisionFactor);
 				}
 			}
@@ -53,7 +53,7 @@ namespace Pathfinding {
 
 		void EnsureCapacity (int c) {
 			if (c > tree.Length) {
-				var newArr = ArrayPool<BBTreeBox>.Claim(c);
+				BBTreeBox[] newArr = ArrayPool<BBTreeBox>.Claim(c);
 				tree.CopyTo(newArr, 0);
 				ArrayPool<BBTreeBox>.Release(ref tree);
 				tree = newArr;
@@ -62,7 +62,7 @@ namespace Pathfinding {
 
 		void EnsureNodeCapacity (int c) {
 			if (c > nodeLookup.Length) {
-				var newArr = ArrayPool<TriangleMeshNode>.Claim(c);
+				TriangleMeshNode[] newArr = ArrayPool<TriangleMeshNode>.Claim(c);
 				nodeLookup.CopyTo(newArr, 0);
 				ArrayPool<TriangleMeshNode>.Release(ref nodeLookup);
 				nodeLookup = newArr;
@@ -95,7 +95,7 @@ namespace Pathfinding {
 			// instead of 4 bytes (sizeof(int)).
 			// It also means we don't have to make a copy of the nodes array since
 			// we do not modify it
-			var permutation = ArrayPool<int>.Claim(nodes.Length);
+			int[] permutation = ArrayPool<int>.Claim(nodes.Length);
 			for (int i = 0; i < nodes.Length; i++) {
 				permutation[i] = i;
 			}
@@ -103,12 +103,12 @@ namespace Pathfinding {
 			// Precalculate the bounds of the nodes in XZ space.
 			// It turns out that calculating the bounds is a bottleneck and precalculating
 			// the bounds makes it around 3 times faster to build a tree
-			var nodeBounds = ArrayPool<IntRect>.Claim(nodes.Length);
+			IntRect[] nodeBounds = ArrayPool<IntRect>.Claim(nodes.Length);
 			for (int i = 0; i < nodes.Length; i++) {
 				Int3 v0, v1, v2;
 				nodes[i].GetVertices(out v0, out v1, out v2);
 
-				var rect = new IntRect(v0.x, v0.z, v0.x, v0.z);
+				IntRect rect = new IntRect(v0.x, v0.z, v0.x, v0.z);
 				rect = rect.ExpandToContain(v1.x, v1.z);
 				rect = rect.ExpandToContain(v2.x, v2.z);
 				nodeBounds[i] = rect;
@@ -127,7 +127,7 @@ namespace Pathfinding {
 				if (nodes[permutation[i]].position.x > divider) {
 					mx--;
 					// Swap items i and mx
-					var tmp = permutation[mx];
+					int tmp = permutation[mx];
 					permutation[mx] = permutation[i];
 					permutation[i] = tmp;
 					i--;
@@ -143,7 +143,7 @@ namespace Pathfinding {
 				if (nodes[permutation[i]].position.z > divider) {
 					mx--;
 					// Swap items i and mx
-					var tmp = permutation[mx];
+					int tmp = permutation[mx];
 					permutation[mx] = permutation[i];
 					permutation[i] = tmp;
 					i--;
@@ -153,11 +153,11 @@ namespace Pathfinding {
 		}
 
 		int RebuildFromInternal (TriangleMeshNode[] nodes, int[] permutation, IntRect[] nodeBounds, int from, int to, bool odd) {
-			var rect = NodeBounds(permutation, nodeBounds, from, to);
+			IntRect rect = NodeBounds(permutation, nodeBounds, from, to);
 			int box = GetBox(rect);
 
 			if (to - from <= MaximumLeafSize) {
-				var nodeOffset = tree[box].nodeOffset = leafNodes*MaximumLeafSize;
+				int nodeOffset = tree[box].nodeOffset = leafNodes*MaximumLeafSize;
 				EnsureNodeCapacity(nodeOffset + MaximumLeafSize);
 				leafNodes++;
 				// Assign all nodes to the array. Note that we also need clear unused slots as the array from the pool may contain any information
@@ -207,10 +207,10 @@ namespace Pathfinding {
 
 		/// <summary>Calculates the bounding box in XZ space of all nodes between from (inclusive) and to (exclusive)</summary>
 		static IntRect NodeBounds (int[] permutation, IntRect[] nodeBounds, int from, int to) {
-			var rect = nodeBounds[permutation[from]];
+			IntRect rect = nodeBounds[permutation[from]];
 
 			for (int j = from + 1; j < to; j++) {
-				var otherRect = nodeBounds[permutation[j]];
+				IntRect otherRect = nodeBounds[permutation[j]];
 
 				// Equivalent to rect = IntRect.Union(rect, otherRect)
 				// but manually inlining is approximately
@@ -267,8 +267,8 @@ namespace Pathfinding {
 		/// Note that the distance parameter need to be configured with the distance for the previous result
 		/// otherwise it may get overwritten even though it was actually closer.</param>
 		public NNInfoInternal QueryClosestXZ (Vector3 p, NNConstraint constraint, ref float distance, NNInfoInternal previous) {
-			var sqrDistance = distance*distance;
-			var origSqrDistance = sqrDistance;
+			float sqrDistance = distance*distance;
+			float origSqrDistance = sqrDistance;
 
 			if (count > 0 && SquaredRectPointDistance(tree[0].rect, p) < sqrDistance) {
 				SearchBoxClosestXZ(0, p, ref sqrDistance, constraint, ref previous);
@@ -283,9 +283,9 @@ namespace Pathfinding {
 			BBTreeBox box = tree[boxi];
 
 			if (box.IsLeaf) {
-				var nodes = nodeLookup;
+				TriangleMeshNode[] nodes = nodeLookup;
 				for (int i = 0; i < MaximumLeafSize && nodes[box.nodeOffset+i] != null; i++) {
-					var node = nodes[box.nodeOffset+i];
+					TriangleMeshNode node = nodes[box.nodeOffset+i];
 					// Update the NNInfo
 					DrawDebugNode(node, 0.2f, Color.red);
 
@@ -336,8 +336,8 @@ namespace Pathfinding {
 		/// <param name="previous">This search will start from the previous NNInfo and improve it if possible.
 		/// Even if the search fails on this call, the solution will never be worse than previous.</param>
 		public NNInfoInternal QueryClosest (Vector3 p, NNConstraint constraint, ref float distance, NNInfoInternal previous) {
-			var sqrDistance = distance*distance;
-			var origSqrDistance = sqrDistance;
+			float sqrDistance = distance*distance;
+			float origSqrDistance = sqrDistance;
 
 			if (count > 0 && SquaredRectPointDistance(tree[0].rect, p) < sqrDistance) {
 				SearchBoxClosest(0, p, ref sqrDistance, constraint, ref previous);
@@ -352,9 +352,9 @@ namespace Pathfinding {
 			BBTreeBox box = tree[boxi];
 
 			if (box.IsLeaf) {
-				var nodes = nodeLookup;
+				TriangleMeshNode[] nodes = nodeLookup;
 				for (int i = 0; i < MaximumLeafSize && nodes[box.nodeOffset+i] != null; i++) {
-					var node = nodes[box.nodeOffset+i];
+					TriangleMeshNode node = nodes[box.nodeOffset+i];
 					Vector3 closest = node.ClosestPointOnNode(p);
 					float dist = (closest-p).sqrMagnitude;
 					if (dist < closestSqrDist) {
@@ -394,10 +394,10 @@ namespace Pathfinding {
 
 			if (secondDist < firstDist) {
 				// Swap
-				var tmp = first;
+				int tmp = first;
 				first = second;
 				second = tmp;
-				var tmp2 = firstDist;
+				float tmp2 = firstDist;
 				firstDist = secondDist;
 				secondDist = tmp2;
 			}
@@ -418,9 +418,9 @@ namespace Pathfinding {
 			BBTreeBox box = tree[boxi];
 
 			if (box.IsLeaf) {
-				var nodes = nodeLookup;
+				TriangleMeshNode[] nodes = nodeLookup;
 				for (int i = 0; i < MaximumLeafSize && nodes[box.nodeOffset+i] != null; i++) {
-					var node = nodes[box.nodeOffset+i];
+					TriangleMeshNode node = nodes[box.nodeOffset+i];
 					if (node.ContainsPoint((Int3)p)) {
 						DrawDebugNode(node, 0.2f, Color.red);
 
@@ -436,12 +436,12 @@ namespace Pathfinding {
 
 				//Search children
 				if (tree[box.left].Contains(p)) {
-					var result = SearchBoxInside(box.left, p, constraint);
+					TriangleMeshNode result = SearchBoxInside(box.left, p, constraint);
 					if (result != null) return result;
 				}
 
 				if (tree[box.right].Contains(p)) {
-					var result = SearchBoxInside(box.right, p, constraint);
+					TriangleMeshNode result = SearchBoxInside(box.right, p, constraint);
 					if (result != null) return result;
 				}
 			}
@@ -474,7 +474,7 @@ namespace Pathfinding {
 			}
 
 			public bool Contains (Vector3 point) {
-				var pi = (Int3)point;
+				Int3 pi = (Int3)point;
 
 				return rect.Contains(pi.x, pi.z);
 			}
@@ -489,8 +489,8 @@ namespace Pathfinding {
 		void OnDrawGizmos (int boxi, int depth) {
 			BBTreeBox box = tree[boxi];
 
-			var min = (Vector3) new Int3(box.rect.xmin, 0, box.rect.ymin);
-			var max = (Vector3) new Int3(box.rect.xmax, 0, box.rect.ymax);
+			Vector3 min = (Vector3) new Int3(box.rect.xmin, 0, box.rect.ymin);
+			Vector3 max = (Vector3) new Int3(box.rect.xmax, 0, box.rect.ymax);
 
 			Vector3 center = (min+max)*0.5F;
 			Vector3 size = (max-center)*2;

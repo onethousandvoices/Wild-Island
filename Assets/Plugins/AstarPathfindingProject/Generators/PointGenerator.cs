@@ -136,7 +136,7 @@ namespace Pathfinding {
 
 		public override void GetNodes (System.Action<GraphNode> action) {
 			if (nodes == null) return;
-			var count = nodeCount;
+			int count = nodeCount;
 			for (int i = 0; i < count; i++) action(nodes[i]);
 		}
 
@@ -150,13 +150,13 @@ namespace Pathfinding {
 
 		NNInfoInternal GetNearestInternal (Vector3 position, NNConstraint constraint, bool fastCheck) {
 			if (nodes == null) return new NNInfoInternal();
-			var iposition = (Int3)position;
+			Int3 iposition = (Int3)position;
 
 
 			float maxDistSqr = constraint == null || constraint.constrainDistance ? AstarPath.active.maxNearestNodeDistanceSqr : float.PositiveInfinity;
 			maxDistSqr *= Int3.FloatPrecision * Int3.FloatPrecision;
 
-			var nnInfo = new NNInfoInternal(null);
+			NNInfoInternal nnInfo = new NNInfoInternal(null);
 			long minDist = long.MaxValue;
 			long minConstDist = long.MaxValue;
 
@@ -182,16 +182,16 @@ namespace Pathfinding {
 		}
 
 		NNInfoInternal FindClosestConnectionPoint (PointNode node, Vector3 position) {
-			var closestConnectionPoint = (Vector3)node.position;
-			var conns = node.connections;
-			var nodePos = (Vector3)node.position;
-			var bestDist = float.PositiveInfinity;
+			Vector3 closestConnectionPoint = (Vector3)node.position;
+			Connection[] conns = node.connections;
+			Vector3 nodePos = (Vector3)node.position;
+			float bestDist = float.PositiveInfinity;
 
 			if (conns != null) {
 				for (int i = 0; i < conns.Length; i++) {
-					var connectionMidpoint = ((UnityEngine.Vector3)conns[i].node.position + nodePos) * 0.5f;
-					var closestPoint = VectorMath.ClosestPointOnSegment(nodePos, connectionMidpoint, position);
-					var dist = (closestPoint - position).sqrMagnitude;
+					Vector3 connectionMidpoint = ((UnityEngine.Vector3)conns[i].node.position + nodePos) * 0.5f;
+					Vector3 closestPoint = VectorMath.ClosestPointOnSegment(nodePos, connectionMidpoint, position);
+					float dist = (closestPoint - position).sqrMagnitude;
 					if (dist < bestDist) {
 						bestDist = dist;
 						closestConnectionPoint = closestPoint;
@@ -199,7 +199,7 @@ namespace Pathfinding {
 				}
 			}
 
-			var result = new NNInfoInternal();
+			NNInfoInternal result = new NNInfoInternal();
 			result.node = node;
 			result.clampedPosition = closestConnectionPoint;
 			return result;
@@ -251,7 +251,7 @@ namespace Pathfinding {
 		/// <param name="position">The node will be set to this position.</param>
 		public T AddNode<T>(T node, Int3 position) where T : PointNode {
 			if (nodes == null || nodeCount == nodes.Length) {
-				var newNodes = new PointNode[nodes != null ? System.Math.Max(nodes.Length+4, nodes.Length*2) : 4];
+				PointNode[] newNodes = new PointNode[nodes != null ? System.Math.Max(nodes.Length+4, nodes.Length*2) : 4];
 				if (nodes != null) nodes.CopyTo(newNodes, 0);
 				nodes = newNodes;
 			}
@@ -335,7 +335,7 @@ namespace Pathfinding {
 		}
 
 		protected virtual PointNode[] CreateNodes (int count) {
-			var nodes = new PointNode[count];
+			PointNode[] nodes = new PointNode[count];
 
 			for (int i = 0; i < nodeCount; i++) nodes[i] = new PointNode(active);
 			return nodes;
@@ -388,7 +388,7 @@ namespace Pathfinding {
 			}
 
 
-			foreach (var progress in ConnectNodesAsync()) yield return progress.MapTo(0.15f, 0.95f);
+			foreach (Progress progress in ConnectNodesAsync()) yield return progress.MapTo(0.15f, 0.95f);
 		}
 
 		/// <summary>
@@ -396,7 +396,7 @@ namespace Pathfinding {
 		/// This is useful if you have created nodes manually using <see cref="AddNode"/> and then want to connect them in the same way as the point graph normally connects nodes.
 		/// </summary>
 		public void ConnectNodes () {
-			var ie = ConnectNodesAsync().GetEnumerator();
+			IEnumerator<Progress> ie = ConnectNodesAsync().GetEnumerator();
 
 			while (ie.MoveNext()) {}
 
@@ -410,7 +410,7 @@ namespace Pathfinding {
 		IEnumerable<Progress> ConnectNodesAsync () {
 			if (maxDistance >= 0) {
 				// To avoid too many allocations, these lists are reused for each node
-				var connections = new List<Connection>();
+				List<Connection> connections = new List<Connection>();
 
 				long maxSquaredRange;
 				// Max possible squared length of a connection between two nodes
@@ -432,7 +432,7 @@ namespace Pathfinding {
 					}
 
 					connections.Clear();
-					var node = nodes[i];
+					PointNode node = nodes[i];
 					// Only brute force is available in the free version
 					for (int j = 0; j < nodeCount; j++) {
 						if (i == j) continue;
@@ -466,7 +466,7 @@ namespace Pathfinding {
 
 			if (!a.Walkable || !b.Walkable) return false;
 
-			var dir = (Vector3)(b.position-a.position);
+			Vector3 dir = (Vector3)(b.position-a.position);
 
 			if (
 				(!Mathf.Approximately(limits.x, 0) && Mathf.Abs(dir.x) > limits.x) ||
@@ -478,8 +478,8 @@ namespace Pathfinding {
 			dist = dir.magnitude;
 			if (maxDistance == 0 || dist < maxDistance) {
 				if (raycast) {
-					var ray = new Ray((Vector3)a.position, dir);
-					var invertRay = new Ray((Vector3)b.position, -dir);
+					Ray ray = new Ray((Vector3)a.position, dir);
+					Ray invertRay = new Ray((Vector3)b.position, -dir);
 
 					if (use2DPhysics) {
 						if (thickRaycast) {

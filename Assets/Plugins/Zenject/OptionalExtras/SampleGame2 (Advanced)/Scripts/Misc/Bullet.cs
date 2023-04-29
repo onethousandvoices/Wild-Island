@@ -38,7 +38,7 @@ namespace Zenject.SpaceFighter
 
         public void OnTriggerEnter(Collider other)
         {
-            var enemyView = other.GetComponent<EnemyView>();
+            EnemyView enemyView = other.GetComponent<EnemyView>();
 
             if (enemyView != null && _type == BulletTypes.FromPlayer)
             {
@@ -47,7 +47,7 @@ namespace Zenject.SpaceFighter
             }
             else
             {
-                var player = other.GetComponent<PlayerFacade>();
+                PlayerFacade player = other.GetComponent<PlayerFacade>();
 
                 if (player != null && _type == BulletTypes.FromEnemy)
                 {

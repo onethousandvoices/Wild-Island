@@ -88,7 +88,7 @@ namespace Pathfinding {
 			}
 
 			for (int i = 0; i < blockersInNode.Count; i++) {
-				var inNode = blockersInNode[i];
+				SingleNodeBlocker inNode = blockersInNode[i];
 				for (int j = 0; j < selector.Count; j++) {
 					// Need to use ReferenceEquals because this code may be called from a separate thread
 					// and the equality comparison that Unity provides is not thread safe
@@ -109,7 +109,7 @@ namespace Pathfinding {
 			}
 
 			for (int i = 0; i < blockersInNode.Count; i++) {
-				var inNode = blockersInNode[i];
+				SingleNodeBlocker inNode = blockersInNode[i];
 				bool found = false;
 				for (int j = 0; j < selector.Count; j++) {
 					// Need to use ReferenceEquals because this code may be called from a separate thread

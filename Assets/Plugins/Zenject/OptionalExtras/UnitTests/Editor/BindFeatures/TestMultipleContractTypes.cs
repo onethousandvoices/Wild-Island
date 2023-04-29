@@ -42,7 +42,7 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test1>().To<Test3>().AsSingle().NonLazy();
             Container.Bind<TestImpl1>().AsSingle().NonLazy();
 
-            var test1 = Container.Resolve<TestImpl1>();
+            TestImpl1 test1 = Container.Resolve<TestImpl1>();
 
             Assert.That(test1.tests.Count == 2);
         }
@@ -54,7 +54,7 @@ namespace Zenject.Tests.BindFeatures
             Container.Bind<Test1>().To<Test3>().AsSingle().NonLazy();
             Container.Bind<TestImpl2>().AsSingle().NonLazy();
 
-            var test = Container.Resolve<TestImpl2>();
+            TestImpl2 test = Container.Resolve<TestImpl2>();
             Assert.That(test.tests.Count == 2);
         }
     }

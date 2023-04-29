@@ -145,7 +145,7 @@ namespace Pathfinding {
 				foreach (IUpdatableGraph g in astar.data.GetUpdateableGraphs()) {
 					NavGraph gr = g as NavGraph;
 					if (ob.nnConstraint == null || ob.nnConstraint.SuitableGraph(astar.data.GetGraphIndex(gr), gr)) {
-						var guo = new GUOSingle();
+						GUOSingle guo = new GUOSingle();
 						guo.order = GraphUpdateOrder.GraphUpdate;
 						guo.obj = ob;
 						guo.graph = g;
@@ -317,17 +317,17 @@ namespace Pathfinding {
 			Profiler.BeginThreadProfiling("Pathfinding", "Threaded Graph Updates");
 #endif
 
-			var handles = new [] { graphUpdateAsyncEvent, exitAsyncThread };
+			AutoResetEvent[] handles = new [] { graphUpdateAsyncEvent, exitAsyncThread };
 
 			while (true) {
 				// Wait for the next batch or exit event
-				var handleIndex = WaitHandle.WaitAny(handles);
+				int handleIndex = WaitHandle.WaitAny(handles);
 
 				if (handleIndex == 1) {
 					// Exit even was fired
 					// Abort thread and clear queue
 					while (graphUpdateQueueAsync.Count > 0) {
-						var s = graphUpdateQueueAsync.Dequeue();
+						GUOSingle s = graphUpdateQueueAsync.Dequeue();
 						s.obj.internalStage = GraphUpdateObject.STAGE_ABORTED;
 					}
 					asyncGraphUpdatesComplete.Set();

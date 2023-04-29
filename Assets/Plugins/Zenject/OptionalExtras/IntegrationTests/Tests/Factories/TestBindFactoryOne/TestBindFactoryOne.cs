@@ -29,25 +29,25 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOn()
         {
             PreInstall();
-            var go = new GameObject();
+            GameObject go = new GameObject();
 
             Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOn(go);
 
             PostInstall();
 
-            var factory = Container.Resolve<Foo.Factory>();
+            Foo.Factory factory = Container.Resolve<Foo.Factory>();
 
             Assert.IsNull(go.GetComponent<Foo>());
-            var foo = factory.Create("asdf");
+            Foo foo = factory.Create("asdf");
             Assert.IsEqual(foo.Value, "asdf");
             Assert.IsNotNull(go.GetComponent<Foo>());
             Assert.IsEqual(go.GetComponent<Foo>(), foo);
 
-            var foo2 = factory.Create("zxcv");
+            Foo foo2 = factory.Create("zxcv");
 
             Assert.IsNotEqual(foo2, foo);
 
-            var allFoos = go.GetComponents<Foo>();
+            Foo[] allFoos = go.GetComponents<Foo>();
             Assert.IsEqual(allFoos.Length, 2);
             Assert.IsEqual(allFoos[0], foo);
             Assert.IsEqual(allFoos[1], foo2);
@@ -63,8 +63,8 @@ namespace Zenject.Tests.Factories
 
             PostInstall();
 
-            var factory = Container.Resolve<Bar.Factory>();
-            var bar = factory.Create("asdf");
+            Bar.Factory factory = Container.Resolve<Bar.Factory>();
+            Bar bar = factory.Create("asdf");
             Assert.IsNotNull(bar);
             Assert.IsEqual(bar.Value, "asdf");
             Assert.IsNotEqual(bar, factory.Create("zxcv"));
@@ -105,7 +105,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOnSelf()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOn(gameObject);
 
@@ -122,7 +122,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestFromNewComponentOnConcrete()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("foo");
 
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromNewComponentOn(gameObject);
 

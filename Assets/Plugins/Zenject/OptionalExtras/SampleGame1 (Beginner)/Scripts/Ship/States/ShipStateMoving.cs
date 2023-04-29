@@ -32,10 +32,10 @@ namespace Zenject.Asteroids
 
         void ApplyOscillation()
         {
-            var obj = _ship.MeshRenderer.gameObject;
+            GameObject obj = _ship.MeshRenderer.gameObject;
 
-            var cycleInterval = 1.0f / _settings.oscillationFrequency;
-            var thetaMoveSpeed = 2 * Mathf.PI / cycleInterval;
+            float cycleInterval = 1.0f / _settings.oscillationFrequency;
+            float thetaMoveSpeed = 2 * Mathf.PI / cycleInterval;
 
             _oscillationTheta += thetaMoveSpeed * Time.deltaTime;
 
@@ -44,11 +44,11 @@ namespace Zenject.Asteroids
 
         void UpdateThruster()
         {
-            var speed = (_ship.Position - _lastPosition).magnitude / Time.deltaTime;
-            var speedPx = Mathf.Clamp(speed / _settings.speedForMaxEmisssion, 0.0f, 1.0f);
+            float speed = (_ship.Position - _lastPosition).magnitude / Time.deltaTime;
+            float speedPx = Mathf.Clamp(speed / _settings.speedForMaxEmisssion, 0.0f, 1.0f);
 
 #if UNITY_2018_1_OR_NEWER
-            var emission = _ship.ParticleEmitter.emission;
+            ParticleSystem.EmissionModule emission = _ship.ParticleEmitter.emission;
             emission.rateOverTime = _settings.maxEmission * speedPx;
 #else
             _ship.ParticleEmitter.maxEmission = _settings.maxEmission * speedPx;
@@ -57,19 +57,19 @@ namespace Zenject.Asteroids
 
         void Move()
         {
-            var mouseRay = _mainCamera.ScreenPointToRay(Input.mousePosition);
-            var mousePos = mouseRay.origin;
+            Ray mouseRay = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            Vector3 mousePos = mouseRay.origin;
             mousePos.z = 0;
 
             _lastPosition = _ship.Position;
             _ship.Position = Vector3.Lerp(_ship.Position, mousePos, Mathf.Min(1.0f, _settings.moveSpeed * Time.deltaTime));
 
-            var moveDelta = _ship.Position - _lastPosition;
-            var moveDistance = moveDelta.magnitude;
+            Vector3 moveDelta = _ship.Position - _lastPosition;
+            float moveDistance = moveDelta.magnitude;
 
             if (moveDistance > 0.01f)
             {
-                var moveDir = moveDelta / moveDistance;
+                Vector3 moveDir = moveDelta / moveDistance;
                 _ship.Rotation = Quaternion.LookRotation(-moveDir);
             }
         }

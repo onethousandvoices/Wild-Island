@@ -42,7 +42,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsCached();
             Container.Bind<Foo>().AsCached();
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().AsCached();
 
             subContainer.Bind<Bar>().FromResolveAllGetter<Foo>(x => x.Bar);
@@ -56,7 +56,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsCached();
             Container.Bind<Foo>().AsCached();
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().AsCached();
 
             subContainer.Bind<Bar>().FromResolveAllGetter<Foo>(null, x => x.Bar, InjectSources.Local);
@@ -70,7 +70,7 @@ namespace Zenject.Tests.Bindings
             Container.Bind<Foo>().AsCached();
             Container.Bind<Foo>().AsCached();
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().AsCached();
 
             subContainer.Bind<Bar>().FromResolveGetter<Foo>(null, x => x.Bar);
@@ -83,7 +83,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.Bind<Foo>().AsCached();
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().AsCached();
             subContainer.Bind<Foo>().AsCached();
 

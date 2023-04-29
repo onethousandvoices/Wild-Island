@@ -42,7 +42,7 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<Test3>().AsSingle().NonLazy();
 
-            var test = Container.Resolve<Test3>();
+            Test3 test = Container.Resolve<Test3>();
             Assert.That(test.val1 == null);
         }
 
@@ -51,7 +51,7 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<Test3>().AsSingle().NonLazy();
 
-            var test1 = new Test1();
+            Test1 test1 = new Test1();
             Container.Bind<Test1>().FromInstance(test1).NonLazy();
 
             Assert.IsEqual(Container.Resolve<Test3>().val1, test1);
@@ -103,7 +103,7 @@ namespace Zenject.Tests.Injection
         {
             Container.Bind<Test5>().AsSingle().NonLazy();
 
-            var test = Container.Resolve<Test5>();
+            Test5 test = Container.Resolve<Test5>();
             Assert.That(test.Val1 == null);
         }
 

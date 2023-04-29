@@ -2,6 +2,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using Pathfinding.WindowsStore;
 using System;
+using System.Collections;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using Guid = Pathfinding.Util.Guid;
+using Object = UnityEngine.Object;
 #if NETFX_CORE
 using System.Linq;
 using WinRTLegacy;
@@ -48,15 +53,15 @@ namespace Pathfinding.Serialization {
 				return;
 			}
 
-			var type = obj.GetType();
-			var typeInfo = WindowsStoreCompatibility.GetTypeInfo(type);
+			Type type = obj.GetType();
+			Type typeInfo = WindowsStoreCompatibility.GetTypeInfo(type);
 			if (serializers.ContainsKey(type)) {
 				serializers[type] (obj);
 			} else if (typeInfo.IsEnum) {
 				output.Append('"' + obj.ToString() + '"');
 			} else if (obj is System.Collections.IList) {
 				output.Append("[");
-				var arr = obj as System.Collections.IList;
+				IList arr = obj as System.Collections.IList;
 				for (int i = 0; i < arr.Count; i++) {
 					if (i != 0)
 						output.Append(", ");
@@ -69,7 +74,7 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 				var optIn = typeInfo.CustomAttributes.Any(attr => attr.GetType() == typeof(JsonOptInAttribute));
 #else
-				var optIn = typeInfo.GetCustomAttributes(typeof(JsonOptInAttribute), true).Length > 0;
+				bool optIn = typeInfo.GetCustomAttributes(typeof(JsonOptInAttribute), true).Length > 0;
 #endif
 				output.Append("{");
 				bool earlier = false;
@@ -78,9 +83,9 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 					var fields = typeInfo.DeclaredFields.Where(f => !f.IsStatic).ToArray();
 #else
-					var fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+					FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 #endif
-					foreach (var field in fields) {
+					foreach (FieldInfo field in fields) {
 						if (field.DeclaringType != type) continue;
 						if ((!optIn && field.IsPublic) ||
 #if NETFX_CORE
@@ -123,13 +128,13 @@ namespace Pathfinding.Serialization {
 			}
 
 			output.Append("{");
-			var path = obj.name;
+			string path = obj.name;
 #if UNITY_EDITOR
 			// Figure out the path of the object relative to a Resources folder.
 			// In a standalone player this cannot be done unfortunately, so we will assume it is at the top level in the Resources folder.
 			// Fortunately it should be extremely rare to have to serialize references to unity objects in a standalone player.
-			var realPath = UnityEditor.AssetDatabase.GetAssetPath(obj);
-			var match = System.Text.RegularExpressions.Regex.Match(realPath, @"Resources/(.*?)(\.\w+)?$");
+			string realPath = UnityEditor.AssetDatabase.GetAssetPath(obj);
+			Match match = System.Text.RegularExpressions.Regex.Match(realPath, @"Resources/(.*?)(\.\w+)?$");
 			if (match != null) path = match.Groups[1].Value;
 #endif
 			QuotedField("Name", path);
@@ -137,15 +142,15 @@ namespace Pathfinding.Serialization {
 			QuotedField("Type", obj.GetType().FullName);
 
 			//Write scene path if the object is a Component or GameObject
-			var component = obj as Component;
-			var go = obj as GameObject;
+			Component component = obj as Component;
+			GameObject go = obj as GameObject;
 
 			if (component != null || go != null) {
 				if (component != null && go == null) {
 					go = component.gameObject;
 				}
 
-				var helper = go.GetComponent<UnityReferenceHelper>();
+				UnityReferenceHelper helper = go.GetComponent<UnityReferenceHelper>();
 
 				if (helper == null) {
 					Debug.Log("Adding UnityReferenceHelper to Unity Reference '"+obj.name+"'");
@@ -188,7 +193,7 @@ namespace Pathfinding.Serialization {
 		/// Will load all fields into the populate object if it is set (only works for classes).
 		/// </summary>
 		System.Object Deserialize (Type tp, System.Object populate = null) {
-			var tpInfo = WindowsStoreCompatibility.GetTypeInfo(tp);
+			Type tpInfo = WindowsStoreCompatibility.GetTypeInfo(tp);
 
 			if (tpInfo.IsEnum) {
 				return Enum.Parse(tp, EatField());
@@ -210,7 +215,7 @@ namespace Pathfinding.Serialization {
 				return new Version(EatField());
 			} else if (Type.Equals(tp, typeof(Vector2))) {
 				Eat("{");
-				var result = new Vector2();
+				Vector2 result = new Vector2();
 				EatField();
 				result.x = float.Parse(EatField(), numberFormat);
 				EatField();
@@ -219,7 +224,7 @@ namespace Pathfinding.Serialization {
 				return result;
 			} else if (Type.Equals(tp, typeof(Vector3))) {
 				Eat("{");
-				var result = new Vector3();
+				Vector3 result = new Vector3();
 				EatField();
 				result.x = float.Parse(EatField(), numberFormat);
 				EatField();
@@ -231,13 +236,13 @@ namespace Pathfinding.Serialization {
 			} else if (Type.Equals(tp, typeof(Pathfinding.Util.Guid))) {
 				Eat("{");
 				EatField();
-				var result = Pathfinding.Util.Guid.Parse(EatField());
+				Guid result = Pathfinding.Util.Guid.Parse(EatField());
 				Eat("}");
 				return result;
 			} else if (Type.Equals(tp, typeof(LayerMask))) {
 				Eat("{");
 				EatField();
-				var result = (LayerMask)int.Parse(EatField());
+				LayerMask result = (LayerMask)int.Parse(EatField());
 				Eat("}");
 				return result;
 			} else if (Type.Equals(tp, typeof(List<string>))) {
@@ -256,17 +261,17 @@ namespace Pathfinding.Serialization {
 					ls.Add(Deserialize(tp.GetElementType()));
 					TryEat(',');
 				}
-				var arr = Array.CreateInstance(tp.GetElementType(), ls.Count);
+				Array arr = Array.CreateInstance(tp.GetElementType(), ls.Count);
 				ls.ToArray().CopyTo(arr, 0);
 				return arr;
 			} else if (Type.Equals(tp, typeof(Mesh)) || Type.Equals(tp, typeof(Texture2D)) || Type.Equals(tp, typeof(Transform)) || Type.Equals(tp, typeof(GameObject))) {
 				return DeserializeUnityObject();
 			} else {
-				var obj = populate ?? Activator.CreateInstance(tp);
+				object obj = populate ?? Activator.CreateInstance(tp);
 				Eat("{");
 				while (!TryEat('}')) {
-					var name = EatField();
-					var tmpType = tp;
+					string name = EatField();
+					Type tmpType = tp;
 					System.Reflection.FieldInfo field = null;
 					while (field == null && tmpType != null) {
 						field = tmpType.GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
@@ -286,14 +291,14 @@ namespace Pathfinding.Serialization {
 
 		UnityEngine.Object DeserializeUnityObject () {
 			Eat("{");
-			var result = DeserializeUnityObjectInner();
+			Object result = DeserializeUnityObjectInner();
 			Eat("}");
 			return result;
 		}
 
 		UnityEngine.Object DeserializeUnityObjectInner () {
 			// Ignore InstanceID field (compatibility only)
-			var fieldName = EatField();
+			string fieldName = EatField();
 
 			if (fieldName == "InstanceID") {
 				EatField();
@@ -314,7 +319,7 @@ namespace Pathfinding.Serialization {
 			}
 
 			// Note calling through assembly is more stable on e.g WebGL
-			var type = WindowsStoreCompatibility.GetTypeInfo(typeof(AstarPath)).Assembly.GetType(typename);
+			Type type = WindowsStoreCompatibility.GetTypeInfo(typeof(AstarPath)).Assembly.GetType(typename);
 			type = type ?? WindowsStoreCompatibility.GetTypeInfo(typeof(Transform)).Assembly.GetType(typename);
 
 			if (Type.Equals(type, null)) {
@@ -329,7 +334,7 @@ namespace Pathfinding.Serialization {
 				string guid = EatField();
 
 				if (contextRoot != null) {
-					foreach (var helper in contextRoot.GetComponentsInChildren<UnityReferenceHelper>(true)) {
+					foreach (UnityReferenceHelper helper in contextRoot.GetComponentsInChildren<UnityReferenceHelper>(true)) {
 						if (helper.GetGUID() == guid) {
 							if (Type.Equals(type, typeof(GameObject))) {
 								return helper.gameObject;
@@ -341,7 +346,7 @@ namespace Pathfinding.Serialization {
 				}
 
 #if UNITY_2020_1_OR_NEWER
-				foreach (var helper in UnityEngine.Object.FindObjectsOfType<UnityReferenceHelper>(true))
+				foreach (UnityReferenceHelper helper in UnityEngine.Object.FindObjectsOfType<UnityReferenceHelper>(true))
 #else
 				foreach (var helper in UnityEngine.Object.FindObjectsOfType<UnityReferenceHelper>())
 #endif
@@ -379,7 +384,7 @@ namespace Pathfinding.Serialization {
 		void Eat (string s) {
 			EatWhitespace();
 			for (int i = 0; i < s.Length; i++) {
-				var c = (char)reader.Read();
+				char c = (char)reader.Read();
 				if (c != s[i]) {
 					throw new Exception("Expected '" + s[i] + "' found '" + c + "'\n\n..." + reader.ReadLine());
 				}
@@ -391,12 +396,12 @@ namespace Pathfinding.Serialization {
 			builder.Length = 0;
 			bool escape = false;
 			while (true) {
-				var readInt = reader.Peek();
+				int readInt = reader.Peek();
 				if (!escape && (char)readInt == '"') {
 					inString = !inString;
 				}
 
-				var readChar = (char)readInt;
+				char readChar = (char)readInt;
 				if (readInt == -1) {
 					throw new Exception("Unexpected EOF");
 				} else if (!escape && readChar == '\\') {
@@ -424,7 +429,7 @@ namespace Pathfinding.Serialization {
 		}
 
 		string EatField () {
-			var result = EatUntil("\",}]", TryEat('"'));
+			string result = EatUntil("\",}]", TryEat('"'));
 
 			TryEat('\"');
 			TryEat(':');
@@ -433,11 +438,11 @@ namespace Pathfinding.Serialization {
 		}
 
 		void SkipFieldData () {
-			var indent = 0;
+			int indent = 0;
 
 			while (true) {
 				EatUntil(",{}[]", false);
-				var last = (char)reader.Peek();
+				char last = (char)reader.Peek();
 
 				switch (last) {
 				case '{':

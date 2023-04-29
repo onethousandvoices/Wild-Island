@@ -14,7 +14,7 @@ namespace Zenject.Tests.Bindings.Singletons
             Container.Bind<Bar>().AsSingle();
             Container.Bind<Foo>().AsSingle();
 
-            var foo = Container.Resolve<Foo>();
+            Foo foo = Container.Resolve<Foo>();
 
             Assert.IsEqual(Bar.InstanceCount, 0);
 
@@ -45,7 +45,7 @@ namespace Zenject.Tests.Bindings.Singletons
         {
             Container.Bind<Gorp>().AsSingle();
 
-            var gorp = Container.Resolve<Gorp>();
+            Gorp gorp = Container.Resolve<Gorp>();
             object temp;
             Assert.Throws(() => temp = gorp.Bar.Value);
         }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pathfinding.Util {
@@ -36,7 +37,7 @@ namespace Pathfinding.Util {
 
 		public void OnEnterPool () {
 			// Will cause pretty much all calls to throw null ref exceptions until Init is called
-			var bld = builder;
+			RetainedGizmos.Builder bld = builder;
 
 			ObjectPool<RetainedGizmos.Builder>.Release(ref bld);
 			builder = null;
@@ -46,7 +47,7 @@ namespace Pathfinding.Util {
 		public void DrawConnections (GraphNode node) {
 			if (showSearchTree) {
 				if (InSearchTree(node, debugData, debugPathID)) {
-					var pnode = debugData.GetPathNode(node);
+					PathNode pnode = debugData.GetPathNode(node);
 					if (pnode.parent != null) {
 						builder.DrawLine((Vector3)node.position, (Vector3)debugData.GetPathNode(node).parent.node.position, NodeColor(node));
 					}
@@ -137,7 +138,7 @@ namespace Pathfinding.Util {
 		}
 
 		public void DrawTriangles (Vector3[] vertices, Color[] colors, int numTriangles) {
-			var triangles = ListPool<int>.Claim(numTriangles);
+			List<int> triangles = ListPool<int>.Claim(numTriangles);
 
 			for (int i = 0; i < numTriangles*3; i++) triangles.Add(i);
 			builder.DrawMesh(gizmos, vertices, triangles, colors);
@@ -155,7 +156,7 @@ namespace Pathfinding.Util {
 		}
 
 		void System.IDisposable.Dispose () {
-			var tmp = this;
+			GraphGizmoHelper tmp = this;
 
 			Submit();
 			ObjectPool<GraphGizmoHelper>.Release(ref tmp);

@@ -19,7 +19,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().NonLazy();
 
-            var ifoo = Container.Resolve<IFooFactory>().Create("asdf");
+            IFoo ifoo = Container.Resolve<IFooFactory>().Create("asdf");
 
             Assert.IsNotNull(ifoo);
             Assert.IsEqual(((Foo)ifoo).Value, "asdf");

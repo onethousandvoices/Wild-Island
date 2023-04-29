@@ -10,7 +10,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestTransient()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindInstance(foo);
             Container.Bind<IFoo>().To<Foo>().FromResolve();
@@ -22,7 +22,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestIdentifier()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.Bind<Foo>().WithId("foo").FromInstance(foo);
             Container.Bind<IFoo>().To<Foo>().FromResolve("foo");
@@ -44,7 +44,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSingle()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
             Container.Bind<Foo>().FromInstance(foo);
             Container.Bind<IFoo>().To<Foo>().FromResolve();
 
@@ -144,12 +144,12 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestResolveSingleLocal()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
 
             Container.Bind<Foo>().FromInstance(foo1);
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().FromInstance(foo2);
 
             subContainer.Bind<IFoo>().To<Foo>().FromResolve();
@@ -160,12 +160,12 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestInjectSource1()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
 
             Container.Bind<Foo>().FromInstance(foo1);
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().FromInstance(foo2);
 
             subContainer.Bind<IFoo>().To<Foo>().FromResolve(null, InjectSources.Parent);
@@ -176,13 +176,13 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestInjectSource2()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
-            var foo3 = new Foo();
+            Foo foo1 = new Foo();
+            Foo foo2 = new Foo();
+            Foo foo3 = new Foo();
 
             Container.Bind<Foo>().FromInstance(foo1);
 
-            var subContainer = Container.CreateSubContainer();
+            DiContainer subContainer = Container.CreateSubContainer();
             subContainer.Bind<Foo>().FromInstance(foo2);
             subContainer.Bind<Foo>().FromInstance(foo3);
 

@@ -13,7 +13,7 @@ namespace Zenject.ReflectionBaking
     {
         public static Type TryGetActualType(this TypeReference typeRef, Assembly assembly)
         {
-            var reflectionName = GetReflectionName(typeRef);
+            string reflectionName = GetReflectionName(typeRef);
             return assembly.GetType(reflectionName);
         }
 
@@ -21,7 +21,7 @@ namespace Zenject.ReflectionBaking
         {
             if (type.IsGenericInstance)
             {
-                var genericInstance = (GenericInstanceType)type;
+                GenericInstanceType genericInstance = (GenericInstanceType)type;
 
                 return string.Format(
                     "{0}.{1}[{2}]", genericInstance.Namespace, type.Name,
@@ -33,9 +33,9 @@ namespace Zenject.ReflectionBaking
 
         public static List<TypeDefinition> LookupAllTypes(this ModuleDefinition module)
         {
-            var allTypes = new List<TypeDefinition>();
+            List<TypeDefinition> allTypes = new List<TypeDefinition>();
 
-            foreach (var type in module.Types)
+            foreach (TypeDefinition type in module.Types)
             {
                 LookupAllTypesInternal(type, allTypes);
             }
@@ -47,7 +47,7 @@ namespace Zenject.ReflectionBaking
         {
             buffer.Add(type);
 
-            foreach (var nestedType in type.NestedTypes)
+            foreach (TypeDefinition nestedType in type.NestedTypes)
             {
                 LookupAllTypesInternal(nestedType, buffer);
             }
@@ -214,14 +214,14 @@ namespace Zenject.ReflectionBaking
         public static MethodReference ChangeDeclaringType(
             this MethodReference methodDef, TypeReference typeRef)
         {
-            var newMethodRef = new MethodReference(
+            MethodReference newMethodRef = new MethodReference(
                 methodDef.Name, methodDef.ReturnType, typeRef);
 
             newMethodRef.HasThis = methodDef.HasThis;
 
-            foreach (var arg in methodDef.Parameters)
+            foreach (ParameterDefinition arg in methodDef.Parameters)
             {
-                var paramDef = new ParameterDefinition(arg.ParameterType);
+                ParameterDefinition paramDef = new ParameterDefinition(arg.ParameterType);
 
                 newMethodRef.Parameters.Add(paramDef);
             }
@@ -260,7 +260,7 @@ namespace Zenject.ReflectionBaking
         {
             yield return specificTypeRef;
 
-            foreach (var ancestor in specificTypeRef.GetSpecificBaseTypesAndSelf())
+            foreach (TypeReference ancestor in specificTypeRef.GetSpecificBaseTypesAndSelf())
             {
                 yield return ancestor;
             }
@@ -269,13 +269,13 @@ namespace Zenject.ReflectionBaking
         public static IEnumerable<TypeReference> GetSpecificBaseTypes(
             this TypeReference specificTypeRef)
         {
-            var specificBaseTypeRef = specificTypeRef.TryGetSpecificBaseType();
+            TypeReference specificBaseTypeRef = specificTypeRef.TryGetSpecificBaseType();
 
             if (specificBaseTypeRef != null)
             {
                 yield return specificBaseTypeRef;
 
-                foreach (var ancestor in GetSpecificBaseTypes(specificBaseTypeRef))
+                foreach (TypeReference ancestor in GetSpecificBaseTypes(specificBaseTypeRef))
                 {
                     yield return ancestor;
                 }
@@ -286,7 +286,7 @@ namespace Zenject.ReflectionBaking
         {
             yield return specificTypeRef;
 
-            foreach (var ancestor in specificTypeRef.AllNestParents())
+            foreach (TypeReference ancestor in specificTypeRef.AllNestParents())
             {
                 yield return ancestor;
             }
@@ -298,7 +298,7 @@ namespace Zenject.ReflectionBaking
             {
                 yield return specificTypeRef.DeclaringType;
 
-                foreach (var ancestor in specificTypeRef.DeclaringType.AllNestParents())
+                foreach (TypeReference ancestor in specificTypeRef.DeclaringType.AllNestParents())
                 {
                     yield return ancestor;
                 }
@@ -319,7 +319,7 @@ namespace Zenject.ReflectionBaking
 
         public static TypeReference TryGetSpecificBaseType(this TypeReference specificTypeRef)
         {
-            var typeDef = specificTypeRef.Resolve();
+            TypeDefinition typeDef = specificTypeRef.Resolve();
 
             if (typeDef.BaseType == null
                 || typeDef.BaseType.FullName == "System.Object")
@@ -327,15 +327,15 @@ namespace Zenject.ReflectionBaking
                 return null;
             }
 
-            var specificBaseTypeRef = typeDef.BaseType;
+            TypeReference specificBaseTypeRef = typeDef.BaseType;
 
             if (specificBaseTypeRef.ContainsGenericParameter)
             {
-                var genericArgMap = new Dictionary<string, TypeReference>();
+                Dictionary<string, TypeReference> genericArgMap = new Dictionary<string, TypeReference>();
 
-                foreach (var ancestor in specificTypeRef.AllNestParentsAndSelf())
+                foreach (TypeReference ancestor in specificTypeRef.AllNestParentsAndSelf())
                 {
-                    var specificTypeRefGenericInstance = ancestor as GenericInstanceType;
+                    GenericInstanceType specificTypeRefGenericInstance = ancestor as GenericInstanceType;
 
                     if (specificTypeRefGenericInstance != null)
                     {
@@ -355,14 +355,14 @@ namespace Zenject.ReflectionBaking
         public static TypeReference FillInGenericParameters(
             TypeReference type, Dictionary<string, TypeReference> genericArgMap)
         {
-            var genericType = type as GenericInstanceType;
+            GenericInstanceType genericType = type as GenericInstanceType;
             Assert.IsNotNull(genericType);
 
-            var genericTypeClone = new GenericInstanceType(type.Resolve());
+            GenericInstanceType genericTypeClone = new GenericInstanceType(type.Resolve());
 
             for (int i = 0; i < genericType.GenericArguments.Count; i++)
             {
-                var arg = genericType.GenericArguments[i];
+                TypeReference arg = genericType.GenericArguments[i];
 
                 if (arg.IsGenericParameter)
                 {

@@ -12,9 +12,9 @@ namespace Zenject.ReflectionBaking
         [MenuItem("Assets/Create/Zenject/Reflection Baking Settings", false, 100)]
         public static void CreateReflectionBakingSettings()
         {
-            var folderPath = ZenUnityEditorUtil.GetCurrentDirectoryAssetPathFromSelection();
+            string folderPath = ZenUnityEditorUtil.GetCurrentDirectoryAssetPathFromSelection();
 
-            var config = ScriptableObject.CreateInstance<ZenjectReflectionBakingSettings>();
+            ZenjectReflectionBakingSettings config = ScriptableObject.CreateInstance<ZenjectReflectionBakingSettings>();
 
             ZenUnityEditorUtil.SaveScriptableObjectAsset(
                 Path.Combine(folderPath, "ZenjectReflectionBakingSettings.asset"), config);

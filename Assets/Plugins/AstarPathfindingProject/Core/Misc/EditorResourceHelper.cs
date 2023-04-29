@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Pathfinding {
 #if UNITY_EDITOR
 	using UnityEditor;
@@ -43,7 +45,7 @@ namespace Pathfinding {
 		/// <summary>Locates the editor assets folder in case the user has moved it</summary>
 		public static bool LocateEditorAssets () {
 #if UNITY_2019_3_OR_NEWER
-			var package = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(EditorResourceHelper).Assembly);
+			UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(EditorResourceHelper).Assembly);
 			if (package != null) {
 				editorAssets = package.assetPath + "/Editor/EditorAssets";
 				if (System.IO.File.Exists(package.resolvedPath + "/Editor/EditorAssets/AstarEditorSkinLight.guiskin")) {
@@ -65,9 +67,9 @@ namespace Pathfinding {
 			if (!System.IO.File.Exists(projectPath + editorAssets + "/AstarEditorSkinLight.guiskin") && !System.IO.File.Exists(projectPath + editorAssets + "/AstarEditorSkin.guiskin")) {
 				//Initiate search
 
-				var sdir = new System.IO.DirectoryInfo(Application.dataPath);
+				DirectoryInfo sdir = new System.IO.DirectoryInfo(Application.dataPath);
 
-				var dirQueue = new Queue<System.IO.DirectoryInfo>();
+				Queue<DirectoryInfo> dirQueue = new Queue<System.IO.DirectoryInfo>();
 				dirQueue.Enqueue(sdir);
 
 				bool found = false;
@@ -87,7 +89,7 @@ namespace Pathfinding {
 						editorAssets = path;
 						return true;
 					}
-					var dirs = dir.GetDirectories();
+					DirectoryInfo[] dirs = dir.GetDirectories();
 					for (int i = 0; i < dirs.Length; i++) {
 						dirQueue.Enqueue(dirs[i]);
 					}

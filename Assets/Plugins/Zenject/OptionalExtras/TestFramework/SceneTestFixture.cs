@@ -47,7 +47,7 @@ namespace Zenject
 
             for (int i = 0; i < sceneNames.Length; i++)
             {
-                var sceneName = sceneNames[i];
+                string sceneName = sceneNames[i];
 
                 Assert.That(Application.CanStreamedLevelBeLoaded(sceneName),
                     "Cannot load scene '{0}' for test '{1}'.  The scenes used by SceneTestFixture derived classes must be added to the build settings for the test to work",
@@ -55,7 +55,7 @@ namespace Zenject
 
                 Log.Info("Loading scene '{0}' for testing", sceneName);
 
-                var loader = SceneManager.LoadSceneAsync(sceneName, i == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive);
+                AsyncOperation loader = SceneManager.LoadSceneAsync(sceneName, i == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive);
 
                 while (!loader.isDone)
                 {
@@ -67,7 +67,7 @@ namespace Zenject
                 if (ProjectContext.HasInstance)
                 // ProjectContext might be null if scene does not have a scene context
                 {
-                    var scene = SceneManager.GetSceneByName(sceneName);
+                    Scene scene = SceneManager.GetSceneByName(sceneName);
 
                     sceneContext = ProjectContext.Instance.Container.Resolve<SceneContextRegistry>()
                         .TryGetSceneContextForScene(scene);

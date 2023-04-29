@@ -5,7 +5,7 @@ namespace Pathfinding {
 	[CustomGraphEditor(typeof(NavMeshGraph), "Navmesh Graph")]
 	public class NavMeshGraphEditor : GraphEditor {
 		public override void OnInspectorGUI (NavGraph target) {
-			var graph = target as NavMeshGraph;
+			NavMeshGraph graph = target as NavMeshGraph;
 
 			graph.sourceMesh = ObjectField("Source Mesh", graph.sourceMesh, typeof(Mesh), false, true) as Mesh;
 

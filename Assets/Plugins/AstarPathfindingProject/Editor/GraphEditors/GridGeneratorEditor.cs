@@ -45,7 +45,7 @@ namespace Pathfinding {
 		}
 
 		public override void OnInspectorGUI (NavGraph target) {
-			var graph = target as GridGraph;
+			GridGraph graph = target as GridGraph;
 
 			DrawFirstSection(graph);
 			Separator();
@@ -92,7 +92,7 @@ namespace Pathfinding {
 
 		void DrawInspectorMode (GridGraph graph) {
 			graph.inspectorGridMode = DetermineGridType(graph);
-			var newMode = (InspectorGridMode)EditorGUILayout.EnumPopup("Shape", (System.Enum)graph.inspectorGridMode);
+			InspectorGridMode newMode = (InspectorGridMode)EditorGUILayout.EnumPopup("Shape", (System.Enum)graph.inspectorGridMode);
 			if (newMode != graph.inspectorGridMode) graph.SetGridShape(newMode);
 		}
 
@@ -113,8 +113,8 @@ namespace Pathfinding {
 
 			Draw2DMode(graph);
 
-			var normalizedPivotPoint = NormalizedPivotPoint(graph, pivot);
-			var worldPoint = graph.CalculateTransform().Transform(normalizedPivotPoint);
+			Vector3 normalizedPivotPoint = NormalizedPivotPoint(graph, pivot);
+			Vector3 worldPoint = graph.CalculateTransform().Transform(normalizedPivotPoint);
 			int newWidth, newDepth;
 
 			DrawWidthDepthFields(graph, out newWidth, out newDepth);
@@ -149,7 +149,7 @@ namespace Pathfinding {
 				graph.SetDimensions(newWidth, newDepth, newNodeSize);
 
 				normalizedPivotPoint = NormalizedPivotPoint(graph, pivot);
-				var newWorldPoint = graph.CalculateTransform().Transform(normalizedPivotPoint);
+				Vector3 newWorldPoint = graph.CalculateTransform().Transform(normalizedPivotPoint);
 				// Move the center so that the pivot point stays at the same point in the world
 				graph.center += worldPoint - newWorldPoint;
 				graph.center = RoundVector3(graph.center);
@@ -169,8 +169,8 @@ namespace Pathfinding {
 
 		void DrawRotationField (GridGraph graph) {
 			if (graph.is2D) {
-				var right = Quaternion.Euler(graph.rotation) * Vector3.right;
-				var angle = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
+				Vector3 right = Quaternion.Euler(graph.rotation) * Vector3.right;
+				float angle = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
 				if (angle < 0) angle += 360;
 				if (Mathf.Abs(angle - Mathf.Round(angle)) < 0.001f) angle = Mathf.Round(angle);
 				EditorGUI.BeginChangeCheck();
@@ -219,10 +219,10 @@ namespace Pathfinding {
 		}
 
 		void DrawIsometricField (GridGraph graph) {
-			var isometricGUIContent = new GUIContent("Isometric Angle", "For an isometric 2D game, you can use this parameter to scale the graph correctly.\nIt can also be used to create a hexagonal grid.\nYou may want to rotate the graph 45 degrees around the Y axis to make it line up better.");
-			var isometricOptions = new [] { new GUIContent("None (0°)"), new GUIContent("Isometric (≈54.74°)"), new GUIContent("Dimetric (60°)"), new GUIContent("Custom") };
-			var isometricValues = new [] { 0f, GridGraph.StandardIsometricAngle, GridGraph.StandardDimetricAngle };
-			var isometricOption = isometricValues.Length;
+			GUIContent isometricGUIContent = new GUIContent("Isometric Angle", "For an isometric 2D game, you can use this parameter to scale the graph correctly.\nIt can also be used to create a hexagonal grid.\nYou may want to rotate the graph 45 degrees around the Y axis to make it line up better.");
+			GUIContent[] isometricOptions = new [] { new GUIContent("None (0°)"), new GUIContent("Isometric (≈54.74°)"), new GUIContent("Dimetric (60°)"), new GUIContent("Custom") };
+			float[] isometricValues = new [] { 0f, GridGraph.StandardIsometricAngle, GridGraph.StandardDimetricAngle };
+			int isometricOption = isometricValues.Length;
 
 			for (int i = 0; i < isometricValues.Length; i++) {
 				if (Mathf.Approximately(graph.isometricAngle, isometricValues[i])) {
@@ -230,7 +230,7 @@ namespace Pathfinding {
 				}
 			}
 
-			var prevIsometricOption = isometricOption;
+			int prevIsometricOption = isometricOption;
 			isometricOption = EditorGUILayout.IntPopup(isometricGUIContent, isometricOption, isometricOptions, new [] { 0, 1, 2, 3 });
 			if (prevIsometricOption != isometricOption) {
 				// Change to something that will not match the predefined values above
@@ -265,10 +265,10 @@ namespace Pathfinding {
 
 		void DrawPositionField (GridGraph graph) {
 			GUILayout.BeginHorizontal();
-			var normalizedPivotPoint = NormalizedPivotPoint(graph, pivot);
-			var worldPoint = RoundVector3(graph.CalculateTransform().Transform(normalizedPivotPoint));
-			var newWorldPoint = EditorGUILayout.Vector3Field(ObjectNames.NicifyVariableName(pivot.ToString()), worldPoint);
-			var delta = newWorldPoint - worldPoint;
+			Vector3 normalizedPivotPoint = NormalizedPivotPoint(graph, pivot);
+			Vector3 worldPoint = RoundVector3(graph.CalculateTransform().Transform(normalizedPivotPoint));
+			Vector3 newWorldPoint = EditorGUILayout.Vector3Field(ObjectNames.NicifyVariableName(pivot.ToString()), worldPoint);
+			Vector3 delta = newWorldPoint - worldPoint;
 			if (delta.magnitude > 0.001f) {
 				graph.center += delta;
 			}
@@ -293,7 +293,7 @@ namespace Pathfinding {
 		protected virtual void DrawNeighbours (GridGraph graph) {
 			if (graph.inspectorGridMode == InspectorGridMode.Hexagonal) return;
 
-			var neighboursGUIContent = new GUIContent("Connections", "Sets how many connections a node should have to it's neighbour nodes.");
+			GUIContent neighboursGUIContent = new GUIContent("Connections", "Sets how many connections a node should have to it's neighbour nodes.");
 			GUIContent[] neighbourOptions;
 			if (graph.inspectorGridMode == InspectorGridMode.Advanced) {
 				neighbourOptions = new [] { new GUIContent("Four"), new GUIContent("Eight"), new GUIContent("Six") };
@@ -413,7 +413,7 @@ namespace Pathfinding {
 				int[] colliderValues = collision.use2D ? new [] { 0, 2 } : new [] { 0, 1, 2 };
 				// In 2D the Circle (Sphere) mode will replace both the Sphere and the Capsule modes
 				// However make sure that the original value is still stored in the grid graph in case the user changes back to the 3D mode in the inspector.
-				var tp = collision.type;
+				ColliderType tp = collision.type;
 				if (tp == ColliderType.Capsule && collision.use2D) tp = ColliderType.Sphere;
 				EditorGUI.BeginChangeCheck();
 				tp = (ColliderType)EditorGUILayout.IntPopup("Collider type", (int)tp, colliderOptions, colliderValues);
@@ -468,7 +468,7 @@ namespace Pathfinding {
 		void DrawArc (Vector2 center, float radius, float startAngle, float endAngle) {
 			// The AA line doesn't always properly close the gap even for full circles
 			endAngle += 1*Mathf.Deg2Rad;
-			var width = 4;
+			int width = 4;
 			// The DrawAAPolyLine method does not draw a centered line unfortunately
 			//radius -= width/2;
 			for (int i = 0; i < arcBuffer.Length; i++) {
@@ -489,11 +489,11 @@ namespace Pathfinding {
 			if (dashLength == 0) {
 				DrawLine(a, b);
 			} else {
-				var dist = (b - a).magnitude;
+				float dist = (b - a).magnitude;
 				int steps = Mathf.RoundToInt(dist / dashLength);
 				for (int i = 0; i < steps; i++) {
-					var t1 = i * 1.0f / (steps-1);
-					var t2 = (i + 0.5f) * 1.0f / (steps-1);
+					float t1 = i * 1.0f / (steps-1);
+					float t2 = (i + 0.5f) * 1.0f / (steps-1);
 					DrawLine(Vector2.Lerp(a, b, t1), Vector2.Lerp(a, b, t2));
 				}
 			}
@@ -514,8 +514,8 @@ namespace Pathfinding {
 			if (!collisionPreviewOpen) return;
 
 			EditorGUILayout.Separator();
-			var rect = EditorGUI.IndentedRect(GUILayoutUtility.GetRect(10, 100));
-			var m = Handles.matrix;
+			Rect rect = EditorGUI.IndentedRect(GUILayoutUtility.GetRect(10, 100));
+			Matrix4x4 m = Handles.matrix;
 			Handles.matrix = Handles.matrix * Matrix4x4.Translate(new Vector3(rect.xMin, rect.yMin));
 
 			// Draw NxN grid with circle in the middle
@@ -527,23 +527,23 @@ namespace Pathfinding {
 			if (Mathf.Abs(interpolatedGridWidthInNodes - gridWidthInNodes) < 0.01f) interpolatedGridWidthInNodes = gridWidthInNodes;
 			else editor.Repaint();
 
-			var dt = Time.realtimeSinceStartup - lastTime;
+			float dt = Time.realtimeSinceStartup - lastTime;
 			lastTime = Time.realtimeSinceStartup;
 			interpolatedGridWidthInNodes = Mathf.Lerp(interpolatedGridWidthInNodes, gridWidthInNodes, 5 * dt);
 
-			var gridCenter = new Vector2(rect.width / 3.0f, rect.height * 0.5f);
-			var gridWidth = Mathf.Min(rect.width / 3, rect.height);
-			var nodeSize = (this.target as GridGraph).nodeSize;
-			var scale = gridWidth / (nodeSize * interpolatedGridWidthInNodes);
-			var diameter = collision.type == ColliderType.Ray ? 0.05f : collision.diameter * nodeSize;
-			var interpolatedGridScale = gridWidthInNodes * nodeSize * scale;
+			Vector2 gridCenter = new Vector2(rect.width / 3.0f, rect.height * 0.5f);
+			float gridWidth = Mathf.Min(rect.width / 3, rect.height);
+			float nodeSize = (this.target as GridGraph).nodeSize;
+			float scale = gridWidth / (nodeSize * interpolatedGridWidthInNodes);
+			float diameter = collision.type == ColliderType.Ray ? 0.05f : collision.diameter * nodeSize;
+			float interpolatedGridScale = gridWidthInNodes * nodeSize * scale;
 			for (int i = 0; i <= gridWidthInNodes; i++) {
-				var c = i*1.0f/gridWidthInNodes;
+				float c = i*1.0f/gridWidthInNodes;
 				DrawLine(gridCenter + new Vector2(c - 0.5f, -0.5f) * interpolatedGridScale, gridCenter + new Vector2(c - 0.5f, 0.5f) * interpolatedGridScale);
 				DrawLine(gridCenter + new Vector2(-0.5f, c - 0.5f) * interpolatedGridScale, gridCenter + new Vector2(0.5f, c - 0.5f) * interpolatedGridScale);
 			}
 
-			var sideBase = new Vector2(2*rect.width / 3f, rect.height);
+			Vector2 sideBase = new Vector2(2*rect.width / 3f, rect.height);
 			float sideScale;
 			if (collision.type == ColliderType.Sphere) {
 				sideScale = scale;
@@ -555,11 +555,11 @@ namespace Pathfinding {
 				sideScale = Mathf.Min(sideScale, sideBase.y / (Mathf.Max(0, collision.collisionOffset) + diameter));
 			}
 
-			var interpolatedGridSideScale = gridWidthInNodes * nodeSize * sideScale;
+			float interpolatedGridSideScale = gridWidthInNodes * nodeSize * sideScale;
 
 			DrawLine(sideBase + new Vector2(-interpolatedGridSideScale * 0.5f, 0), sideBase + new Vector2(interpolatedGridSideScale * 0.5f, 0));
 			for (int i = 0; i <= gridWidthInNodes; i++) {
-				var c = i*1.0f/gridWidthInNodes;
+				float c = i*1.0f/gridWidthInNodes;
 				DrawArc(sideBase + new Vector2(c - 0.5f, 0) * interpolatedGridSideScale, 2, 0, Mathf.PI*2);
 			}
 
@@ -567,23 +567,23 @@ namespace Pathfinding {
 			DrawArc(new Vector2(rect.width/3, 50), diameter * 0.5f * scale, 0, Mathf.PI*2);
 
 			if (collision.type == ColliderType.Ray) {
-				var height = collision.height;
-				var maxHeight = sideBase.y / sideScale - (collision.collisionOffset + diameter*0.5f);
+				float height = collision.height;
+				float maxHeight = sideBase.y / sideScale - (collision.collisionOffset + diameter*0.5f);
 				float dashLength = 0;
 				if (collision.height > maxHeight + 0.01f) {
 					height = maxHeight;
 					dashLength = 6;
 				}
 
-				var offset = sideBase + new Vector2(0, -collision.collisionOffset) * sideScale;
+				Vector2 offset = sideBase + new Vector2(0, -collision.collisionOffset) * sideScale;
 				DrawLine(offset + new Vector2(0, -height*0.75f) * sideScale, offset);
 				DrawDashedLine(offset + new Vector2(0, -height) * sideScale, offset + new Vector2(0, -height * 0.75f) * sideScale, dashLength);
 				DrawLine(offset, offset + new Vector2(6, -6));
 				DrawLine(offset, offset + new Vector2(-6, -6));
 			} else {
-				var height = collision.type == ColliderType.Capsule ? collision.height : 0;
+				float height = collision.type == ColliderType.Capsule ? collision.height : 0;
 				// sideBase.y - (collision.collisionOffset + height + diameter * 0.5f) * scale < 0
-				var maxHeight = sideBase.y / sideScale - (collision.collisionOffset + diameter*0.5f);
+				float maxHeight = sideBase.y / sideScale - (collision.collisionOffset + diameter*0.5f);
 				float dashLength = 0;
 				if (height > maxHeight + 0.01f) {
 					height = maxHeight;
@@ -648,10 +648,10 @@ namespace Pathfinding {
 		public override void OnSceneGUI (NavGraph target) {
 			Event e = Event.current;
 
-			var graph = target as GridGraph;
+			GridGraph graph = target as GridGraph;
 
 			graph.UpdateTransform();
-			var currentTransform = graph.transform * Matrix4x4.Scale(new Vector3(graph.width, 1, graph.depth));
+			GraphTransform currentTransform = graph.transform * Matrix4x4.Scale(new Vector3(graph.width, 1, graph.depth));
 
 			if (e.type == EventType.MouseDown) {
 				isMouseDown = true;
@@ -673,7 +673,7 @@ namespace Pathfinding {
 			Handles.DrawCapFunction cap = Handles.CylinderCap;
 #endif
 
-			var center = currentTransform.Transform(new Vector3(0.5f, 0, 0.5f));
+			Vector3 center = currentTransform.Transform(new Vector3(0.5f, 0, 0.5f));
 			if (Tools.current == Tool.Scale) {
 				const float HandleScale = 0.1f;
 
@@ -681,7 +681,7 @@ namespace Pathfinding {
 				Vector3 mx = Vector3.zero;
 				EditorGUI.BeginChangeCheck();
 				for (int i = 0; i < handlePoints.Length; i++) {
-					var ps = currentTransform.Transform(handlePoints[i]);
+					Vector3 ps = currentTransform.Transform(handlePoints[i]);
 					Vector3 p = savedTransform.InverseTransform(Handles.Slider(ps, ps - center, HandleScale*HandleUtility.GetHandleSize(ps), cap, 0));
 
 					// Snap to increments of whole nodes
@@ -709,7 +709,7 @@ namespace Pathfinding {
 				}
 			} else if (Tools.current == Tool.Rotate) {
 				EditorGUI.BeginChangeCheck();
-				var rot = Handles.RotationHandle(Quaternion.Euler(graph.rotation), graph.center);
+				Quaternion rot = Handles.RotationHandle(Quaternion.Euler(graph.rotation), graph.center);
 
 				if (EditorGUI.EndChangeCheck() && Tools.viewTool != ViewTool.Orbit) {
 					graph.rotation = rot.eulerAngles;

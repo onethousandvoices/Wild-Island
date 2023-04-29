@@ -126,8 +126,8 @@ namespace Pathfinding.Util {
 		public Bounds Transform (Bounds bounds) {
 			if (onlyTranslational) return new Bounds(bounds.center + translation, bounds.size);
 
-			var corners = ArrayPool<Vector3>.Claim(8);
-			var extents = bounds.extents;
+			Vector3[] corners = ArrayPool<Vector3>.Claim(8);
+			Vector3 extents = bounds.extents;
 			corners[0] = Transform(bounds.center + new Vector3(extents.x, extents.y, extents.z));
 			corners[1] = Transform(bounds.center + new Vector3(extents.x, extents.y, -extents.z));
 			corners[2] = Transform(bounds.center + new Vector3(extents.x, -extents.y, extents.z));
@@ -137,8 +137,8 @@ namespace Pathfinding.Util {
 			corners[6] = Transform(bounds.center + new Vector3(-extents.x, -extents.y, extents.z));
 			corners[7] = Transform(bounds.center + new Vector3(-extents.x, -extents.y, -extents.z));
 
-			var min = corners[0];
-			var max = corners[0];
+			Vector3 min = corners[0];
+			Vector3 max = corners[0];
 			for (int i = 1; i < 8; i++) {
 				min = Vector3.Min(min, corners[i]);
 				max = Vector3.Max(max, corners[i]);
@@ -150,8 +150,8 @@ namespace Pathfinding.Util {
 		public Bounds InverseTransform (Bounds bounds) {
 			if (onlyTranslational) return new Bounds(bounds.center - translation, bounds.size);
 
-			var corners = ArrayPool<Vector3>.Claim(8);
-			var extents = bounds.extents;
+			Vector3[] corners = ArrayPool<Vector3>.Claim(8);
+			Vector3 extents = bounds.extents;
 			corners[0] = InverseTransform(bounds.center + new Vector3(extents.x, extents.y, extents.z));
 			corners[1] = InverseTransform(bounds.center + new Vector3(extents.x, extents.y, -extents.z));
 			corners[2] = InverseTransform(bounds.center + new Vector3(extents.x, -extents.y, extents.z));
@@ -161,8 +161,8 @@ namespace Pathfinding.Util {
 			corners[6] = InverseTransform(bounds.center + new Vector3(-extents.x, -extents.y, extents.z));
 			corners[7] = InverseTransform(bounds.center + new Vector3(-extents.x, -extents.y, -extents.z));
 
-			var min = corners[0];
-			var max = corners[0];
+			Vector3 min = corners[0];
+			Vector3 max = corners[0];
 			for (int i = 1; i < 8; i++) {
 				min = Vector3.Min(min, corners[i]);
 				max = Vector3.Max(max, corners[i]);

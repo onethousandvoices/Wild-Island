@@ -80,21 +80,21 @@ namespace Pathfinding {
 		/// <param name="results">Will be called once for each contour with the contour as a parameter as well as a boolean indicating if the contour is a cycle or a chain (see second image).</param>
 		public static void GetContours (INavmesh navmesh, System.Action<List<Int3>, bool> results) {
 			// Assume 3 vertices per node
-			var uses = new bool[3];
+			bool[] uses = new bool[3];
 
-			var outline = new Dictionary<int, int>();
-			var vertexPositions = new Dictionary<int, Int3>();
-			var hasInEdge = new HashSet<int>();
+			Dictionary<int, int> outline = new Dictionary<int, int>();
+			Dictionary<int, Int3> vertexPositions = new Dictionary<int, Int3>();
+			HashSet<int> hasInEdge = new HashSet<int>();
 
 			navmesh.GetNodes(_node => {
-				var node = _node as TriangleMeshNode;
+				TriangleMeshNode node = _node as TriangleMeshNode;
 
 				uses[0] = uses[1] = uses[2] = false;
 
 				if (node != null) {
 				    // Find out which edges are shared with other nodes
 					for (int j = 0; j < node.connections.Length; j++) {
-						var other = node.connections[j].node as TriangleMeshNode;
+						TriangleMeshNode other = node.connections[j].node as TriangleMeshNode;
 
 				        // Not necessarily a TriangleMeshNode
 						if (other != null) {
@@ -108,8 +108,8 @@ namespace Pathfinding {
 				        // The edge is not shared with any other node
 				        // I.e it is an exterior edge on the mesh
 						if (!uses[j]) {
-							var i1 = j;
-							var i2 = (j+1) % node.GetVertexCount();
+							int i1 = j;
+							int i2 = (j+1) % node.GetVertexCount();
 
 							outline[node.GetVertexIndex(i1)] = node.GetVertexIndex(i2);
 							hasInEdge.Add(node.GetVertexIndex(i2));
@@ -165,22 +165,22 @@ namespace Pathfinding {
 			nodes = nodes ?? grid.nodes;
 			int[] neighbourXOffsets = grid.neighbourXOffsets;
 			int[] neighbourZOffsets = grid.neighbourZOffsets;
-			var neighbourIndices = grid.neighbours == NumNeighbours.Six ? GridGraph.hexagonNeighbourIndices : new [] { 0, 1, 2, 3 };
-			var offsetMultiplier = grid.neighbours == NumNeighbours.Six ? 1/3f : 0.5f;
+			int[] neighbourIndices = grid.neighbours == NumNeighbours.Six ? GridGraph.hexagonNeighbourIndices : new [] { 0, 1, 2, 3 };
+			float offsetMultiplier = grid.neighbours == NumNeighbours.Six ? 1/3f : 0.5f;
 
 			if (nodes != null) {
-				var trace = ListPool<Vector3>.Claim();
-				var seenStates = new HashSet<int>();
+				List<Vector3> trace = ListPool<Vector3>.Claim();
+				HashSet<int> seenStates = new HashSet<int>();
 
 				for (int i = 0; i < nodes.Length; i++) {
-					var startNode = nodes[i];
+					GridNodeBase startNode = nodes[i];
 					// The third check is a fast check for if the node has connections in all grid directions, if it has then we can skip processing it (unless the nodes parameter was used in which case we have to handle the edge cases)
 					if (startNode != null && startNode.Walkable && (!startNode.HasConnectionsToAllEightNeighbours || nodeSet != null)) {
 						for (int startDir = 0; startDir < neighbourIndices.Length; startDir++) {
 							int startState = (startNode.NodeIndex << 4) | startDir;
 
 							// Check if there is an obstacle in that direction
-							var startNeighbour = startNode.GetNeighbourAlongDirection(neighbourIndices[startDir]);
+							GridNodeBase startNeighbour = startNode.GetNeighbourAlongDirection(neighbourIndices[startDir]);
 							if ((startNeighbour == null || (nodeSet != null && !nodeSet.Contains(startNeighbour))) && !seenStates.Contains(startState)) {
 								// Start tracing a contour here
 								trace.ClearFast();
@@ -195,12 +195,12 @@ namespace Pathfinding {
 
 									seenStates.Add(state);
 
-									var neighbour = node.GetNeighbourAlongDirection(neighbourIndices[dir]);
+									GridNodeBase neighbour = node.GetNeighbourAlongDirection(neighbourIndices[dir]);
 									if (neighbour == null || (nodeSet != null && !nodeSet.Contains(neighbour))) {
 										// Draw edge
-										var d0 = neighbourIndices[dir];
+										int d0 = neighbourIndices[dir];
 										dir = (dir + 1) % neighbourIndices.Length;
-										var d1 = neighbourIndices[dir];
+										int d1 = neighbourIndices[dir];
 
 										// Position in graph space of the vertex
 										Vector3 graphSpacePos = new Vector3(node.XCoordinateInGrid + 0.5f, 0, node.ZCoordinateInGrid + 0.5f);
@@ -210,10 +210,10 @@ namespace Pathfinding {
 										graphSpacePos.y = grid.transform.InverseTransform((Vector3)node.position).y;
 
 										if (trace.Count >= 2) {
-											var v0 = trace[trace.Count-2];
-											var v1 = trace[trace.Count-1];
-											var v1d = v1 - v0;
-											var v2d = graphSpacePos - v0;
+											Vector3 v0 = trace[trace.Count-2];
+											Vector3 v1 = trace[trace.Count-1];
+											Vector3 v1d = v1 - v0;
+											Vector3 v2d = graphSpacePos - v0;
 											// Replace the previous point if it is colinear with the point just before it and just after it (the current point), because that point wouldn't add much information, but it would add CPU overhead
 											if (((Mathf.Abs(v1d.x) > 0.01f || Mathf.Abs(v2d.x) > 0.01f) && (Mathf.Abs(v1d.z) > 0.01f || Mathf.Abs(v2d.z) > 0.01f)) || (Mathf.Abs(v1d.y) > yMergeThreshold || Mathf.Abs(v2d.y) > yMergeThreshold)) {
 												trace.Add(graphSpacePos);
@@ -234,10 +234,10 @@ namespace Pathfinding {
 								// Otherwise we might return a cycle which was not as simplified as possible and the number of vertices
 								// would depend on where in the cycle the algorithm started to traverse the contour.
 								if (trace.Count >= 3) {
-									var v0 = trace[trace.Count-2];
-									var v1 = trace[trace.Count-1];
-									var v1d = v1 - v0;
-									var v2d = trace[0] - v0;
+									Vector3 v0 = trace[trace.Count-2];
+									Vector3 v1 = trace[trace.Count-1];
+									Vector3 v1d = v1 - v0;
+									Vector3 v2d = trace[0] - v0;
 									// Replace the previous point if it is colinear with the point just before it and just after it (the current point), because that point wouldn't add much information, but it would add CPU overhead
 									if (!(((Mathf.Abs(v1d.x) > 0.01f || Mathf.Abs(v2d.x) > 0.01f) && (Mathf.Abs(v1d.z) > 0.01f || Mathf.Abs(v2d.z) > 0.01f)) || (Mathf.Abs(v1d.y) > yMergeThreshold || Mathf.Abs(v2d.y) > yMergeThreshold))) {
 										trace.RemoveAt(trace.Count - 1);
@@ -245,16 +245,16 @@ namespace Pathfinding {
 								}
 
 								if (trace.Count >= 3) {
-									var v0 = trace[trace.Count-1];
-									var v1 = trace[0];
-									var v1d = v1 - v0;
-									var v2d = trace[1] - v0;
+									Vector3 v0 = trace[trace.Count-1];
+									Vector3 v1 = trace[0];
+									Vector3 v1d = v1 - v0;
+									Vector3 v2d = trace[1] - v0;
 									// Replace the previous point if it is colinear with the point just before it and just after it (the current point), because that point wouldn't add much information, but it would add CPU overhead
 									if (!(((Mathf.Abs(v1d.x) > 0.01f || Mathf.Abs(v2d.x) > 0.01f) && (Mathf.Abs(v1d.z) > 0.01f || Mathf.Abs(v2d.z) > 0.01f)) || (Mathf.Abs(v1d.y) > yMergeThreshold || Mathf.Abs(v2d.y) > yMergeThreshold))) {
 										trace.RemoveAt(0);
 									}
 								}
-								var result = trace.ToArray();
+								Vector3[] result = trace.ToArray();
 								grid.transform.Transform(result);
 								callback(result);
 							}

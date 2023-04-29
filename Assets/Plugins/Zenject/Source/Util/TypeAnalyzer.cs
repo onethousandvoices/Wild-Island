@@ -100,7 +100,7 @@ namespace Zenject
 
         public static InjectTypeInfo GetInfo(Type type)
         {
-            var info = TryGetInfo(type);
+            InjectTypeInfo info = TryGetInfo(type);
             Assert.IsNotNull(info, "Unable to get type info for type '{0}'", type);
             return info;
         }
@@ -136,7 +136,7 @@ namespace Zenject
                 Assert.IsEqual(info.Type, type);
                 Assert.IsNull(info.BaseTypeInfo);
 
-                var baseType = type.BaseType();
+                Type baseType = type.BaseType();
 
                 if (baseType != null && !ShouldSkipTypeAnalysis(baseType))
                 {
@@ -173,7 +173,7 @@ namespace Zenject
             using (ProfileTimers.CreateTimedBlock("Type Analysis - Calling Baked Reflection Getter"))
 #endif
             {
-                var getInfoMethod = type.GetMethod(
+                MethodInfo getInfoMethod = type.GetMethod(
                     ReflectionBakingGetInjectInfoMethodName,
                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 
@@ -183,8 +183,8 @@ namespace Zenject
                     var infoGetter = (ZenTypeInfoGetter)getInfoMethod.CreateDelegate(
                         typeof(ZenTypeInfoGetter), null);
 #else
-                    var infoGetter = ((ZenTypeInfoGetter)Delegate.CreateDelegate(
-                        typeof(ZenTypeInfoGetter), getInfoMethod));
+                    ZenTypeInfoGetter infoGetter = ((ZenTypeInfoGetter)Delegate.CreateDelegate(
+                                                           typeof(ZenTypeInfoGetter), getInfoMethod));
 #endif
 
                     return infoGetter();
@@ -229,15 +229,15 @@ namespace Zenject
 
         static InjectTypeInfo CreateTypeInfoFromReflection(Type type)
         {
-            var reflectionInfo = ReflectionTypeAnalyzer.GetReflectionInfo(type);
+            ReflectionTypeInfo reflectionInfo = ReflectionTypeAnalyzer.GetReflectionInfo(type);
 
-            var injectConstructor = ReflectionInfoTypeInfoConverter.ConvertConstructor(
+            InjectTypeInfo.InjectConstructorInfo injectConstructor = ReflectionInfoTypeInfoConverter.ConvertConstructor(
                 reflectionInfo.InjectConstructor, type);
 
-            var injectMethods = reflectionInfo.InjectMethods.Select(
+            InjectTypeInfo.InjectMethodInfo[] injectMethods = reflectionInfo.InjectMethods.Select(
                 ReflectionInfoTypeInfoConverter.ConvertMethod).ToArray();
 
-            var memberInfos = reflectionInfo.InjectFields.Select(
+            InjectTypeInfo.InjectMemberInfo[] memberInfos = reflectionInfo.InjectFields.Select(
                 x => ReflectionInfoTypeInfoConverter.ConvertField(type, x)).Concat(
                     reflectionInfo.InjectProperties.Select(
                         x => ReflectionInfoTypeInfoConverter.ConvertProperty(type, x))).ToArray();

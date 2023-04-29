@@ -93,7 +93,7 @@ namespace Pathfinding.Util {
 		/// </summary>
 		public static T[] ShrinkArray<T>(T[] arr, int newLength) {
 			newLength = Math.Min(newLength, arr.Length);
-			var shrunkArr = new T[newLength];
+			T[] shrunkArr = new T[newLength];
 			Array.Copy(arr, shrunkArr, newLength);
 			return shrunkArr;
 		}

@@ -27,10 +27,10 @@ namespace Zenject.Tests.Other
 
             Assert.That(Container.Resolve<IFoo>() is Foo1);
 
-            var context = new InjectContext(Container, typeof(IFoo));
+            InjectContext context = new InjectContext(Container, typeof(IFoo));
 
-            var provider = Container.AllProviders.OfType<CachedProvider>()
-                .Where(x => x.GetInstanceType(context) == typeof(Foo1)).Single();
+            CachedProvider provider = Container.AllProviders.OfType<CachedProvider>()
+                                               .Where(x => x.GetInstanceType(context) == typeof(Foo1)).Single();
 
             Assert.IsEqual(provider.NumInstances, 1);
 

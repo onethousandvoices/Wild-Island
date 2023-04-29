@@ -13,7 +13,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestBasic()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -30,7 +30,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
 
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -46,7 +46,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestTransient()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -63,7 +63,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestSingle()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -79,7 +79,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestCached1()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -96,7 +96,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestCached2()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 
@@ -113,7 +113,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestCachedMultipleConcrete()
         {
             PreInstall();
-            var gameObject = Container.CreateEmptyGameObject("Foo");
+            GameObject gameObject = Container.CreateEmptyGameObject("Foo");
 
             Container.BindInstance(gameObject).WithId("Foo");
 

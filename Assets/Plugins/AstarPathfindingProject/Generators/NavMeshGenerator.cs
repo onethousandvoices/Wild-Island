@@ -113,7 +113,7 @@ namespace Pathfinding {
 			Bounds bounds = graph.transform.InverseTransform(o.bounds);
 
 			// Bounding rectangle with integer coordinates
-			var irect = new IntRect(
+			IntRect irect = new IntRect(
 				Mathf.FloorToInt(bounds.min.x*Int3.Precision),
 				Mathf.FloorToInt(bounds.min.z*Int3.Precision),
 				Mathf.CeilToInt(bounds.max.x*Int3.Precision),
@@ -121,17 +121,17 @@ namespace Pathfinding {
 				);
 
 			// Corners of the bounding rectangle
-			var a = new Int3(irect.xmin, 0, irect.ymin);
-			var b = new Int3(irect.xmin, 0, irect.ymax);
-			var c = new Int3(irect.xmax, 0, irect.ymin);
-			var d = new Int3(irect.xmax, 0, irect.ymax);
+			Int3 a = new Int3(irect.xmin, 0, irect.ymin);
+			Int3 b = new Int3(irect.xmin, 0, irect.ymax);
+			Int3 c = new Int3(irect.xmax, 0, irect.ymin);
+			Int3 d = new Int3(irect.xmax, 0, irect.ymax);
 
-			var ymin = ((Int3)bounds.min).y;
-			var ymax = ((Int3)bounds.max).y;
+			int ymin = ((Int3)bounds.min).y;
+			int ymax = ((Int3)bounds.max).y;
 
 			// Loop through all nodes and check if they intersect the bounding box
 			graph.GetNodes(_node => {
-				var node = _node as TriangleMeshNode;
+				TriangleMeshNode node = _node as TriangleMeshNode;
 
 				bool inside = false;
 
@@ -213,7 +213,7 @@ namespace Pathfinding {
 
 			sourceMesh = mesh;
 
-			var scan = ScanInternal().GetEnumerator();
+			IEnumerator<Progress> scan = ScanInternal().GetEnumerator();
 			while (scan.MoveNext()) {}
 		}
 
@@ -233,8 +233,8 @@ namespace Pathfinding {
 
 			forcedBoundsSize = sourceMesh.bounds.size * scale;
 			Vector3[] vectorVertices = sourceMesh.vertices;
-			var intVertices = ListPool<Int3>.Claim(vectorVertices.Length);
-			var matrix = Matrix4x4.TRS(-sourceMesh.bounds.min * scale, Quaternion.identity, Vector3.one * scale);
+			List<Int3> intVertices = ListPool<Int3>.Claim(vectorVertices.Length);
+			Matrix4x4 matrix = Matrix4x4.TRS(-sourceMesh.bounds.min * scale, Quaternion.identity, Vector3.one * scale);
 			// Convert the vertices to integer coordinates and also position them in graph space
 			// so that the minimum of the bounding box of the mesh is at the origin
 			// (the vertices will later be transformed to world space)

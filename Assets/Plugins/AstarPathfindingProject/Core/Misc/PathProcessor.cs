@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -106,7 +107,7 @@ namespace Pathfinding {
 
 				// Start lots of threads
 				for (int i = 0; i < processors; i++) {
-					var pathHandler = pathHandlers[i];
+					PathHandler pathHandler = pathHandlers[i];
 					threads[i] = new Thread(() => CalculatePathsThreaded(pathHandler));
 #if !UNITY_SWITCH || UNITY_EDITOR
 					// Note: Setting the thread name seems to crash when deploying for Switch: https://forum.arongranberg.com/t/path-processor-crashing-nintendo-switch-build/6584
@@ -476,7 +477,7 @@ namespace Pathfinding {
 
 				// Call some callbacks
 				// It needs to be stored in a local variable to avoid race conditions
-				var tmpOnPathPreSearch = OnPathPreSearch;
+				Action<Path> tmpOnPathPreSearch = OnPathPreSearch;
 				if (tmpOnPathPreSearch != null) tmpOnPathPreSearch(p);
 
 				// Tick for when the path started, used for calculating how long time the calculation took
@@ -557,13 +558,13 @@ namespace Pathfinding {
 
 				// Call the immediate callback
 				// It needs to be stored in a local variable to avoid race conditions
-				var tmpImmediateCallback = p.immediateCallback;
+				OnPathDelegate tmpImmediateCallback = p.immediateCallback;
 				if (tmpImmediateCallback != null) tmpImmediateCallback(p);
 
 				AstarProfiler.StartFastProfile(13);
 
 				// It needs to be stored in a local variable to avoid race conditions
-				var tmpOnPathPostSearch = OnPathPostSearch;
+				Action<Path> tmpOnPathPostSearch = OnPathPostSearch;
 				if (tmpOnPathPostSearch != null) tmpOnPathPostSearch(p);
 
 				AstarProfiler.EndFastProfile(13);

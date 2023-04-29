@@ -30,7 +30,7 @@ namespace Zenject.SpaceFighter
 
         public void Die()
         {
-            var explosion = _explosionFactory.Create();
+            Explosion explosion = _explosionFactory.Create();
             explosion.transform.position = _view.Position;
 
             _audioPlayer.Play(_settings.DeathSound, _settings.DeathSoundVolume);

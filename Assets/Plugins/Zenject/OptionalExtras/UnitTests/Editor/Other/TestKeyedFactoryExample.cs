@@ -22,7 +22,7 @@ namespace Zenject.Tests.Other
 
             Container.Bind<FooFactory>().AsSingle();
 
-            var keyedFactory = Container.Resolve<FooFactory>();
+            FooFactory keyedFactory = Container.Resolve<FooFactory>();
 
             Assert.IsEqual(keyedFactory.Create("foo1").Number, 5);
             Assert.IsEqual(keyedFactory.Create("foo2").Number, 6);

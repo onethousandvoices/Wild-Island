@@ -76,9 +76,9 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunMissingChildrenSuccess()
         {
-            var root = new GameObject("root").AddComponent<Root>();
+            Root root = new GameObject("root").AddComponent<Root>();
 
-            var grandchild = new GameObject("grandchild").AddComponent<Grandchild>();
+            Grandchild grandchild = new GameObject("grandchild").AddComponent<Grandchild>();
             grandchild.transform.SetParent(root.transform);
 
             PreInstall();
@@ -91,7 +91,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator TestOptional()
         {
-            var root = new GameObject("root").AddComponent<RootWithOptional>();
+            RootWithOptional root = new GameObject("root").AddComponent<RootWithOptional>();
 
             PreInstall();
 
@@ -107,9 +107,9 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator TestOptional2()
         {
-            var root = new GameObject("root").AddComponent<Root>();
+            Root root = new GameObject("root").AddComponent<Root>();
 
-            var grandChild = new GameObject("grandchild").AddComponent<Grandchild>();
+            Grandchild grandChild = new GameObject("grandchild").AddComponent<Grandchild>();
             grandChild.transform.SetParent(root.transform, false);
 
             PreInstall();
@@ -174,9 +174,9 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator RunMissingChildrenSuccessNonGeneric()
         {
-            var root = new GameObject("root").AddComponent<Root>();
+            Root root = new GameObject("root").AddComponent<Root>();
 
-            var grandchild = new GameObject("grandchild").AddComponent<Grandchild>();
+            Grandchild grandchild = new GameObject("grandchild").AddComponent<Grandchild>();
             grandchild.transform.SetParent(root.transform);
 
             PreInstall();
@@ -189,7 +189,7 @@ namespace Zenject.Tests.Bindings
         [UnityTest]
         public IEnumerator TestOptionalNonGeneric()
         {
-            var root = new GameObject("root").AddComponent<RootWithOptional>();
+            RootWithOptional root = new GameObject("root").AddComponent<RootWithOptional>();
 
             PreInstall();
 

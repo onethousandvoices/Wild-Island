@@ -16,11 +16,11 @@ namespace Pathfinding {
 			base.Inspector();
 
 			scripts.Clear();
-			foreach (var script in targets) scripts.Add(script as Seeker);
+			foreach (Object script in targets) scripts.Add(script as Seeker);
 
 			Undo.RecordObjects(targets, "Modify settings on Seeker");
 
-			var startEndModifierProp = FindProperty("startEndModifier");
+			SerializedProperty startEndModifierProp = FindProperty("startEndModifier");
 			startEndModifierProp.isExpanded = EditorGUILayout.Foldout(startEndModifierProp.isExpanded, startEndModifierProp.displayName);
 			if (startEndModifierProp.isExpanded) {
 				EditorGUI.indentLevel++;
@@ -85,7 +85,7 @@ namespace Pathfinding {
 #if !ASTAR_NoTagPenalty
 				EditorGUILayout.BeginVertical();
 				EditorGUILayout.LabelField("Penalty", EditorStyles.boldLabel, GUILayout.MaxWidth(100));
-				var prop = FindProperty("tagPenalties").FindPropertyRelative("Array");
+				SerializedProperty prop = FindProperty("tagPenalties").FindPropertyRelative("Array");
 				prop.Next(true);
 				for (int i = 0; i < tagNames.Length; i++) {
 					prop.Next(false);
@@ -106,16 +106,16 @@ namespace Pathfinding {
 				EditorGUILayout.BeginVertical();
 				EditorGUILayout.LabelField("Traversable", EditorStyles.boldLabel, GUILayout.MaxWidth(100));
 				for (int i = 0; i < tagNames.Length; i++) {
-					var anyFalse = false;
-					var anyTrue = false;
+					bool anyFalse = false;
+					bool anyTrue = false;
 					for (int j = 0; j < scripts.Count; j++) {
-						var prevTraversable = ((scripts[j].traversableTags >> i) & 0x1) != 0;
+						bool prevTraversable = ((scripts[j].traversableTags >> i) & 0x1) != 0;
 						anyTrue |= prevTraversable;
 						anyFalse |= !prevTraversable;
 					}
 					EditorGUI.BeginChangeCheck();
 					EditorGUI.showMixedValue = anyTrue & anyFalse;
-					var newTraversable = EditorGUILayout.Toggle(anyTrue);
+					bool newTraversable = EditorGUILayout.Toggle(anyTrue);
 					EditorGUI.showMixedValue = false;
 					if (EditorGUI.EndChangeCheck()) {
 						for (int j = 0; j < scripts.Count; j++) {

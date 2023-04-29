@@ -11,7 +11,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<Foo>();
 
-            var factory = Container.Resolve<IFactory<Foo>>();
+            IFactory<Foo> factory = Container.Resolve<IFactory<Foo>>();
 
             Assert.IsNotNull(factory.Create());
         }
@@ -21,7 +21,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<FooTwo>();
 
-            var factory = Container.Resolve<IFactory<FooTwo>>();
+            IFactory<FooTwo> factory = Container.Resolve<IFactory<FooTwo>>();
 
             Assert.Throws(() => factory.Create());
         }
@@ -31,7 +31,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<string, FooTwo>();
 
-            var factory = Container.Resolve<IFactory<string, FooTwo>>();
+            IFactory<string, FooTwo> factory = Container.Resolve<IFactory<string, FooTwo>>();
 
             Assert.IsEqual(factory.Create("asdf").Value, "asdf");
         }
@@ -41,7 +41,7 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindIFactory<string, int, char, long, double, IFooFive>().To<FooFive>();
 
-            var factory = Container.Resolve<IFactory<string, int, char, long, double, IFooFive>>();
+            IFactory<string, int, char, long, double, IFooFive> factory = Container.Resolve<IFactory<string, int, char, long, double, IFooFive>>();
 
             Assert.IsEqual(factory.Create("asdf", 0, 'z', 2, 3.0).P1, "asdf");
         }

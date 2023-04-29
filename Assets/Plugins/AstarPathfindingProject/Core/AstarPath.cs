@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Pathfinding;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
@@ -718,7 +720,7 @@ public class AstarPath : VersionedMonoBehaviour {
 							debugFloor = Mathf.Min(debugFloor, node.Penalty);
 							debugRoof = Mathf.Max(debugRoof, node.Penalty);
 						} else if (debugPathData != null) {
-							var rnode = debugPathData.GetPathNode(node);
+							PathNode rnode = debugPathData.GetPathNode(node);
 							switch (debugMode) {
 							case GraphDebugMode.F:
 								debugFloor = Mathf.Min(debugFloor, rnode.F);
@@ -1005,7 +1007,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	public void QueueGraphUpdates () {
 		if (!graphUpdatesWorkItemAdded) {
 			graphUpdatesWorkItemAdded = true;
-			var workItem = graphUpdates.GetWorkItem();
+			AstarWorkItem workItem = graphUpdates.GetWorkItem();
 
 			// Add a new work item which first
 			// sets the graphUpdatesWorkItemAdded flag to false
@@ -1143,7 +1145,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// </summary>
 	public void FlushWorkItems () {
 		if (workItems.anyQueued) {
-			var graphLock = PausePathfinding();
+			PathProcessor.GraphUpdateLock graphLock = PausePathfinding();
 			PerformBlockingActions(true);
 			graphLock.Release();
 		}
@@ -1161,7 +1163,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	///              If false, then after this call there might still be work left to do.</param>
 	[System.Obsolete("Use FlushWorkItems() instead")]
 	public void FlushWorkItems (bool unblockOnComplete, bool block) {
-		var graphLock = PausePathfinding();
+		PathProcessor.GraphUpdateLock graphLock = PausePathfinding();
 
 		// Run tasks
 		PerformBlockingActions(block);
@@ -1278,13 +1280,13 @@ public class AstarPath : VersionedMonoBehaviour {
 		pathProcessor = new PathProcessor(this, pathReturnQueue, numProcessors, multithreaded);
 
 		pathProcessor.OnPathPreSearch += path => {
-			var tmp = OnPathPreSearch;
+			OnPathDelegate tmp = OnPathPreSearch;
 			if (tmp != null) tmp(path);
 		};
 
 		pathProcessor.OnPathPostSearch += path => {
 			LogPathResults(path);
-			var tmp = OnPathPostSearch;
+			OnPathDelegate tmp = OnPathPostSearch;
 			if (tmp != null) tmp(path);
 		};
 
@@ -1587,11 +1589,11 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// </summary>
 	/// <param name="graphsToScan">The graphs to scan. If this parameter is null then all graphs will be scanned</param>
 	public void Scan (NavGraph[] graphsToScan = null) {
-		var prevProgress = new Progress();
+		Progress prevProgress = new Progress();
 
 		Profiler.BeginSample("Scan");
 		Profiler.BeginSample("Init");
-		foreach (var p in ScanAsync(graphsToScan)) {
+		foreach (Progress p in ScanAsync(graphsToScan)) {
 			if (prevProgress.description != p.description) {
 #if !NETFX_CORE && UNITY_EDITOR
 				Profiler.EndSample();
@@ -1668,7 +1670,7 @@ public class AstarPath : VersionedMonoBehaviour {
 
 		VerifyIntegrity();
 
-		var graphUpdateLock = PausePathfinding();
+		PathProcessor.GraphUpdateLock graphUpdateLock = PausePathfinding();
 
 		// Make sure all paths that are in the queue to be returned
 		// are returned immediately
@@ -1704,7 +1706,7 @@ public class AstarPath : VersionedMonoBehaviour {
 		data.LockGraphStructure();
 
 		Physics2D.SyncTransforms();
-		var watch = System.Diagnostics.Stopwatch.StartNew();
+		Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
 		// Destroy previous nodes
 		for (int i = 0; i < graphsToScan.Length; i++) {
@@ -1723,11 +1725,11 @@ public class AstarPath : VersionedMonoBehaviour {
 			float minp = Mathf.Lerp(0.1F, 0.8F, (float)(i)/(graphsToScan.Length));
 			float maxp = Mathf.Lerp(0.1F, 0.8F, (float)(i+0.95F)/(graphsToScan.Length));
 
-			var progressDescriptionPrefix = "Scanning graph " + (i+1) + " of " + graphsToScan.Length + " - ";
+			string progressDescriptionPrefix = "Scanning graph " + (i+1) + " of " + graphsToScan.Length + " - ";
 
 			// Like a foreach loop but it gets a little complicated because of the exception
 			// handling (it is not possible to yield inside try-except clause).
-			var coroutine = ScanGraph(graphsToScan[i]).GetEnumerator();
+			IEnumerator<Progress> coroutine = ScanGraph(graphsToScan[i]).GetEnumerator();
 			while (true) {
 				try {
 					if (!coroutine.MoveNext()) break;
@@ -1793,7 +1795,7 @@ public class AstarPath : VersionedMonoBehaviour {
 
 		yield return new Progress(0, "");
 
-		foreach (var p in ((IGraphInternals)graph).ScanInternal()) {
+		foreach (Progress p in ((IGraphInternals)graph).ScanInternal()) {
 			yield return p.MapTo(0, 0.95f);
 		}
 
@@ -1931,7 +1933,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// If too many paths are put in the front of the queue often, this can lead to normal paths having to wait a very long time before being calculated.</param>
 	public static void StartPath (Path path, bool pushToFront = false) {
 		// Copy to local variable to avoid multithreading issues
-		var astar = active;
+		AstarPath astar = active;
 
 		if (System.Object.ReferenceEquals(astar, null)) {
 			Debug.LogError("There is no AstarPath object in the scene or it has not been initialized yet");
@@ -2038,7 +2040,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// </summary>
 	public NNInfo GetNearest (Vector3 position, NNConstraint constraint, GraphNode hint) {
 		// Cache property lookup
-		var graphs = this.graphs;
+		NavGraph[] graphs = this.graphs;
 
 		float minDist = float.PositiveInfinity;
 		NNInfoInternal nearestNode = new NNInfoInternal();

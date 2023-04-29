@@ -105,7 +105,7 @@ namespace Pathfinding {
 		}
 
 		void RemoveGridGraphFromStatic () {
-			var graphIndex = active.data.GetGraphIndex(this);
+			int graphIndex = active.data.GetGraphIndex(this);
 
 			GridNode.ClearGridGraph(graphIndex, this);
 		}
@@ -478,7 +478,7 @@ namespace Pathfinding {
 		/// This will move all nodes in the graph to new positions which matches the new settings.
 		/// </summary>
 		public void RelocateNodes (Vector3 center, Quaternion rotation, float nodeSize, float aspectRatio = 1, float isometricAngle = 0) {
-			var previousTransform = transform;
+			GraphTransform previousTransform = transform;
 
 			this.center = center;
 			this.rotation = rotation.eulerAngles;
@@ -488,8 +488,8 @@ namespace Pathfinding {
 			SetDimensions(width, depth, nodeSize);
 
 			GetNodes(node => {
-				var gnode = node as GridNodeBase;
-				var height = previousTransform.InverseTransform((Vector3)node.position).y;
+				GridNodeBase gnode = node as GridNodeBase;
+				float height = previousTransform.InverseTransform((Vector3)node.position).y;
 				node.position = GraphPointToWorld(gnode.XCoordinateInGrid, gnode.ZCoordinateInGrid, height);
 			});
 		}
@@ -728,19 +728,19 @@ namespace Pathfinding {
 
 			// Generate a matrix which shrinks the graph along one of the diagonals
 			// corresponding to the isometricAngle
-			var isometricMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 45, 0), Vector3.one);
+			Matrix4x4 isometricMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 45, 0), Vector3.one);
 			isometricMatrix = Matrix4x4.Scale(new Vector3(Mathf.Cos(Mathf.Deg2Rad*isometricAngle), 1, 1)) * isometricMatrix;
 			isometricMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, -45, 0), Vector3.one) * isometricMatrix;
 
 			// Generate a matrix for the bounds of the graph
 			// This moves a point to the correct offset in the world and the correct rotation and the aspect ratio and isometric angle is taken into account
 			// The unit is still world units however
-			var boundsMatrix = Matrix4x4.TRS(center, Quaternion.Euler(rotation), new Vector3(aspectRatio, 1, 1)) * isometricMatrix;
+			Matrix4x4 boundsMatrix = Matrix4x4.TRS(center, Quaternion.Euler(rotation), new Vector3(aspectRatio, 1, 1)) * isometricMatrix;
 
 			// Generate a matrix where Vector3.zero is the corner of the graph instead of the center
 			// The unit is nodes here (so (0.5,0,0.5) is the position of the first node and (1.5,0,0.5) is the position of the second node)
 			// 0.5 is added since this is the node center, not its corner. In graph space a node has a size of 1
-			var m = Matrix4x4.TRS(boundsMatrix.MultiplyPoint3x4(-new Vector3(newWidth*newNodeSize, 0, newDepth*newNodeSize)*0.5F), Quaternion.Euler(rotation), new Vector3(newNodeSize*aspectRatio, 1, newNodeSize)) * isometricMatrix;
+			Matrix4x4 m = Matrix4x4.TRS(boundsMatrix.MultiplyPoint3x4(-new Vector3(newWidth*newNodeSize, 0, newDepth*newNodeSize)*0.5F), Quaternion.Euler(rotation), new Vector3(newNodeSize*aspectRatio, 1, newNodeSize)) * isometricMatrix;
 
 			// Set the matrix of the graph
 			// This will also set inverseMatrix
@@ -753,7 +753,7 @@ namespace Pathfinding {
 		/// allowed to be larger than 1024 (artificial limit).
 		/// </summary>
 		void CalculateDimensions (out int width, out int depth, out float nodeSize) {
-			var newSize = unclampedSize;
+			Vector2 newSize = unclampedSize;
 
 			// Make sure size is positive
 			newSize.x *= Mathf.Sign(newSize.x);
@@ -796,7 +796,7 @@ namespace Pathfinding {
 			int x = Mathf.Clamp((int)xf, 0, width-1);
 			int z = Mathf.Clamp((int)zf, 0, depth-1);
 
-			var nn = new NNInfoInternal(nodes[z*width+x]);
+			NNInfoInternal nn = new NNInfoInternal(nodes[z*width+x]);
 
 			float y = transform.InverseTransform((Vector3)nodes[z*width+x].position).y;
 			nn.clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, x, x+1f), y, Mathf.Clamp(zf, z, z+1f)));
@@ -829,7 +829,7 @@ namespace Pathfinding {
 			int overlap = getNearestForceOverlap;
 
 			Vector3 clampedPosition = Vector3.zero;
-			var nn = new NNInfoInternal(null);
+			NNInfoInternal nn = new NNInfoInternal(null);
 
 			// If the closest node was suitable
 			if (constraint == null || constraint.Suitable(node)) {
@@ -1043,8 +1043,8 @@ namespace Pathfinding {
 			nodes = new GridNode[width*depth];
 			for (int z = 0; z < depth; z++) {
 				for (int x = 0; x < width; x++) {
-					var index = z*width+x;
-					var node = nodes[index] = new GridNode(active);
+					int index = z*width+x;
+					GridNode node = nodes[index] = new GridNode(active);
 					node.GraphIndex = graphIndex;
 					node.NodeInGridIndex = index;
 				}
@@ -1131,7 +1131,7 @@ namespace Pathfinding {
 		///      (this excludes texture data however which is only done when scanning the graph).</param>
 		/// <param name="resetTags">If true, the tag will be reset to zero (the default tag).</param>
 		public virtual void RecalculateCell (int x, int z, bool resetPenalties = true, bool resetTags = true) {
-			var node = nodes[z*width + x];
+			GridNode node = nodes[z*width + x];
 
 			// Set the node's initial position with a y-offset of zero
 			node.position = GraphPointToWorld(x, z, 0);
@@ -1195,7 +1195,7 @@ namespace Pathfinding {
 		/// Internal method used for erosion.
 		/// </summary>
 		protected virtual bool ErosionAnyFalseConnections (GraphNode baseNode) {
-			var node = baseNode as GridNode;
+			GridNode node = baseNode as GridNode;
 
 			if (neighbours == NumNeighbours.Six) {
 				// Check the 6 hexagonal connections
@@ -1234,13 +1234,13 @@ namespace Pathfinding {
 
 		/// <summary>Internal method used for erosion</summary>
 		void ErodeNodeWithTags (GraphNode node, int iteration) {
-			var gnode = node as GridNodeBase;
+			GridNodeBase gnode = node as GridNodeBase;
 
 			if (gnode.Walkable && gnode.Tag >= erosionFirstTag && gnode.Tag < erosionFirstTag + iteration) {
 				if (neighbours == NumNeighbours.Six) {
 					// Check the 6 hexagonal connections
 					for (int i = 0; i < 6; i++) {
-						var other = gnode.GetNeighbourAlongDirection(hexagonNeighbourIndices[i]);
+						GridNodeBase other = gnode.GetNeighbourAlongDirection(hexagonNeighbourIndices[i]);
 						if (other != null) {
 							uint tag = other.Tag;
 							if (tag > erosionFirstTag + iteration || tag < erosionFirstTag) {
@@ -1251,7 +1251,7 @@ namespace Pathfinding {
 				} else {
 					// Check the four axis aligned connections
 					for (int i = 0; i < 4; i++) {
-						var other = gnode.GetNeighbourAlongDirection(i);
+						GridNodeBase other = gnode.GetNeighbourAlongDirection(i);
 						if (other != null) {
 							uint tag = other.Tag;
 							if (tag > erosionFirstTag + iteration || tag < erosionFirstTag) {
@@ -1294,8 +1294,8 @@ namespace Pathfinding {
 			if (erodeIterations == 0) return;
 
 			// Get all nodes inside the rectangle
-			var rect = new IntRect(xmin, zmin, xmax - 1, zmax - 1);
-			var nodesInRect = GetNodesInRegion(rect);
+			IntRect rect = new IntRect(xmin, zmin, xmax - 1, zmax - 1);
+			List<GraphNode> nodesInRect = GetNodesInRegion(rect);
 			int nodeCount = nodesInRect.Count;
 			for (int it = 0; it < erodeIterations; it++) {
 				if (erosionUseTags) {
@@ -1350,9 +1350,9 @@ namespace Pathfinding {
 				// This code is hot when scanning so it does have an impact.
 				return System.Math.Abs(node1.position.y - node2.position.y) <= maxClimb*Int3.Precision;
 			} else {
-				var p1 = (Vector3)node1.position;
-				var p2 = (Vector3)node2.position;
-				var up = transform.WorldUpAtGraphPosition(p1);
+				Vector3 p1 = (Vector3)node1.position;
+				Vector3 p2 = (Vector3)node2.position;
+				Vector3 up = transform.WorldUpAtGraphPosition(p1);
 				return System.Math.Abs(Vector3.Dot(up, p1) - Vector3.Dot(up, p2)) <= maxClimb;
 			}
 		}
@@ -1433,7 +1433,7 @@ namespace Pathfinding {
 		/// See: CalculateConnections(GridNodeBase)
 		/// </summary>
 		public virtual void CalculateConnections (int x, int z) {
-			var node = nodes[z*width + x];
+			GridNode node = nodes[z*width + x];
 
 			// All connections are disabled if the node is not walkable
 			if (!node.Walkable) {
@@ -1461,7 +1461,7 @@ namespace Pathfinding {
 					// Bitwise AND (&) is measurably faster than &&
 					// (not much, but this code is hot)
 					if (nx >= 0 & nz >= 0 & nx < width & nz < depth) {
-						var other = nodes[index+neighbourOffsets[i]];
+						GridNode other = nodes[index+neighbourOffsets[i]];
 
 						if (IsValidConnection(node, other)) {
 							// Enable connection i
@@ -1528,13 +1528,13 @@ namespace Pathfinding {
 
 				// Loop through all possible neighbours and try to connect to them
 				for (int j = 0; j < hexagonNeighbourIndices.Length; j++) {
-					var i = hexagonNeighbourIndices[j];
+					int i = hexagonNeighbourIndices[j];
 
 					int nx = x + neighbourXOffsets[i];
 					int nz = z + neighbourZOffsets[i];
 
 					if (nx >= 0 & nz >= 0 & nx < width & nz < depth) {
-						var other = nodes[index+neighbourOffsets[i]];
+						GridNode other = nodes[index+neighbourOffsets[i]];
 						node.SetConnectionInternal(i, IsValidConnection(node, other));
 					}
 				}
@@ -1543,21 +1543,21 @@ namespace Pathfinding {
 
 
 		public override void OnDrawGizmos (RetainedGizmos gizmos, bool drawNodes) {
-			using (var helper = gizmos.GetSingleFrameGizmoHelper(active)) {
+			using (GraphGizmoHelper helper = gizmos.GetSingleFrameGizmoHelper(active)) {
 				// The width and depth fields might not be up to date, so recalculate
 				// them from the #unclampedSize field
 				int w, d;
 				float s;
 				CalculateDimensions(out w, out d, out s);
-				var bounds = new Bounds();
+				Bounds bounds = new Bounds();
 				bounds.SetMinMax(Vector3.zero, new Vector3(w, 0, d));
-				var trans = CalculateTransform();
+				GraphTransform trans = CalculateTransform();
 				helper.builder.DrawWireCube(trans, bounds, Color.white);
 
 				int nodeCount = nodes != null ? nodes.Length : -1;
 
 				if (drawNodes && width*depth*LayerCount != nodeCount) {
-					var color = new Color(1, 1, 1, 0.2f);
+					Color color = new Color(1, 1, 1, 0.2f);
 					for (int z = 0; z < d; z++) {
 						helper.builder.DrawLine(trans.Transform(new Vector3(0, 0, z)), trans.Transform(new Vector3(w, 0, z)), color);
 					}
@@ -1581,8 +1581,8 @@ namespace Pathfinding {
 			for (int cx = width/chunkWidth; cx >= 0; cx--) {
 				for (int cz = depth/chunkWidth; cz >= 0; cz--) {
 					Profiler.BeginSample("Hash");
-					var allNodesCount = GetNodesInRegion(new IntRect(cx*chunkWidth, cz*chunkWidth, (cx+1)*chunkWidth - 1, (cz+1)*chunkWidth - 1), allNodes);
-					var hasher = new RetainedGizmos.Hasher(active);
+					int allNodesCount = GetNodesInRegion(new IntRect(cx*chunkWidth, cz*chunkWidth, (cx+1)*chunkWidth - 1, (cz+1)*chunkWidth - 1), allNodes);
+					RetainedGizmos.Hasher hasher = new RetainedGizmos.Hasher(active);
 					hasher.AddHash(showMeshOutline ? 1 : 0);
 					hasher.AddHash(showMeshSurface ? 1 : 0);
 					hasher.AddHash(showNodeConnections ? 1 : 0);
@@ -1593,7 +1593,7 @@ namespace Pathfinding {
 
 					if (!gizmos.Draw(hasher)) {
 						Profiler.BeginSample("Rebuild Retained Gizmo Chunk");
-						using (var helper = gizmos.GetGizmoHelper(active, hasher)) {
+						using (GraphGizmoHelper helper = gizmos.GetGizmoHelper(active, hasher)) {
 							if (showNodeConnections) {
 								for (int i = 0; i < allNodesCount; i++) {
 									// Don't bother drawing unwalkable nodes
@@ -1625,23 +1625,23 @@ namespace Pathfinding {
 				if (nodes[i].Walkable) walkable++;
 			}
 
-			var neighbourIndices = neighbours == NumNeighbours.Six ? hexagonNeighbourIndices : new [] { 0, 1, 2, 3 };
-			var offsetMultiplier = neighbours == NumNeighbours.Six ? 0.333333f : 0.5f;
+			int[] neighbourIndices = neighbours == NumNeighbours.Six ? hexagonNeighbourIndices : new [] { 0, 1, 2, 3 };
+			float offsetMultiplier = neighbours == NumNeighbours.Six ? 0.333333f : 0.5f;
 
 			// 2 for a square-ish grid, 4 for a hexagonal grid.
-			var trianglesPerNode = neighbourIndices.Length-2;
-			var verticesPerNode = 3*trianglesPerNode;
+			int trianglesPerNode = neighbourIndices.Length-2;
+			int verticesPerNode = 3*trianglesPerNode;
 
 			// Get arrays that have room for all vertices/colors (the array might be larger)
-			var vertices = ArrayPool<Vector3>.Claim(walkable*verticesPerNode);
-			var colors = ArrayPool<Color>.Claim(walkable*verticesPerNode);
+			Vector3[] vertices = ArrayPool<Vector3>.Claim(walkable*verticesPerNode);
+			Color[] colors = ArrayPool<Color>.Claim(walkable*verticesPerNode);
 			int baseIndex = 0;
 
 			for (int i = 0; i < nodeCount; i++) {
-				var node = nodes[i];
+				GridNodeBase node = nodes[i];
 				if (!node.Walkable) continue;
 
-				var nodeColor = helper.NodeColor(node);
+				Color nodeColor = helper.NodeColor(node);
 				// Don't bother drawing transparent nodes
 				if (nodeColor.a <= 0.001f) continue;
 
@@ -1652,8 +1652,8 @@ namespace Pathfinding {
 					// n  -- n1
 					//
 					// n = this node
-					var d = neighbourIndices[dIndex];
-					var nextD = neighbourIndices[(dIndex + 1) % neighbourIndices.Length];
+					int d = neighbourIndices[dIndex];
+					int nextD = neighbourIndices[(dIndex + 1) % neighbourIndices.Length];
 					GridNodeBase n1, n2, n3 = null;
 					n1 = node.GetNeighbourAlongDirection(d);
 					if (n1 != null && neighbours != NumNeighbours.Six) {
@@ -1706,7 +1706,7 @@ namespace Pathfinding {
 
 				// Draw the outline of the node
 				for (int j = 0; j < neighbourIndices.Length; j++) {
-					var other = node.GetNeighbourAlongDirection(neighbourIndices[(j+1) % neighbourIndices.Length]);
+					GridNodeBase other = node.GetNeighbourAlongDirection(neighbourIndices[(j+1) % neighbourIndices.Length]);
 					// Just a tie breaker to make sure we don't draw the line twice.
 					// Using NodeInGridIndex instead of NodeIndex to make the gizmos deterministic for a given grid layout.
 					// This is important because if the graph would be re-scanned and only a small part of it would change
@@ -1748,10 +1748,10 @@ namespace Pathfinding {
 			int minZ = Mathf.RoundToInt(min.z-0.5F);
 			int maxZ = Mathf.RoundToInt(max.z-0.5F);
 
-			var originalRect = new IntRect(minX, minZ, maxX, maxZ);
+			IntRect originalRect = new IntRect(minX, minZ, maxX, maxZ);
 
 			// Rect which covers the whole grid
-			var gridRect = new IntRect(0, 0, width-1, depth-1);
+			IntRect gridRect = new IntRect(0, 0, width-1, depth-1);
 
 			// Clamp the rect to the grid
 			return IntRect.Intersection(originalRect, gridRect);
@@ -1803,14 +1803,14 @@ namespace Pathfinding {
 		/// See: GraphUpdateShape.GetBounds
 		/// </summary>
 		protected virtual List<GraphNode> GetNodesInRegion (Bounds bounds, GraphUpdateShape shape) {
-			var rect = GetRectFromBounds(bounds);
+			IntRect rect = GetRectFromBounds(bounds);
 
 			if (nodes == null || !rect.IsValid() || nodes.Length != width*depth) {
 				return ListPool<GraphNode>.Claim();
 			}
 
 			// Get a buffer we can use
-			var inArea = ListPool<GraphNode>.Claim(rect.Width*rect.Height);
+			List<GraphNode> inArea = ListPool<GraphNode>.Claim(rect.Width*rect.Height);
 
 			// Loop through all nodes in the rectangle
 			for (int x = rect.xmin; x <= rect.xmax; x++) {
@@ -1839,18 +1839,18 @@ namespace Pathfinding {
 		public virtual List<GraphNode> GetNodesInRegion (IntRect rect) {
 			// Clamp the rect to the grid
 			// Rect which covers the whole grid
-			var gridRect = new IntRect(0, 0, width-1, depth-1);
+			IntRect gridRect = new IntRect(0, 0, width-1, depth-1);
 
 			rect = IntRect.Intersection(rect, gridRect);
 
 			if (nodes == null || !rect.IsValid() || nodes.Length != width*depth) return ListPool<GraphNode>.Claim(0);
 
 			// Get a buffer we can use
-			var inArea = ListPool<GraphNode>.Claim(rect.Width*rect.Height);
+			List<GraphNode> inArea = ListPool<GraphNode>.Claim(rect.Width*rect.Height);
 
 
 			for (int z = rect.ymin; z <= rect.ymax; z++) {
-				var zw = z*Width;
+				int zw = z*Width;
 				for (int x = rect.xmin; x <= rect.xmax; x++) {
 					inArea.Add(nodes[zw + x]);
 				}
@@ -1873,7 +1873,7 @@ namespace Pathfinding {
 		public virtual int GetNodesInRegion (IntRect rect, GridNodeBase[] buffer) {
 			// Clamp the rect to the grid
 			// Rect which covers the whole grid
-			var gridRect = new IntRect(0, 0, width-1, depth-1);
+			IntRect gridRect = new IntRect(0, 0, width-1, depth-1);
 
 			rect = IntRect.Intersection(rect, gridRect);
 
@@ -1920,7 +1920,7 @@ namespace Pathfinding {
 			// Take the bounds and transform it using the matrix
 			// Then convert that to a rectangle which contains
 			// all nodes that might be inside the bounds
-			var bounds = transform.InverseTransform(o.bounds);
+			Bounds bounds = transform.InverseTransform(o.bounds);
 			Vector3 min = bounds.min;
 			Vector3 max = bounds.max;
 
@@ -1987,7 +1987,7 @@ namespace Pathfinding {
 #endif
 
 			// Rect which covers the whole grid
-			var gridRect = new IntRect(0, 0, width-1, depth-1);
+			IntRect gridRect = new IntRect(0, 0, width-1, depth-1);
 
 			// Clamp the rect to the grid bounds
 			IntRect clampedRect = IntRect.Intersection(affectRect, gridRect);
@@ -2217,7 +2217,7 @@ namespace Pathfinding {
 
 			for (int z = 0; z < depth; z++) {
 				for (int x = 0; x < width; x++) {
-					var node = nodes[z*width+x];
+					GridNode node = nodes[z*width+x];
 
 					if (node == null) {
 						Debug.LogError("Deserialization Error : Couldn't cast the node to the appropriate type - GridGenerator");

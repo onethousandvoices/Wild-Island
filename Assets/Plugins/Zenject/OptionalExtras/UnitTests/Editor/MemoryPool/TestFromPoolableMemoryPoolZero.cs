@@ -48,10 +48,10 @@ namespace Zenject.Tests.Bindings
         {
             Container.BindFactory<Foo, Foo.Factory>().FromPoolableMemoryPool(x => x.WithInitialSize(2).FromNew());
 
-            var factory = Container.Resolve<Foo.Factory>();
+            Foo.Factory factory = Container.Resolve<Foo.Factory>();
 
-            var foo = factory.Create();
-            var pool = foo.Pool;
+            Foo foo = factory.Create();
+            IMemoryPool pool = foo.Pool;
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 2);

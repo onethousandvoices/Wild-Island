@@ -56,7 +56,7 @@ namespace Pathfinding.Util {
 		/// This is good if you want to do all allocations at start.
 		/// </summary>
 		public static void Warmup (int count) {
-			var tmp = new Stack<T>[count];
+			Stack<T>[] tmp = new Stack<T>[count];
 
 			for (int i = 0; i < count; i++) tmp[i] = Claim();
 			for (int i = 0; i < count; i++) Release(tmp[i]);

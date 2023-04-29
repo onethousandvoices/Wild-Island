@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding.Util;
 using Pathfinding.WindowsStore;
+using System.Text;
 
 #if ASTAR_NO_ZIP
 using Pathfinding.Serialization.Zip;
@@ -57,7 +58,7 @@ namespace Pathfinding.Serialization {
 		}
 
 		public GraphNode DeserializeNodeReference () {
-			var id = reader.ReadInt32();
+			int id = reader.ReadInt32();
 
 			if (id2NodeMapping == null) throw new Exception("Calling DeserializeNodeReference when not deserializing node references");
 
@@ -284,8 +285,8 @@ namespace Pathfinding.Serialization {
 			// Prevents the scene from being marked as dirty in the editor
 			// If ASTAR_NO_ZIP is defined this is not relevant since the replacement zip
 			// implementation does not even store dates
-			var dummy = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-			foreach (var entry in zip.Entries) {
+			DateTime dummy = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			foreach (ZipEntry entry in zip.Entries) {
 				entry.AccessedTime = dummy;
 				entry.CreationTime = dummy;
 				entry.LastModified = dummy;
@@ -347,7 +348,7 @@ namespace Pathfinding.Serialization {
 			}
 
 			// Grab a cached string builder to avoid allocations
-			var output = GetStringBuilder();
+			StringBuilder output = GetStringBuilder();
 			TinyJsonSerializer.Serialize(meta, output);
 			return encoding.GetBytes(output.ToString());
 		}
@@ -355,7 +356,7 @@ namespace Pathfinding.Serialization {
 		/// <summary>Serializes the graph settings to JSON and returns the data</summary>
 		public byte[] Serialize (NavGraph graph) {
 			// Grab a cached string builder to avoid allocations
-			var output = GetStringBuilder();
+			StringBuilder output = GetStringBuilder();
 
 			TinyJsonSerializer.Serialize(graph, output);
 			return encoding.GetBytes(output.ToString());
@@ -385,8 +386,8 @@ namespace Pathfinding.Serialization {
 		}
 
 		static byte[] SerializeNodeIndices (NavGraph[] graphs) {
-			var stream = new MemoryStream();
-			var writer = new BinaryWriter(stream);
+			MemoryStream stream = new MemoryStream();
+			BinaryWriter writer = new BinaryWriter(stream);
 
 			int maxNodeIndex = GetMaxNodeIndexInAllGraphs(graphs);
 
@@ -414,9 +415,9 @@ namespace Pathfinding.Serialization {
 
 		/// <summary>Serializes info returned by NavGraph.SerializeExtraInfo</summary>
 		static byte[] SerializeGraphExtraInfo (NavGraph graph) {
-			var stream = new MemoryStream();
-			var writer = new BinaryWriter(stream);
-			var ctx = new GraphSerializationContext(writer);
+			MemoryStream stream = new MemoryStream();
+			BinaryWriter writer = new BinaryWriter(stream);
+			GraphSerializationContext ctx = new GraphSerializationContext(writer);
 
 			((IGraphInternals)graph).SerializeExtraInfo(ctx);
 			byte[] bytes = stream.ToArray();
@@ -432,14 +433,14 @@ namespace Pathfinding.Serialization {
 		/// for serialization and deserialization respectively.
 		/// </summary>
 		static byte[] SerializeGraphNodeReferences (NavGraph graph) {
-			var stream = new MemoryStream();
-			var writer = new BinaryWriter(stream);
-			var ctx = new GraphSerializationContext(writer);
+			MemoryStream stream = new MemoryStream();
+			BinaryWriter writer = new BinaryWriter(stream);
+			GraphSerializationContext ctx = new GraphSerializationContext(writer);
 
 			graph.GetNodes(node => node.SerializeReferences(ctx));
 			writer.Close();
 
-			var bytes = stream.ToArray();
+			byte[] bytes = stream.ToArray();
 			return bytes;
 		}
 
@@ -447,7 +448,7 @@ namespace Pathfinding.Serialization {
 			if (!settings.nodes) return;
 			if (graphs == null) throw new InvalidOperationException("Cannot serialize extra info with no serialized graphs (call SerializeGraphs first)");
 
-			var bytes = SerializeNodeIndices(graphs);
+			byte[] bytes = SerializeNodeIndices(graphs);
 			AddChecksum(bytes);
 			AddEntry("graph_references"+binaryExt, bytes);
 
@@ -469,11 +470,11 @@ namespace Pathfinding.Serialization {
 		}
 
 		byte[] SerializeNodeLinks () {
-			var stream = new MemoryStream();
+			MemoryStream stream = new MemoryStream();
 
 #if !ASTAR_NO_LINKS
-			var writer = new BinaryWriter(stream);
-			var ctx = new GraphSerializationContext(writer);
+			BinaryWriter writer = new BinaryWriter(stream);
+			GraphSerializationContext ctx = new GraphSerializationContext(writer);
 			NodeLink2.SerializeReferences(ctx);
 #endif
 			return stream.ToArray();
@@ -549,7 +550,7 @@ namespace Pathfinding.Serialization {
 
 		NavGraph DeserializeGraph (int zipIndex, int graphIndex, System.Type[] availableGraphTypes) {
 			// Get the graph type from the metadata we deserialized earlier
-			var graphType = meta.GetGraphType(zipIndex, availableGraphTypes);
+			Type graphType = meta.GetGraphType(zipIndex, availableGraphTypes);
 
 			// Graph was null when saving, ignore
 			if (System.Type.Equals(graphType, null)) return null;
@@ -558,15 +559,15 @@ namespace Pathfinding.Serialization {
 			NavGraph graph = data.CreateGraph(graphType);
 			graph.graphIndex = (uint)(graphIndex);
 
-			var jsonName = "graph" + zipIndex + jsonExt;
-			var binName = "graph" + zipIndex + binaryExt;
+			string jsonName = "graph" + zipIndex + jsonExt;
+			string binName = "graph" + zipIndex + binaryExt;
 
 			if (ContainsEntry(jsonName)) {
 				// Read the graph settings
 				TinyJsonDeserializer.Deserialize(GetString(GetEntry(jsonName)), graphType, graph, contextRoot);
 			} else if (ContainsEntry(binName)) {
-				var reader = GetBinaryReader(GetEntry(binName));
-				var ctx = new GraphSerializationContext(reader, null, graph.graphIndex, meta);
+				BinaryReader reader = GetBinaryReader(GetEntry(binName));
+				GraphSerializationContext ctx = new GraphSerializationContext(reader, null, graph.graphIndex, meta);
 				((IGraphInternals)graph).DeserializeSettingsCompatibility(ctx);
 			} else {
 				throw new FileNotFoundException("Could not find data for graph " + zipIndex + " in zip. Entry 'graph" + zipIndex + jsonExt + "' does not exist");
@@ -584,13 +585,13 @@ namespace Pathfinding.Serialization {
 		/// </summary>
 		public NavGraph[] DeserializeGraphs (System.Type[] availableGraphTypes) {
 			// Allocate a list of graphs to be deserialized
-			var graphList = new List<NavGraph>();
+			List<NavGraph> graphList = new List<NavGraph>();
 
 			graphIndexInZip = new Dictionary<NavGraph, int>();
 
 			for (int i = 0; i < meta.graphs; i++) {
-				var newIndex = graphList.Count + graphIndexOffset;
-				var graph = DeserializeGraph(i, newIndex, availableGraphTypes);
+				int newIndex = graphList.Count + graphIndexOffset;
+				NavGraph graph = DeserializeGraph(i, newIndex, availableGraphTypes);
 				if (graph != null) {
 					graphList.Add(graph);
 					graphIndexInZip[graph] = i;
@@ -602,15 +603,15 @@ namespace Pathfinding.Serialization {
 		}
 
 		bool DeserializeExtraInfo (NavGraph graph) {
-			var zipIndex = graphIndexInZip[graph];
-			var entry = GetEntry("graph"+zipIndex+"_extra"+binaryExt);
+			int zipIndex = graphIndexInZip[graph];
+			ZipEntry entry = GetEntry("graph"+zipIndex+"_extra"+binaryExt);
 
 			if (entry == null)
 				return false;
 
-			var reader = GetBinaryReader(entry);
+			BinaryReader reader = GetBinaryReader(entry);
 
-			var ctx = new GraphSerializationContext(reader, null, graph.graphIndex, meta);
+			GraphSerializationContext ctx = new GraphSerializationContext(reader, null, graph.graphIndex, meta);
 
 			// Call the graph to process the data
 			((IGraphInternals)graph).DeserializeExtraInfo(ctx);
@@ -634,18 +635,18 @@ namespace Pathfinding.Serialization {
 			// Get the file containing the list of all node indices
 			// This is correlated with the new indices of the nodes and a mapping from old to new
 			// is done so that references can be resolved
-			var entry = GetEntry("graph_references"+binaryExt);
+			ZipEntry entry = GetEntry("graph_references"+binaryExt);
 
 			if (entry == null) throw new Exception("Node references not found in the data. Was this loaded from an older version of the A* Pathfinding Project?");
 
-			var reader = GetBinaryReader(entry);
+			BinaryReader reader = GetBinaryReader(entry);
 			int maxNodeIndex = reader.ReadInt32();
-			var int2Node = new GraphNode[maxNodeIndex+1];
+			GraphNode[] int2Node = new GraphNode[maxNodeIndex+1];
 
 			try {
 				for (int i = 0; i < graphs.Length; i++) {
 					graphs[i].GetNodes(node => {
-						var index = reader.ReadInt32();
+						int index = reader.ReadInt32();
 						int2Node[index] = node;
 					});
 				}
@@ -666,13 +667,13 @@ namespace Pathfinding.Serialization {
 		}
 
 		void DeserializeNodeReferences (NavGraph graph, GraphNode[] int2Node) {
-			var zipIndex = graphIndexInZip[graph];
-			var entry = GetEntry("graph"+zipIndex+"_references"+binaryExt);
+			int zipIndex = graphIndexInZip[graph];
+			ZipEntry entry = GetEntry("graph"+zipIndex+"_references"+binaryExt);
 
 			if (entry == null) throw new Exception("Node references for graph " + zipIndex + " not found in the data. Was this loaded from an older version of the A* Pathfinding Project?");
 
-			var reader = GetBinaryReader(entry);
-			var ctx = new GraphSerializationContext(reader, int2Node, graph.graphIndex, meta);
+			BinaryReader reader = GetBinaryReader(entry);
+			GraphSerializationContext ctx = new GraphSerializationContext(reader, int2Node, graph.graphIndex, meta);
 
 			graph.GetNodes(node => node.DeserializeReferences(ctx));
 		}
@@ -703,7 +704,7 @@ namespace Pathfinding.Serialization {
 			}
 
 			// Deserialize map from old node indices to new nodes
-			var int2Node = DeserializeNodeReferenceMap();
+			GraphNode[] int2Node = DeserializeNodeReferenceMap();
 
 			// Deserialize node references
 			for (int i = 0; i < graphs.Length; i++) {
@@ -715,13 +716,13 @@ namespace Pathfinding.Serialization {
 
 		void DeserializeNodeLinks (GraphNode[] int2Node) {
 #if !ASTAR_NO_LINKS
-			var entry = GetEntry("node_link2"+binaryExt);
+			ZipEntry entry = GetEntry("node_link2"+binaryExt);
 
 			if (entry == null)
 				return;
 
-			var reader = GetBinaryReader(entry);
-			var ctx = new GraphSerializationContext(reader, int2Node, 0, meta);
+			BinaryReader reader = GetBinaryReader(entry);
+			GraphSerializationContext ctx = new GraphSerializationContext(reader, int2Node, 0, meta);
 			NodeLink2.DeserializeReferences(ctx);
 #endif
 		}
@@ -729,7 +730,7 @@ namespace Pathfinding.Serialization {
 		/// <summary>Calls PostDeserialization on all loaded graphs</summary>
 		public void PostDeserialization () {
 			for (int i = 0; i < graphs.Length; i++) {
-				var ctx = new GraphSerializationContext(null, null, 0, meta);
+				GraphSerializationContext ctx = new GraphSerializationContext(null, null, 0, meta);
 				((IGraphInternals)graphs[i]).PostDeserialization(ctx);
 			}
 		}
@@ -745,7 +746,7 @@ namespace Pathfinding.Serialization {
 		/// </summary>
 		public void DeserializeEditorSettingsCompatibility () {
 			for (int i = 0; i < graphs.Length; i++) {
-				var zipIndex = graphIndexInZip[graphs[i]];
+				int zipIndex = graphIndexInZip[graphs[i]];
 				ZipEntry entry = GetEntry("graph"+zipIndex+"_editor"+jsonExt);
 				if (entry == null) continue;
 
@@ -758,7 +759,7 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 			return new BinaryReader(entry.Open());
 #else
-			var stream = new System.IO.MemoryStream();
+			MemoryStream stream = new System.IO.MemoryStream();
 
 			entry.Extract(stream);
 			stream.Position = 0;
@@ -771,11 +772,11 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 			var reader = new StreamReader(entry.Open());
 #else
-			var buffer = new MemoryStream();
+			MemoryStream buffer = new MemoryStream();
 
 			entry.Extract(buffer);
 			buffer.Position = 0;
-			var reader = new StreamReader(buffer);
+			StreamReader reader = new StreamReader(buffer);
 #endif
 			string s = reader.ReadToEnd();
 			reader.Dispose();
@@ -787,9 +788,9 @@ namespace Pathfinding.Serialization {
 		}
 
 		private GraphMeta DeserializeBinaryMeta (ZipEntry entry) {
-			var meta = new GraphMeta();
+			GraphMeta meta = new GraphMeta();
 
-			var reader = GetBinaryReader(entry);
+			BinaryReader reader = GetBinaryReader(entry);
 
 			if (reader.ReadString() != "A*") throw new System.Exception("Invalid magic number in saved data");
 			int major = reader.ReadInt32();
@@ -829,7 +830,7 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 			throw new System.NotSupportedException("Cannot save to file on this platform");
 #else
-			using (var stream = new FileStream(path, FileMode.Create)) {
+			using (FileStream stream = new FileStream(path, FileMode.Create)) {
 				stream.Write(data, 0, data.Length);
 			}
 #endif
@@ -840,8 +841,8 @@ namespace Pathfinding.Serialization {
 #if NETFX_CORE
 			throw new System.NotSupportedException("Cannot load from file on this platform");
 #else
-			using (var stream = new FileStream(path, FileMode.Open)) {
-				var bytes = new byte[(int)stream.Length];
+			using (FileStream stream = new FileStream(path, FileMode.Open)) {
+				byte[] bytes = new byte[(int)stream.Length];
 				stream.Read(bytes, 0, (int)stream.Length);
 				return bytes;
 			}

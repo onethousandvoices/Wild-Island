@@ -203,7 +203,7 @@ namespace Pathfinding {
 			bool same = true;
 
 			{
-				var info = AstarPath.active.GetNearest(StartTransform.position, nn);
+				NNInfo info = AstarPath.active.GetNearest(StartTransform.position, nn);
 				same &= info.node == connectedNode1 && info.node != null;
 				connectedNode1 = info.node as MeshNode;
 				clamped1 = info.position;
@@ -211,7 +211,7 @@ namespace Pathfinding {
 			}
 
 			{
-				var info = AstarPath.active.GetNearest(EndTransform.position, nn);
+				NNInfo info = AstarPath.active.GetNearest(EndTransform.position, nn);
 				same &= info.node == connectedNode2 && info.node != null;
 				connectedNode2 = info.node as MeshNode;
 				clamped2 = info.position;

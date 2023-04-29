@@ -25,10 +25,10 @@ namespace Zenject.Tests.Misc.TestMonoKernelDecoration
             yield return new WaitForSeconds(1.0f);
 
             InitializableManagerSpy initializableManager = SceneContext.Container.Resolve<InitializableManager>() as InitializableManagerSpy;
-            var initializedBeforeDelay = initializableManager.IsInitialized;
+            bool initializedBeforeDelay = initializableManager.IsInitialized;
             
             yield return new WaitForSeconds(6.0f);
-            var initializedAfterDelay = initializableManager.IsInitialized;
+            bool initializedAfterDelay = initializableManager.IsInitialized;
 
             Assert.IsFalse(initializedBeforeDelay);
             Assert.IsTrue(initializedAfterDelay);

@@ -116,13 +116,13 @@ namespace Pathfinding {
 		public override Vector3 RandomPointOnSurface () {
 			GridGraph gg = GridNode.GetGridGraph(GraphIndex);
 
-			var graphSpacePosition = gg.transform.InverseTransform((Vector3)position);
+			Vector3 graphSpacePosition = gg.transform.InverseTransform((Vector3)position);
 
 			return gg.transform.Transform(graphSpacePosition + new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f));
 		}
 
 		public override int GetGizmoHashCode () {
-			var hash = base.GetGizmoHashCode();
+			int hash = base.GetGizmoHashCode();
 
 #if !ASTAR_GRID_NO_CUSTOM_CONNECTIONS
 			if (connections != null) {
@@ -286,7 +286,7 @@ namespace Pathfinding {
 
 			int connLength = connections != null ? connections.Length : 0;
 
-			var newconns = new Connection[connLength+1];
+			Connection[] newconns = new Connection[connLength+1];
 			for (int i = 0; i < connLength; i++) {
 				newconns[i] = connections[i];
 			}
@@ -312,7 +312,7 @@ namespace Pathfinding {
 				if (connections[i].node == node) {
 					int connLength = connections.Length;
 
-					var newconns = new Connection[connLength-1];
+					Connection[] newconns = new Connection[connLength-1];
 					for (int j = 0; j < i; j++) {
 						newconns[j] = connections[j];
 					}

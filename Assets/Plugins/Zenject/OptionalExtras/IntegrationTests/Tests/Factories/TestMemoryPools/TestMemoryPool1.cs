@@ -17,13 +17,13 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var pool = Container.Resolve<Foo.Pool>();
+            Foo.Pool pool = Container.Resolve<Foo.Pool>();
 
             Assert.IsEqual(pool.NumActive, 0);
             Assert.IsEqual(pool.NumTotal, 0);
             Assert.IsEqual(pool.NumInactive, 0);
 
-            var foo = pool.Spawn("asdf");
+            Foo foo = pool.Spawn("asdf");
 
             Assert.IsEqual(pool.NumActive, 1);
             Assert.IsEqual(pool.NumTotal, 1);
@@ -46,7 +46,7 @@ namespace Zenject.Tests.Bindings
             Assert.IsEqual(foo.ResetCount, 2);
             Assert.IsEqual(foo.Value, "zxcv");
 
-            var foo2 = pool.Spawn("qwer");
+            Foo foo2 = pool.Spawn("qwer");
 
             Assert.IsEqual(pool.NumActive, 2);
             Assert.IsEqual(pool.NumTotal, 2);
@@ -112,9 +112,9 @@ namespace Zenject.Tests.Bindings
         {
             TestAbstractMemoryPoolInternal();
 
-            var pool = Container.Resolve<BarPool>();
+            BarPool pool = Container.Resolve<BarPool>();
 
-            var foo = pool.Spawn(5);
+            IBar foo = pool.Spawn(5);
 
             Assert.IsEqual(foo.GetType(), typeof(Bar));
             yield break;

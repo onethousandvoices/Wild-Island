@@ -149,7 +149,7 @@ namespace Zenject.Tests.Bindings
 
             PostInstall();
 
-            var foo = GameObject.Find("Foo").transform.GetChild(0);
+            Transform foo = GameObject.Find("Foo").transform.GetChild(0);
 
             Assert.IsNotNull(foo.GetComponent<Foo>());
             yield break;
@@ -159,7 +159,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestUnderTransform()
         {
             PreInstall();
-            var tempGameObject = new GameObject("Foo");
+            GameObject tempGameObject = new GameObject("Foo");
 
             Container.Bind<Foo>().FromNewComponentOnNewGameObject()
                 .WithGameObjectName(GameObjName)
@@ -175,7 +175,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestUnderTransformGetter()
         {
             PreInstall();
-            var tempGameObject = new GameObject("Foo");
+            GameObject tempGameObject = new GameObject("Foo");
 
             Container.Bind<Foo>().FromNewComponentOnNewGameObject()
                 .WithGameObjectName(GameObjName)

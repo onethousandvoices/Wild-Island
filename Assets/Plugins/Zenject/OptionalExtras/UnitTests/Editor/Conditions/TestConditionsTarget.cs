@@ -44,7 +44,7 @@ namespace Zenject.Tests.Conditions
         {
             Container.Bind<Test2>().AsSingle().NonLazy();
 
-            var test2 = Container.Resolve<Test2>();
+            Test2 test2 = Container.Resolve<Test2>();
 
             Assert.That(test2 != null);
         }

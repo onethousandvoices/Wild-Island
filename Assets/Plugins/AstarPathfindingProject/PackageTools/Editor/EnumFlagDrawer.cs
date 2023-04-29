@@ -29,7 +29,7 @@ namespace Pathfinding {
 			// Go down to the root of this serialized property
 			System.Object reflectionTarget = prop.serializedObject.targetObject as object;
 			// Walk down the path to get the target object
-			foreach (var path in separatedPaths) {
+			foreach (string path in separatedPaths) {
 				FieldInfo fieldInfo = reflectionTarget.GetType().GetField(path, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 				reflectionTarget = fieldInfo.GetValue(reflectionTarget);
 			}

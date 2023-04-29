@@ -9,7 +9,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestSelf()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindFactory<Foo, Foo.Factory>().FromInstance(foo).NonLazy();
 
@@ -19,7 +19,7 @@ namespace Zenject.Tests.Bindings
         [Test]
         public void TestConcrete()
         {
-            var foo = new Foo();
+            Foo foo = new Foo();
 
             Container.BindFactory<IFoo, IFooFactory>().FromInstance(foo).NonLazy();
 

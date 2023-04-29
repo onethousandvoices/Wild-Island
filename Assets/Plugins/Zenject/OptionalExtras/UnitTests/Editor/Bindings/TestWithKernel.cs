@@ -59,7 +59,7 @@ namespace Zenject.Tests.Bindings
             ZenjectManagersInstaller.Install(Container);
             Container.ResolveRoots();
 
-            var facade = Container.Resolve<FooFacade>();
+            FooFacade facade = Container.Resolve<FooFacade>();
 
             Assert.That(!facade.Foo.WasInitialized);
             Container.Resolve<InitializableManager>().Initialize();
@@ -75,7 +75,7 @@ namespace Zenject.Tests.Bindings
             ZenjectManagersInstaller.Install(Container);
             Container.ResolveRoots();
 
-            var facade = Container.Resolve<FooFacade>();
+            FooFacade facade = Container.Resolve<FooFacade>();
 
             Assert.That(!facade.Foo.WasInitialized);
             Container.Resolve<InitializableManager>().Initialize();
@@ -111,7 +111,7 @@ namespace Zenject.Tests.Bindings
             ZenjectManagersInstaller.Install(Container);
             Container.ResolveRoots();
 
-            var facade = Container.Resolve<FooFacade>();
+            FooFacade facade = Container.Resolve<FooFacade>();
 
             Assert.That(!facade.Foo.WasInitialized);
             Container.Resolve<InitializableManager>().Initialize();
@@ -135,7 +135,7 @@ namespace Zenject.Tests.Bindings
             ZenjectManagersInstaller.Install(Container);
             Container.ResolveRoots();
 
-            var facade = Container.Resolve<FooFacade>();
+            FooFacade facade = Container.Resolve<FooFacade>();
 
             Assert.That(!facade.Foo.WasInitialized);
             Container.Resolve<InitializableManager>().Initialize();

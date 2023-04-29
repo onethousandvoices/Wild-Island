@@ -97,20 +97,20 @@ namespace Zenject.SpaceFighter
 
         void Fire()
         {
-            var bullet = _bulletFactory.Create(
+            Bullet bullet = _bulletFactory.Create(
                 _settings.BulletSpeed, _settings.BulletLifetime, BulletTypes.FromEnemy);
 
             // Randomize our aim a bit
-            var accuracy = Mathf.Clamp(_tunables.Accuracy, 0, 1);
-            var maxError = 1.0f - accuracy;
-            var error = Random.Range(0, maxError);
+            float accuracy = Mathf.Clamp(_tunables.Accuracy, 0, 1);
+            float maxError = 1.0f - accuracy;
+            float error = Random.Range(0, maxError);
 
             if (Random.Range(0.0f, 1.0f) < 0.5f)
             {
                 error *= -1;
             }
 
-            var thetaError = error * _settings.ErrorRangeTheta;
+            float thetaError = error * _settings.ErrorRangeTheta;
 
             bullet.transform.position = _view.Position + _view.LookDir * _settings.BulletOffsetDistance;
             bullet.transform.rotation = Quaternion.AngleAxis(thetaError, Vector3.forward) * _view.Rotation;

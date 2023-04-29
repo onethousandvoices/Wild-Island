@@ -17,8 +17,8 @@ namespace Pathfinding {
 
 		protected override void Inspector () {
 			// Find all properties
-			var points = FindProperty("points");
-			var legacyMode = FindProperty("legacyMode");
+			SerializedProperty points = FindProperty("points");
+			SerializedProperty legacyMode = FindProperty("legacyMode");
 
 			// Get a list of inspected components
 			scripts = new GraphUpdateScene[targets.Length];
@@ -78,7 +78,7 @@ namespace Pathfinding {
 			}
 
 			if (scripts.Length == 1 && scripts[0].points.Length >= 3) {
-				var size = scripts[0].GetBounds().size;
+				Vector3 size = scripts[0].GetBounds().size;
 				if (Mathf.Min(Mathf.Min(Mathf.Abs(size.x), Mathf.Abs(size.y)), Mathf.Abs(size.z)) < 0.05f) {
 					EditorGUILayout.HelpBox("The bounding box is very thin. Your shape might be oriented incorrectly. The shape will be projected down on the XZ plane in local space. Rotate this object " +
 						"so that the local XZ plane corresponds to the plane in which you want to create your shape. For example if you want to create your shape in the XY plane then " +
@@ -156,11 +156,11 @@ namespace Pathfinding {
 
 		void DrawTagField () {
 			if (PropertyField("modifyTag")) {
-				var tagValue = FindProperty("setTag");
+				SerializedProperty tagValue = FindProperty("setTag");
 				EditorGUI.indentLevel++;
 				EditorGUI.showMixedValue = tagValue.hasMultipleDifferentValues;
 				EditorGUI.BeginChangeCheck();
-				var newTag = EditorGUILayoutx.TagField("Tag Value", tagValue.intValue, () => AstarPathEditor.EditTags());
+				int newTag = EditorGUILayoutx.TagField("Tag Value", tagValue.intValue, () => AstarPathEditor.EditTags());
 				if (EditorGUI.EndChangeCheck()) {
 					tagValue.intValue = newTag;
 				}
@@ -181,7 +181,7 @@ namespace Pathfinding {
 		}
 
 		public void OnSceneGUI () {
-			var script = target as GraphUpdateScene;
+			GraphUpdateScene script = target as GraphUpdateScene;
 
 			// Don't allow editing unless it is the active object
 			if (Selection.activeGameObject != script.gameObject || script.legacyMode) return;
@@ -239,13 +239,13 @@ namespace Pathfinding {
 				if (((int)Event.current.modifiers & (int)EventModifiers.Alt) != 0) {
 					if (Event.current.type == EventType.MouseDown && selectedPoint >= 0 && selectedPoint < points.Count) {
 						Undo.RecordObject(script, "Removed Point");
-						var arr = new List<Vector3>(script.points);
+						List<Vector3> arr = new List<Vector3>(script.points);
 						arr.RemoveAt(selectedPoint);
 						points.RemoveAt(selectedPoint);
 						script.points = arr.ToArray();
 						GUI.changed = true;
 					} else if (points.Count > 0) {
-						var index = -(HandleUtility.nearestControl+1);
+						int index = -(HandleUtility.nearestControl+1);
 						if (index >= 0 && index < points.Count) {
 							Handles.color = Color.red;
 							SphereCap(0, points[index], Quaternion.identity, HandleUtility.GetHandleSize(points[index])*2f*pointGizmosRadius);
@@ -263,7 +263,7 @@ namespace Pathfinding {
 						}
 					}
 
-					var ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+					Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 					System.Object hit = HandleUtility.RaySnap(ray);
 					Vector3 rayhit = Vector3.zero;
 					bool didHit = false;
@@ -271,7 +271,7 @@ namespace Pathfinding {
 						rayhit = ((RaycastHit)hit).point;
 						didHit = true;
 					} else {
-						var plane = new Plane(script.transform.up, script.transform.position);
+						Plane plane = new Plane(script.transform.up, script.transform.position);
 						float distance;
 						plane.Raycast(ray, out distance);
 						if (distance > 0) {
@@ -285,7 +285,7 @@ namespace Pathfinding {
 							points.Insert(insertionIndex, rayhit);
 
 							Undo.RecordObject(script, "Added Point");
-							var arr = new List<Vector3>(script.points);
+							List<Vector3> arr = new List<Vector3>(script.points);
 							arr.Insert(insertionIndex, invMatrix.MultiplyPoint3x4(rayhit));
 							script.points = arr.ToArray();
 							GUI.changed = true;
@@ -295,7 +295,7 @@ namespace Pathfinding {
 							Handles.DrawDottedLine(points[insertionIndex % points.Count], rayhit, 8);
 							SphereCap(0, rayhit, Quaternion.identity, HandleUtility.GetHandleSize(rayhit)*pointGizmosRadius);
 							// Project point down onto a plane
-							var zeroed = invMatrix.MultiplyPoint3x4(rayhit);
+							Vector3 zeroed = invMatrix.MultiplyPoint3x4(rayhit);
 							zeroed.y = 0;
 							Handles.color = new Color(1, 1, 1, 0.5f);
 							Handles.DrawDottedLine(matrix.MultiplyPoint3x4(zeroed), rayhit, 4);

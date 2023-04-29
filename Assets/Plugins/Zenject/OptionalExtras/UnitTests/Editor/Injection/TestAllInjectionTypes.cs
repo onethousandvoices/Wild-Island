@@ -17,7 +17,7 @@ namespace Zenject.Tests.Injection
 
             InjectCounter = 1;
 
-            var foo = Container.Resolve<IFoo>();
+            IFoo foo = Container.Resolve<IFoo>();
 
             Assert.That(foo.DidPostInjectBase);
             Assert.That(foo.DidPostInjectDerived);

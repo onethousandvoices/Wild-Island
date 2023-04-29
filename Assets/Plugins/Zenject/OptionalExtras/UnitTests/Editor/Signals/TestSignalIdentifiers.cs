@@ -16,7 +16,7 @@ namespace Zenject.Tests.Signals
         [Test]
         public void TestMissingDeclaration()
         {
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             Assert.Throws(() => signalBus.FireId<FooSignal>("asdf"));
         }
@@ -24,11 +24,11 @@ namespace Zenject.Tests.Signals
         [Test]
         public void TestSubscribeAndUnsubscribe()
         {
-            var signalId = "asdf";
+            string signalId = "asdf";
 
             Container.DeclareSignal<FooSignal>().WithId(signalId);
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             bool received = false;
 
@@ -82,7 +82,7 @@ namespace Zenject.Tests.Signals
             Container.BindSignal<FooSignal>().WithId("asdf").ToMethod(() => received = true);
             Container.ResolveRoots();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             Assert.That(!received);
             signalBus.FireId<FooSignal>("asdf");
@@ -99,8 +99,8 @@ namespace Zenject.Tests.Signals
             Container.BindSignal<FooSignal>().WithId("asdf").ToMethod(x => received = x);
             Container.ResolveRoots();
 
-            var signalBus = Container.Resolve<SignalBus>();
-            var sent = new FooSignal();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
+            FooSignal sent = new FooSignal();
 
             Assert.IsNull(received);
             signalBus.FireId("asdf", sent);
@@ -112,12 +112,12 @@ namespace Zenject.Tests.Signals
         {
             Container.DeclareSignal<FooSignal>().WithId("asdf");
 
-            var qux = new Qux();
+            Qux qux = new Qux();
             Container.BindSignal<FooSignal>().WithId("asdf")
                 .ToMethod<Qux>(x => x.OnFoo).From(b => b.FromInstance(qux));
             Container.ResolveRoots();
 
-            var signalBus = Container.Resolve<SignalBus>();
+            SignalBus signalBus = Container.Resolve<SignalBus>();
 
             Assert.That(!qux.HasRecievedSignal);
             signalBus.FireId<FooSignal>("asdf");

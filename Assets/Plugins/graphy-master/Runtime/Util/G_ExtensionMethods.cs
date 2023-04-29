@@ -32,7 +32,7 @@ namespace Tayx.Graphy.Utils
         /// </param>
         public static List<GameObject> SetAllActive( this List<GameObject> gameObjects, bool active )
         {
-            foreach( var gameObj in gameObjects )
+            foreach( GameObject gameObj in gameObjects )
             {
                 gameObj.SetActive( active );
             }
@@ -52,7 +52,7 @@ namespace Tayx.Graphy.Utils
 
         public static List<Image> SetAllActive( this List<Image> images, bool active )
         {
-            foreach( var image in images )
+            foreach( Image image in images )
             {
                 image.gameObject.SetActive( active );
             }

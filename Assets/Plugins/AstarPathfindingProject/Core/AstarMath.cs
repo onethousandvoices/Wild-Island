@@ -126,7 +126,7 @@ namespace Pathfinding {
 		/// See: ClosestPointOnSegment
 		/// </summary>
 		public static float ClosestPointOnLineFactor (Vector3 lineStart, Vector3 lineEnd, Vector3 point) {
-			var dir = lineEnd - lineStart;
+			Vector3 dir = lineEnd - lineStart;
 			float sqrMagn = dir.sqrMagnitude;
 
 			if (sqrMagn <= 0.000001) return 0;
@@ -140,7 +140,7 @@ namespace Pathfinding {
 		/// The closest point can be calculated using (end-start)*factor + start
 		/// </summary>
 		public static float ClosestPointOnLineFactor (Int3 lineStart, Int3 lineEnd, Int3 point) {
-			var lineDirection = lineEnd - lineStart;
+			Int3 lineDirection = lineEnd - lineStart;
 			float magn = lineDirection.sqrMagnitude;
 
 			float closestPoint = Int3.Dot((point - lineStart), lineDirection);
@@ -156,7 +156,7 @@ namespace Pathfinding {
 		/// The closest point can be calculated using (end-start)*factor + start;
 		/// </summary>
 		public static float ClosestPointOnLineFactor (Int2 lineStart, Int2 lineEnd, Int2 point) {
-			var lineDirection = lineEnd - lineStart;
+			Int2 lineDirection = lineEnd - lineStart;
 			double magn = lineDirection.sqrMagnitudeLong;
 
 			double closestPoint = Int2.DotLong(point - lineStart, lineDirection);
@@ -173,7 +173,7 @@ namespace Pathfinding {
 		/// See: ClosestPointOnSegmentXZ
 		/// </summary>
 		public static Vector3 ClosestPointOnSegment (Vector3 lineStart, Vector3 lineEnd, Vector3 point) {
-			var dir = lineEnd - lineStart;
+			Vector3 dir = lineEnd - lineStart;
 			float sqrMagn = dir.sqrMagnitude;
 
 			if (sqrMagn <= 0.000001) return lineStart;
@@ -262,7 +262,7 @@ namespace Pathfinding {
 		/// The line is not considered infinite.
 		/// </summary>
 		public static float SqrDistancePointSegment (Vector3 a, Vector3 b, Vector3 p) {
-			var nearest = ClosestPointOnSegment(a, b, p);
+			Vector3 nearest = ClosestPointOnSegment(a, b, p);
 
 			return (nearest-p).sqrMagnitude;
 		}
@@ -342,7 +342,7 @@ namespace Pathfinding {
 
 		/// <summary>Squared distance between two points in the XZ plane</summary>
 		public static float SqrDistanceXZ (Vector3 a, Vector3 b) {
-			var delta = a-b;
+			Vector3 delta = a-b;
 
 			return delta.x*delta.x+delta.z*delta.z;
 		}
@@ -384,7 +384,7 @@ namespace Pathfinding {
 		/// Uses XZ space.
 		/// </summary>
 		public static Side SideXZ (Int3 a, Int3 b, Int3 p) {
-			var s = (long)(b.x - a.x) * (long)(p.z - a.z) - (long)(p.x - a.x) * (long)(b.z - a.z);
+			long s = (long)(b.x - a.x) * (long)(p.z - a.z) - (long)(p.x - a.x) * (long)(b.z - a.z);
 
 			return s > 0 ? Side.Left : (s < 0 ? Side.Right : Side.Colinear);
 		}
@@ -452,8 +452,8 @@ namespace Pathfinding {
 
 		/// <summary>Returns if the points are colinear (lie on a straight line)</summary>
 		public static bool IsColinear (Vector3 a, Vector3 b, Vector3 c) {
-			var lhs = b - a;
-			var rhs = c - a;
+			Vector3 lhs = b - a;
+			Vector3 rhs = c - a;
 			// Take the cross product of lhs and rhs
 			// The magnitude of the cross product will be zero if the points a,b,c are colinear
 			float x = lhs.y * rhs.z - lhs.z * rhs.y;
@@ -827,9 +827,9 @@ namespace Pathfinding {
 			b -= bounds.center;
 
 			// Get line midpoint and extent
-			var LMid = (a + b) * 0.5F;
-			var L = (a - LMid);
-			var LExt = new Vector3(Math.Abs(L.x), Math.Abs(L.y), Math.Abs(L.z));
+			Vector3 LMid = (a + b) * 0.5F;
+			Vector3 L = (a - LMid);
+			Vector3 LExt = new Vector3(Math.Abs(L.x), Math.Abs(L.y), Math.Abs(L.z));
 
 			Vector3 extent = bounds.extents;
 
@@ -860,18 +860,18 @@ namespace Pathfinding {
 		/// </summary>
 		public static float LineCircleIntersectionFactor (Vector3 circleCenter, Vector3 linePoint1, Vector3 linePoint2, float radius) {
 			float segmentLength;
-			var normalizedDirection = Normalize(linePoint2 - linePoint1, out segmentLength);
-			var dirToStart = linePoint1 - circleCenter;
+			Vector3 normalizedDirection = Normalize(linePoint2 - linePoint1, out segmentLength);
+			Vector3 dirToStart = linePoint1 - circleCenter;
 
-			var dot = Vector3.Dot(dirToStart, normalizedDirection);
-			var discriminant = dot * dot - (dirToStart.sqrMagnitude - radius*radius);
+			float dot = Vector3.Dot(dirToStart, normalizedDirection);
+			float discriminant = dot * dot - (dirToStart.sqrMagnitude - radius*radius);
 
 			if (discriminant < 0) {
 				// No intersection, pick closest point on segment
 				discriminant = 0;
 			}
 
-			var t = -dot + Mathf.Sqrt(discriminant);
+			float t = -dot + Mathf.Sqrt(discriminant);
 			// Note: the default value of 1 is important for the PathInterpolator.MoveToCircleIntersection2D
 			// method to work properly. Maybe find some better abstraction where this default value is more obvious.
 			return segmentLength > 0.00001f ? t / segmentLength : 1f;
@@ -895,12 +895,12 @@ namespace Pathfinding {
 		/// See: https://en.wikipedia.org/wiki/Parallelepiped
 		/// </summary>
 		public static bool ReversesFaceOrientations (Matrix4x4 matrix) {
-			var dX = matrix.MultiplyVector(new Vector3(1, 0, 0));
-			var dY = matrix.MultiplyVector(new Vector3(0, 1, 0));
-			var dZ = matrix.MultiplyVector(new Vector3(0, 0, 1));
+			Vector3 dX = matrix.MultiplyVector(new Vector3(1, 0, 0));
+			Vector3 dY = matrix.MultiplyVector(new Vector3(0, 1, 0));
+			Vector3 dZ = matrix.MultiplyVector(new Vector3(0, 0, 1));
 
 			// Calculate the signed volume of the parallelepiped
-			var volume = Vector3.Dot(Vector3.Cross(dX, dY), dZ);
+			float volume = Vector3.Dot(Vector3.Cross(dX, dY), dZ);
 
 			return volume < 0;
 		}
@@ -927,11 +927,11 @@ namespace Pathfinding {
 		/// The signed area is calculated using a cross product of the vectors.
 		/// </summary>
 		public static bool ReversesFaceOrientationsXZ (Matrix4x4 matrix) {
-			var dX = matrix.MultiplyVector(new Vector3(1, 0, 0));
-			var dZ = matrix.MultiplyVector(new Vector3(0, 0, 1));
+			Vector3 dX = matrix.MultiplyVector(new Vector3(1, 0, 0));
+			Vector3 dZ = matrix.MultiplyVector(new Vector3(0, 0, 1));
 
 			// Take the cross product of the vectors projected onto the XZ plane
-			var cross = (dX.x*dZ.z - dZ.x*dX.z);
+			float cross = (dX.x*dZ.z - dZ.x*dX.z);
 
 			return cross < 0;
 		}
@@ -971,7 +971,7 @@ namespace Pathfinding {
 			float squaredMagnitudeXZ = v.x*v.x + v.z*v.z;
 
 			if (squaredMagnitudeXZ > maxMagnitude*maxMagnitude && maxMagnitude > 0) {
-				var factor = maxMagnitude / Mathf.Sqrt(squaredMagnitudeXZ);
+				float factor = maxMagnitude / Mathf.Sqrt(squaredMagnitudeXZ);
 				v.x *= factor;
 				v.z *= factor;
 			}
@@ -1171,7 +1171,7 @@ namespace Pathfinding {
 		public static Vector3[] ConvexHullXZ (Vector3[] points) {
 			if (points.Length == 0) return new Vector3[0];
 
-			var hull = Pathfinding.Util.ListPool<Vector3>.Claim();
+			List<Vector3> hull = Pathfinding.Util.ListPool<Vector3>.Claim();
 
 			int pointOnHull = 0;
 			for (int i = 1; i < points.Length; i++) if (points[i].x < points[pointOnHull].x) pointOnHull = i;
@@ -1193,7 +1193,7 @@ namespace Pathfinding {
 				}
 			} while (pointOnHull != startpoint);
 
-			var result = hull.ToArray();
+			Vector3[] result = hull.ToArray();
 
 			// Return to pool
 			Pathfinding.Util.ListPool<Vector3>.Release(hull);
@@ -1206,12 +1206,12 @@ namespace Pathfinding {
 		/// </summary>
 		public static Vector2 ClosestPointOnTriangle (Vector2 a, Vector2 b, Vector2 c, Vector2 p) {
 			// Check if p is in vertex region outside A
-			var ab = b - a;
-			var ac = c - a;
-			var ap = p - a;
+			Vector2 ab = b - a;
+			Vector2 ac = c - a;
+			Vector2 ap = p - a;
 
-			var d1 = Vector2.Dot(ab, ap);
-			var d2 = Vector2.Dot(ac, ap);
+			float d1 = Vector2.Dot(ab, ap);
+			float d2 = Vector2.Dot(ac, ap);
 
 			// Barycentric coordinates (1,0,0)
 			if (d1 <= 0 && d2 <= 0) {
@@ -1219,9 +1219,9 @@ namespace Pathfinding {
 			}
 
 			// Check if p is in vertex region outside B
-			var bp = p - b;
-			var d3 = Vector2.Dot(ab, bp);
-			var d4 = Vector2.Dot(ac, bp);
+			Vector2 bp = p - b;
+			float d3 = Vector2.Dot(ab, bp);
+			float d4 = Vector2.Dot(ac, bp);
 
 			// Barycentric coordinates (0,1,0)
 			if (d3 >= 0 && d4 <= d3) {
@@ -1230,18 +1230,18 @@ namespace Pathfinding {
 
 			// Check if p is in edge region outside AB, if so return a projection of p onto AB
 			if (d1 >= 0 && d3 <= 0) {
-				var vc = d1 * d4 - d3 * d2;
+				float vc = d1 * d4 - d3 * d2;
 				if (vc <= 0) {
 					// Barycentric coordinates (1-v, v, 0)
-					var v = d1 / (d1 - d3);
+					float v = d1 / (d1 - d3);
 					return a + ab*v;
 				}
 			}
 
 			// Check if p is in vertex region outside C
-			var cp = p - c;
-			var d5 = Vector2.Dot(ab, cp);
-			var d6 = Vector2.Dot(ac, cp);
+			Vector2 cp = p - c;
+			float d5 = Vector2.Dot(ab, cp);
+			float d6 = Vector2.Dot(ac, cp);
 
 			// Barycentric coordinates (0,0,1)
 			if (d6 >= 0 && d5 <= d6) {
@@ -1250,19 +1250,19 @@ namespace Pathfinding {
 
 			// Check if p is in edge region of AC, if so return a projection of p onto AC
 			if (d2 >= 0 && d6 <= 0) {
-				var vb = d5 * d2 - d1 * d6;
+				float vb = d5 * d2 - d1 * d6;
 				if (vb <= 0) {
 					// Barycentric coordinates (1-v, 0, v)
-					var v = d2 / (d2 - d6);
+					float v = d2 / (d2 - d6);
 					return a + ac*v;
 				}
 			}
 
 			// Check if p is in edge region of BC, if so return projection of p onto BC
 			if ((d4 - d3) >= 0 && (d5 - d6) >= 0) {
-				var va = d3 * d6 - d5 * d4;
+				float va = d3 * d6 - d5 * d4;
 				if (va <= 0) {
-					var v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+					float v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
 					return b + (c - b) * v;
 				}
 			}
@@ -1276,12 +1276,12 @@ namespace Pathfinding {
 		/// </summary>
 		public static Vector3 ClosestPointOnTriangleXZ (Vector3 a, Vector3 b, Vector3 c, Vector3 p) {
 			// Check if p is in vertex region outside A
-			var ab = new Vector2(b.x - a.x, b.z - a.z);
-			var ac = new Vector2(c.x - a.x, c.z - a.z);
-			var ap = new Vector2(p.x - a.x, p.z - a.z);
+			Vector2 ab = new Vector2(b.x - a.x, b.z - a.z);
+			Vector2 ac = new Vector2(c.x - a.x, c.z - a.z);
+			Vector2 ap = new Vector2(p.x - a.x, p.z - a.z);
 
-			var d1 = Vector2.Dot(ab, ap);
-			var d2 = Vector2.Dot(ac, ap);
+			float d1 = Vector2.Dot(ab, ap);
+			float d2 = Vector2.Dot(ac, ap);
 
 			// Barycentric coordinates (1,0,0)
 			if (d1 <= 0 && d2 <= 0) {
@@ -1289,9 +1289,9 @@ namespace Pathfinding {
 			}
 
 			// Check if p is in vertex region outside B
-			var bp = new Vector2(p.x - b.x, p.z - b.z);
-			var d3 = Vector2.Dot(ab, bp);
-			var d4 = Vector2.Dot(ac, bp);
+			Vector2 bp = new Vector2(p.x - b.x, p.z - b.z);
+			float d3 = Vector2.Dot(ab, bp);
+			float d4 = Vector2.Dot(ac, bp);
 
 			// Barycentric coordinates (0,1,0)
 			if (d3 >= 0 && d4 <= d3) {
@@ -1299,17 +1299,17 @@ namespace Pathfinding {
 			}
 
 			// Check if p is in edge region outside AB, if so return a projection of p onto AB
-			var vc = d1 * d4 - d3 * d2;
+			float vc = d1 * d4 - d3 * d2;
 			if (d1 >= 0 && d3 <= 0 && vc <= 0) {
 				// Barycentric coordinates (1-v, v, 0)
-				var v = d1 / (d1 - d3);
+				float v = d1 / (d1 - d3);
 				return (1-v)*a + v*b;
 			}
 
 			// Check if p is in vertex region outside C
-			var cp = new Vector2(p.x - c.x, p.z - c.z);
-			var d5 = Vector2.Dot(ab, cp);
-			var d6 = Vector2.Dot(ac, cp);
+			Vector2 cp = new Vector2(p.x - c.x, p.z - c.z);
+			float d5 = Vector2.Dot(ab, cp);
+			float d6 = Vector2.Dot(ac, cp);
 
 			// Barycentric coordinates (0,0,1)
 			if (d6 >= 0 && d5 <= d6) {
@@ -1317,24 +1317,24 @@ namespace Pathfinding {
 			}
 
 			// Check if p is in edge region of AC, if so return a projection of p onto AC
-			var vb = d5 * d2 - d1 * d6;
+			float vb = d5 * d2 - d1 * d6;
 			if (d2 >= 0 && d6 <= 0 && vb <= 0) {
 				// Barycentric coordinates (1-v, 0, v)
-				var v = d2 / (d2 - d6);
+				float v = d2 / (d2 - d6);
 				return (1-v)*a + v*c;
 			}
 
 			// Check if p is in edge region of BC, if so return projection of p onto BC
-			var va = d3 * d6 - d5 * d4;
+			float va = d3 * d6 - d5 * d4;
 			if ((d4 - d3) >= 0 && (d5 - d6) >= 0 && va <= 0) {
-				var v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+				float v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
 				return b + (c - b) * v;
 			} else {
 				// P is inside the face region. Compute the point using its barycentric coordinates (u, v, w)
 				// Note that the x and z coordinates will be exactly the same as P's x and z coordinates
-				var denom = 1f / (va + vb + vc);
-				var v = vb * denom;
-				var w = vc * denom;
+				float denom = 1f / (va + vb + vc);
+				float v = vb * denom;
+				float w = vc * denom;
 
 				return new Vector3(p.x, (1 - v - w)*a.y + v*b.y + w*c.y, p.z);
 			}
@@ -1346,61 +1346,61 @@ namespace Pathfinding {
 		/// </summary>
 		public static Vector3 ClosestPointOnTriangle (Vector3 a, Vector3 b, Vector3 c, Vector3 p) {
 			// Check if p is in vertex region outside A
-			var ab = b - a;
-			var ac = c - a;
-			var ap = p - a;
+			Vector3 ab = b - a;
+			Vector3 ac = c - a;
+			Vector3 ap = p - a;
 
-			var d1 = Vector3.Dot(ab, ap);
-			var d2 = Vector3.Dot(ac, ap);
+			float d1 = Vector3.Dot(ab, ap);
+			float d2 = Vector3.Dot(ac, ap);
 
 			// Barycentric coordinates (1,0,0)
 			if (d1 <= 0 && d2 <= 0)
 				return a;
 
 			// Check if p is in vertex region outside B
-			var bp = p - b;
-			var d3 = Vector3.Dot(ab, bp);
-			var d4 = Vector3.Dot(ac, bp);
+			Vector3 bp = p - b;
+			float d3 = Vector3.Dot(ab, bp);
+			float d4 = Vector3.Dot(ac, bp);
 
 			// Barycentric coordinates (0,1,0)
 			if (d3 >= 0 && d4 <= d3)
 				return b;
 
 			// Check if p is in edge region outside AB, if so return a projection of p onto AB
-			var vc = d1 * d4 - d3 * d2;
+			float vc = d1 * d4 - d3 * d2;
 			if (d1 >= 0 && d3 <= 0 && vc <= 0) {
 				// Barycentric coordinates (1-v, v, 0)
-				var v = d1 / (d1 - d3);
+				float v = d1 / (d1 - d3);
 				return a + ab * v;
 			}
 
 			// Check if p is in vertex region outside C
-			var cp = p - c;
-			var d5 = Vector3.Dot(ab, cp);
-			var d6 = Vector3.Dot(ac, cp);
+			Vector3 cp = p - c;
+			float d5 = Vector3.Dot(ab, cp);
+			float d6 = Vector3.Dot(ac, cp);
 
 			// Barycentric coordinates (0,0,1)
 			if (d6 >= 0 && d5 <= d6)
 				return c;
 
 			// Check if p is in edge region of AC, if so return a projection of p onto AC
-			var vb = d5 * d2 - d1 * d6;
+			float vb = d5 * d2 - d1 * d6;
 			if (d2 >= 0 && d6 <= 0 && vb <= 0) {
 				// Barycentric coordinates (1-v, 0, v)
-				var v = d2 / (d2 - d6);
+				float v = d2 / (d2 - d6);
 				return a + ac * v;
 			}
 
 			// Check if p is in edge region of BC, if so return projection of p onto BC
-			var va = d3 * d6 - d5 * d4;
+			float va = d3 * d6 - d5 * d4;
 			if ((d4 - d3) >= 0 && (d5 - d6) >= 0 && va <= 0) {
-				var v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+				float v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
 				return b + (c - b) * v;
 			} else {
 				// P is inside the face region. Compute the point using its barycentric coordinates (u, v, w)
-				var denom = 1f / (va + vb + vc);
-				var v = vb * denom;
-				var w = vc * denom;
+				float denom = 1f / (va + vb + vc);
+				float v = vb * denom;
+				float w = vc * denom;
 
 				// This is equal to: u*a + v*b + w*c, u = va*denom = 1 - v - w;
 				return a + ab * v + ac * w;
@@ -1477,14 +1477,14 @@ namespace Pathfinding {
 			// we need to start these at the beginning of the chain.
 			// Then iterate over all the loops of the outline.
 			// Since they are loops, we can start at any point.
-			var obstacleVertices = ListPool<int>.Claim();
-			var outlineKeys = ListPool<int>.Claim();
+			List<int> obstacleVertices = ListPool<int>.Claim();
+			List<int> outlineKeys = ListPool<int>.Claim();
 
 			outlineKeys.AddRange(outline.Keys);
 			for (int k = 0; k <= 1; k++) {
 				bool cycles = k == 1;
 				for (int i = 0; i < outlineKeys.Count; i++) {
-					var startIndex = outlineKeys[i];
+					int startIndex = outlineKeys[i];
 
 					// Chains (not cycles) need to start at the start of the chain
 					// Cycles can start at any point
@@ -1492,12 +1492,12 @@ namespace Pathfinding {
 						continue;
 					}
 
-					var index = startIndex;
+					int index = startIndex;
 					obstacleVertices.Clear();
 					obstacleVertices.Add(index);
 
 					while (outline.ContainsKey(index)) {
-						var next = outline[index];
+						int next = outline[index];
 						outline.Remove(index);
 
 						obstacleVertices.Add(next);

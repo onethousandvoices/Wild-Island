@@ -11,7 +11,7 @@ namespace Zenject.Tests.Other
         {
             Container.Bind<Foo>().AsSingle();
 
-            var sub1 = Container.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
 
             Assert.IsEqual(sub1.Resolve<Foo>(), Container.Resolve<Foo>());
         }
@@ -21,7 +21,7 @@ namespace Zenject.Tests.Other
         {
             Container.Bind<Foo>().AsSingle().CopyIntoAllSubContainers();
 
-            var sub1 = Container.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
 
             Assert.IsNotEqual(sub1.Resolve<Foo>(), Container.Resolve<Foo>());
         }
@@ -32,7 +32,7 @@ namespace Zenject.Tests.Other
             Container.Bind<IBar>().To<Bar>().FromResolve().CopyIntoAllSubContainers();
             Container.Bind<Bar>().AsSingle();
 
-            var sub1 = Container.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
 
             Assert.IsEqual(Container.ResolveAll<IBar>().Count, 1);
             Assert.IsEqual(sub1.ResolveAll<IBar>().Count, 2);
@@ -43,8 +43,8 @@ namespace Zenject.Tests.Other
         {
             Container.Bind<Foo>().AsSingle().CopyIntoDirectSubContainers();
 
-            var sub1 = Container.CreateSubContainer();
-            var sub2 = sub1.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
+            DiContainer sub2 = sub1.CreateSubContainer();
 
             Assert.That(Container.HasBindingId(typeof(Foo), null, InjectSources.Local));
             Assert.That(sub1.HasBindingId(typeof(Foo), null, InjectSources.Local));
@@ -56,8 +56,8 @@ namespace Zenject.Tests.Other
         {
             Container.Bind<Foo>().AsSingle().MoveIntoDirectSubContainers();
 
-            var sub1 = Container.CreateSubContainer();
-            var sub2 = sub1.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
+            DiContainer sub2 = sub1.CreateSubContainer();
 
             Assert.That(!Container.HasBindingId(typeof(Foo), null, InjectSources.Local));
             Assert.That(sub1.HasBindingId(typeof(Foo), null, InjectSources.Local));
@@ -69,8 +69,8 @@ namespace Zenject.Tests.Other
         {
             Container.Bind<Foo>().AsSingle().MoveIntoAllSubContainers();
 
-            var sub1 = Container.CreateSubContainer();
-            var sub2 = sub1.CreateSubContainer();
+            DiContainer sub1 = Container.CreateSubContainer();
+            DiContainer sub2 = sub1.CreateSubContainer();
 
             Assert.That(!Container.HasBindingId(typeof(Foo), null, InjectSources.Local));
             Assert.That(sub1.HasBindingId(typeof(Foo), null, InjectSources.Local));

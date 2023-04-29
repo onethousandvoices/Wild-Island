@@ -53,7 +53,7 @@ namespace Zenject.SpaceFighter
                 return;
             }
 
-            var distanceToPlayer = (_player.Position - _view.Position).magnitude;
+            float distanceToPlayer = (_player.Position - _view.Position).magnitude;
 
             // Always look towards the player
             _rotationHandler.DesiredLookDir = (_player.Position - _view.Position).normalized;
@@ -93,7 +93,7 @@ namespace Zenject.SpaceFighter
 
         void MoveTowardsPlayer()
         {
-            var playerDir = (_player.Position - _view.Position).normalized;
+            Vector3 playerDir = (_player.Position - _view.Position).normalized;
 
             _view.AddForce(playerDir * _tunables.Speed);
         }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Pathfinding {
 	/// <summary>
@@ -92,7 +93,7 @@ namespace Pathfinding {
 		/// Returns: The constructed path object
 		/// </summary>
 		public static ABPath Construct (Vector3 start, Vector3 end, OnPathDelegate callback = null) {
-			var p = PathPool.GetPath<ABPath>();
+			ABPath p = PathPool.GetPath<ABPath>();
 
 			p.Setup(start, end, callback);
 			return p;
@@ -137,7 +138,7 @@ namespace Pathfinding {
 		/// </code>
 		/// </summary>
 		public static ABPath FakePath (List<Vector3> vectorPath, List<GraphNode> nodePath = null) {
-			var path = PathPool.GetPath<ABPath>();
+			ABPath path = PathPool.GetPath<ABPath>();
 
 			for (int i = 0; i < vectorPath.Count; i++) path.vectorPath.Add(vectorPath[i]);
 
@@ -262,22 +263,22 @@ namespace Pathfinding {
 		/// [Open online documentation to see images]
 		/// </summary>
 		protected virtual bool EndPointGridGraphSpecialCase (GraphNode closestWalkableEndNode) {
-			var gridNode = closestWalkableEndNode as GridNode;
+			GridNode gridNode = closestWalkableEndNode as GridNode;
 
 			if (gridNode != null) {
-				var gridGraph = GridNode.GetGridGraph(gridNode.GraphIndex);
+				GridGraph gridGraph = GridNode.GetGridGraph(gridNode.GraphIndex);
 
 				// Find the closest node, not neccessarily walkable
-				var endNNInfo2 = AstarPath.active.GetNearest(originalEndPoint, NNConstraintNone);
-				var gridNode2 = endNNInfo2.node as GridNode;
+				NNInfo endNNInfo2 = AstarPath.active.GetNearest(originalEndPoint, NNConstraintNone);
+				GridNode gridNode2 = endNNInfo2.node as GridNode;
 
 				if (gridNode != gridNode2 && gridNode2 != null && gridNode.GraphIndex == gridNode2.GraphIndex) {
 					// Calculate the coordinates of the nodes
-					var x1 = gridNode.NodeInGridIndex % gridGraph.width;
-					var z1 = gridNode.NodeInGridIndex / gridGraph.width;
+					int x1 = gridNode.NodeInGridIndex % gridGraph.width;
+					int z1 = gridNode.NodeInGridIndex / gridGraph.width;
 
-					var x2 = gridNode2.NodeInGridIndex % gridGraph.width;
-					var z2 = gridNode2.NodeInGridIndex / gridGraph.width;
+					int x2 = gridNode2.NodeInGridIndex % gridGraph.width;
+					int z2 = gridNode2.NodeInGridIndex / gridGraph.width;
 
 					bool wasClose = false;
 					switch (gridGraph.neighbours) {
@@ -302,8 +303,8 @@ namespace Pathfinding {
 					case NumNeighbours.Six:
 						// Hexagon graph
 						for (int i = 0; i < 6; i++) {
-							var nx = x2 + gridGraph.neighbourXOffsets[GridGraph.hexagonNeighbourIndices[i]];
-							var nz = z2 + gridGraph.neighbourZOffsets[GridGraph.hexagonNeighbourIndices[i]];
+							int nx = x2 + gridGraph.neighbourXOffsets[GridGraph.hexagonNeighbourIndices[i]];
+							int nz = z2 + gridGraph.neighbourZOffsets[GridGraph.hexagonNeighbourIndices[i]];
 							if (x1 == nx && z1 == nz) {
 								// If 'O' is gridNode2, then gridNode is one of the nodes marked with an 'x'
 								//    x x
@@ -350,14 +351,14 @@ namespace Pathfinding {
 		/// <summary>Helper method to set PathNode.flag1 to a specific value for all nodes adjacent to a grid node</summary>
 		void SetFlagOnSurroundingGridNodes (GridNode gridNode, int flag, bool flagState) {
 			// Loop through all adjacent grid nodes
-			var gridGraph = GridNode.GetGridGraph(gridNode.GraphIndex);
+			GridGraph gridGraph = GridNode.GetGridGraph(gridNode.GraphIndex);
 
 			// Number of neighbours as an int
 			int mxnum = gridGraph.neighbours == NumNeighbours.Four ? 4 : (gridGraph.neighbours == NumNeighbours.Eight ? 8 : 6);
 
 			// Calculate the coordinates of the node
-			var x = gridNode.NodeInGridIndex % gridGraph.width;
-			var z = gridNode.NodeInGridIndex / gridGraph.width;
+			int x = gridNode.NodeInGridIndex % gridGraph.width;
+			int z = gridNode.NodeInGridIndex / gridGraph.width;
 
 			if (flag != 1 && flag != 2)
 				throw new System.ArgumentOutOfRangeException("flag");
@@ -375,8 +376,8 @@ namespace Pathfinding {
 
 				// Check if the position is still inside the grid
 				if (nx >= 0 && nz >= 0 && nx < gridGraph.width && nz < gridGraph.depth) {
-					var adjacentNode = gridGraph.nodes[nz*gridGraph.width + nx];
-					var pathNode = pathHandler.GetPathNode(adjacentNode);
+					GridNode adjacentNode = gridGraph.nodes[nz*gridGraph.width + nx];
+					PathNode pathNode = pathHandler.GetPathNode(adjacentNode);
 					if (flag == 1) pathNode.flag1 = flagState;
 					else pathNode.flag2 = flagState;
 				}
@@ -390,10 +391,10 @@ namespace Pathfinding {
 
 			//Initialize the NNConstraint
 			nnConstraint.tags = enabledTags;
-			var startNNInfo  = AstarPath.active.GetNearest(startPoint, nnConstraint);
+			NNInfo startNNInfo  = AstarPath.active.GetNearest(startPoint, nnConstraint);
 
 			//Tell the NNConstraint which node was found as the start node if it is a PathNNConstraint and not a normal NNConstraint
-			var pathNNConstraint = nnConstraint as PathNNConstraint;
+			PathNNConstraint pathNNConstraint = nnConstraint as PathNNConstraint;
 			if (pathNNConstraint != null) {
 				pathNNConstraint.SetStart(startNNInfo.node);
 			}
@@ -416,7 +417,7 @@ namespace Pathfinding {
 			// If it is declared that this path type has an end point
 			// Some path types might want to use most of the ABPath code, but will not have an explicit end point at this stage
 			if (hasEndPoint) {
-				var endNNInfo = AstarPath.active.GetNearest(endPoint, nnConstraint);
+				NNInfo endNNInfo = AstarPath.active.GetNearest(endPoint, nnConstraint);
 				endPoint = endNNInfo.position;
 				endNode = endNNInfo.node;
 
@@ -515,13 +516,13 @@ namespace Pathfinding {
 		protected override void Cleanup () {
 			// TODO: Set flag1 = false as well?
 			if (startNode != null) {
-				var pathStartNode = pathHandler.GetPathNode(startNode);
+				PathNode pathStartNode = pathHandler.GetPathNode(startNode);
 				pathStartNode.flag1 = false;
 				pathStartNode.flag2 = false;
 			}
 
 			if (endNode != null) {
-				var pathEndNode = pathHandler.GetPathNode(endNode);
+				PathNode pathEndNode = pathHandler.GetPathNode(endNode);
 				pathEndNode.flag1 = false;
 				pathEndNode.flag2 = false;
 			}
@@ -535,7 +536,7 @@ namespace Pathfinding {
 			// and thus the flag2 which is set to false above might not set
 			// it on the correct node
 			if (gridSpecialCaseNode != null) {
-				var pathNode = pathHandler.GetPathNode(gridSpecialCaseNode);
+				PathNode pathNode = pathHandler.GetPathNode(gridSpecialCaseNode);
 				pathNode.flag1 = false;
 				pathNode.flag2 = false;
 				SetFlagOnSurroundingGridNodes(gridSpecialCaseNode, 1, false);
@@ -563,7 +564,7 @@ namespace Pathfinding {
 				// Nothing to do
 			} else {
 				// See EndPointGridGraphSpecialCase()
-				var gridNode = node as GridNode;
+				GridNode gridNode = node as GridNode;
 				if (gridNode == null) {
 					throw new System.Exception("Some path is not cleaning up the flag1 field. This is a bug.");
 				}
@@ -686,7 +687,7 @@ namespace Pathfinding {
 				return "";
 			}
 
-			var text = new System.Text.StringBuilder();
+			StringBuilder text = new System.Text.StringBuilder();
 
 			DebugStringPrefix(logMode, text);
 
