@@ -3,16 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StarterAssets
+namespace WildIsland.Core
 {
     public class PlayerInput : MonoBehaviour
     {
-        public Vector2 move;
-        public Vector2 look;
-        public bool jump;
-        public bool sprint;
-
-        public bool analogMovement;
+        public Vector2 Move { get; private set; }
+        public Vector2 Look { get; private set; }
+        public bool Jump { get; private set; }
+        public bool Sprint { get; private set; }
 
 #if ENABLE_INPUT_SYSTEM
         public void OnMove(InputValue value)
@@ -28,17 +26,20 @@ namespace StarterAssets
             => SprintInput(value.isPressed);
 #endif
 
-        public void MoveInput(Vector2 newMoveDirection)
-            => move = newMoveDirection;
+        public void ResetJump()
+            => Jump = false;
 
-        public void LookInput(Vector2 newLookDirection)
-            => look = newLookDirection;
+        private void MoveInput(Vector2 newMoveDirection)
+            => Move = newMoveDirection;
 
-        public void JumpInput(bool newJumpState)
-            => jump = newJumpState;
+        private void LookInput(Vector2 newLookDirection)
+            => Look = newLookDirection;
 
-        public void SprintInput(bool newSprintState)
-            => sprint = newSprintState;
+        private void JumpInput(bool newJumpState)
+            => Jump = newJumpState;
+
+        private void SprintInput(bool newSprintState)
+            => Sprint = newSprintState;
 
         private void OnApplicationFocus(bool hasFocus)
             => SetCursorState(true);
