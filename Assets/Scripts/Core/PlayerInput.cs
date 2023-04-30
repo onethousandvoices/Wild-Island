@@ -24,6 +24,9 @@ namespace WildIsland.Core
 
         public void OnSprint(InputValue value)
             => SprintInput(value.isPressed);
+
+        public void OnInventory(InputValue value)
+            => Debug.Log("inventory");
 #endif
 
         public void ResetJump()
@@ -35,11 +38,11 @@ namespace WildIsland.Core
         private void LookInput(Vector2 newLookDirection)
             => Look = newLookDirection;
 
-        private void JumpInput(bool newJumpState)
-            => Jump = newJumpState;
+        private void JumpInput(bool state)
+            => Jump = state;
 
-        private void SprintInput(bool newSprintState)
-            => Sprint = newSprintState;
+        private void SprintInput(bool state)
+            => Sprint = state;
 
         private void OnApplicationFocus(bool hasFocus)
             => SetCursorState(true);

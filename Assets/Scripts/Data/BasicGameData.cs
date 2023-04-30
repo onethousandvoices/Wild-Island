@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using WildIsland.Data;
 
-namespace Data
+namespace WildIsland.Data
 {
     [Serializable]
     public class BasicGameData : IGDDDataTypeString
@@ -26,5 +26,4 @@ namespace Data
             { "Day", typeof(DaySettings)}
         };
     }
-    
 }

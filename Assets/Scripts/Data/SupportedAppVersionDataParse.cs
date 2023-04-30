@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WildIsland.Data;
 
-namespace Data
+namespace WildIsland.Data
 {
 public class SupportedAppVersionDataParse
     {
@@ -22,7 +21,6 @@ public class SupportedAppVersionDataParse
         public AppVersion AndroidVersion, IOSVersion;
 
         private static string[] _tags = new string[] { "GameDataVersion", "AndroidVersion", "iOSVersion" };
-
 
         public static SupportedAppVersionData Parse(string input)
         {

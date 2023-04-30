@@ -3,7 +3,7 @@ using Zenject;
 
 namespace WildIsland.Installers
 {
-    public class RootInstaller : MonoInstaller
+    public class CoreInstaller : MonoInstaller
     {
         public override void InstallBindings()
         {

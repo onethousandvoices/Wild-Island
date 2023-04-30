@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using WildIsland.Data;
 
-namespace Data
+namespace WildIsland.Data
 {
     public class GDDDownloaderConfig
     {
@@ -17,22 +17,7 @@ namespace Data
         public static readonly WorksheetConfig[] ParsingDataTypes =
         {
             new WorksheetConfig(CustomGDDParsers.BasicSheetParser, FileGdId.Main, "Basic", GameDataId),
-            // new WorksheetConfig(typeof(BuildingsData), FileGdId.Main, "BuildingsBasic", GameDataId),
-            // new WorksheetConfig(CustomGDDParsers.CustomBuildingsUpgradesParser, FileGdId.Main, "Buildings", GameDataId),
-            // new WorksheetConfig(CustomGDDParsers.CustomWorkerPriceParser, FileGdId.Main, "WorkersPrice", GameDataId),
-            // new WorksheetConfig(typeof(StorageBasicData), FileGdId.Main, "BasicCapacity", GameDataId),
-            // new WorksheetConfig(typeof(LoadersData), FileGdId.Main, "Loaders", GameDataId),
-            // new WorksheetConfig(CustomGDDParsers.CustomCarPriceParser, FileGdId.Main, "CarPrice", GameDataId),
-            // new WorksheetConfig(typeof(LocationsData), FileGdId.Main, "Locations", GameDataId),
-            // new WorksheetConfig(typeof(TimeTempering), FileGdId.Main, "TimeTempering", GameDataId),
-            // new WorksheetConfig(typeof(BerryFieldsData), FileGdId.Main, "BerryFields", GameDataId),
-            // new WorksheetConfig(CustomGDDParsers.CustomWorkerParametersParser, FileGdId.Main, "WorkingFields", GameDataId),
-            // new WorksheetConfig(typeof(TimePickersData), FileGdId.Main, "TimePicker", GameDataId),
-            // new WorksheetConfig(typeof(TierListData), FileGdId.Main, "TierList", GameDataId),
-            // new WorksheetConfig(typeof(TaskData), FileGdId.Main, "TasksList", GameDataId),
-            // new WorksheetConfig(CustomGDDParsers.CustomOrderProductDataParser, FileGdId.Main, "ProductOrders", GameDataId),
-            // new WorksheetConfig(typeof(OrderProductPriceModifierData), FileGdId.Main, "ModOrders", GameDataId),
-            // new WorksheetConfig(typeof(SoundData), FileGdId.Main, "Sounds", GameDataId),
+            new WorksheetConfig(CustomGDDParsers.MainCharacterParser, FileGdId.Main, "MainCharacter", GameDataId),
 
             // new WorksheetConfig(CustomGDDParsers.LocalizationParserBasic, FileGdId.Localization, "UI", GameDataId),
             // new WorksheetConfig(CustomGDDParsers.LocalizationParserBasic, FileGdId.Localization, "prestige", GameDataId),
@@ -81,269 +66,6 @@ namespace Data
 
     internal static class CustomGDDParsers
     {
-//         private static List<LocalizationData> _localizationTexts = new List<LocalizationData>();
-//
-//         /*
-//         internal static void CustomSupportedAppVersionParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-//         {
-//             var dataParse = (SupportedAppVersionDataParse)GDDDownloader
-//                 .CreateObjectFromData(typeof(SupportedAppVersionDataParse), sheet[0], sheet[1]);
-//             SupportedAppVersionData data = new SupportedAppVersionData()
-//             {
-//                 GameDataVersion = dataParse.GameDataVersion,
-//                 AndroidVersion = AppVersion.Parse(dataParse.AndroidVersion),
-//                 IOSVersion = AppVersion.Parse(dataParse.IOSVersion)
-//             };
-//             dataStorage.SetData(typeof(SupportedAppVersionData), data);
-//         }
-//
-//         */
-//         internal static void CustomBuildingsUpgradesParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-//         {
-//             List<string> header = sheet[0];
-//
-//             List<object> items = new List<object>();
-//
-//             string buildingName = "", curBdId = null;
-//             List<BuildingUpgradeLevelData> levels = new List<BuildingUpgradeLevelData>();
-//
-//             Action addNewItem = () =>
-//             {
-//                 BuildingsUpgradeData bd = new BuildingsUpgradeData(buildingName, levels.ToArray());
-//                 items.Add(bd);
-//                 levels.Clear();
-//             };
-//
-//             for (int i = 1; i < sheet.Count; ++i)
-//             {
-//                 curBdId = sheet[i][0];
-//
-//                 if (!string.IsNullOrEmpty(curBdId) && curBdId != buildingName)
-//                 { // Building name changed in current row
-//                     if (buildingName.Length > 0)
-//                     { // Previous name was not empty
-//                         addNewItem.Invoke();
-//                     }
-//                     buildingName = curBdId;
-//                 }
-//
-//                 BuildingUpgradeLevelData item = (BuildingUpgradeLevelData)GDDDownloader.CreateObjectFromData(typeof(BuildingUpgradeLevelData), header, sheet[i]);
-//                 levels.Add(item);
-//             }
-//             addNewItem.Invoke();
-//             dataStorage.SetData(typeof(BuildingsUpgradeData), items.ToArray());
-//         }
-//
-//         internal static void CustomWorkerPriceParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-//         {
-//             var header = sheet[0];
-//
-//             var items = new List<object>();
-//
-//             var workerID = string.Empty;
-//             var levels = new List<WorkerPriceData>();
-//
-//             void AddNewItem()
-//             {
-//                 var bd = new WorkersPriceData(workerID, levels.ToArray());
-//                 items.Add(bd);
-//                 levels.Clear();
-//             }
-//
-//             for (var i = 1; i < sheet.Count; ++i)
-//             {
-//                 var workerNum = sheet[i][0];
-//
-//                 if (!string.IsNullOrEmpty(workerNum) && workerNum != workerID)
-//                 {
-//                     if (workerID.Length > 0)
-//                         AddNewItem();
-//                     workerID = workerNum;
-//                 }
-//
-//                 var item = (WorkerPriceData)GDDDownloader.CreateObjectFromData(typeof(WorkerPriceData), header, sheet[i]);
-//                 levels.Add(item);
-//             }
-//             AddNewItem();
-//             dataStorage.SetData(typeof(WorkersPriceData), items.ToArray());
-//         }
-//
-//         internal static void CustomWorkerParametersParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-//         {
-//             var header = sheet[0];
-//
-//             var items = new List<object>();
-//
-//             var workerID = string.Empty;
-//             var levels = new List<FieldWorkerParametersData>();
-//
-//             void AddNewItem()
-//             {
-//                 var bd = new FieldWorkerData(workerID, levels.ToArray());
-//                 items.Add(bd);
-//                 levels.Clear();
-//             }
-//
-//             for (var i = 1; i < sheet.Count; ++i)
-//             {
-//                 var workerNum = sheet[i][0];
-//
-//                 if (!string.IsNullOrEmpty(workerNum) && workerNum != workerID)
-//                 {
-//                     if (workerID.Length > 0)
-//                         AddNewItem();
-//                     workerID = workerNum;
-//                 }
-//
-//                 var item = (FieldWorkerParametersData)GDDDownloader.CreateObjectFromData(typeof(FieldWorkerParametersData), header, sheet[i]);
-//                 levels.Add(item);
-//             }
-//             AddNewItem();
-//             dataStorage.SetData(typeof(FieldWorkerData), items.ToArray());
-//         }
-//
-//         internal static void CustomCarPriceParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-//         {
-//             var header = sheet[0];
-//
-//             var items = new List<object>();
-//
-//             var workerID = string.Empty;
-//             var levels = new List<LoaderPriceData>();
-//
-//             void AddNewItem()
-//             {
-//                 var bd = new LoadersPriceData(workerID, levels.ToArray());
-//                 items.Add(bd);
-//                 levels.Clear();
-//             }
-//
-//             for (var i = 1; i < sheet.Count; ++i)
-//             {
-//                 var workerNum = sheet[i][0];
-//
-//                 if (!string.IsNullOrEmpty(workerNum) && workerNum != workerID)
-//                 {
-//                     if (workerID.Length > 0)
-//                         AddNewItem();
-//                     workerID = workerNum;
-//                 }
-//
-//                 var item = (LoaderPriceData)GDDDownloader.CreateObjectFromData(typeof(LoaderPriceData), header, sheet[i]);
-//                 levels.Add(item);
-//             }
-//             AddNewItem();
-//             dataStorage.SetData(typeof(LoadersPriceData), items.ToArray());
-//         }
-
-        // internal static void CustomOrderProductDataParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-        // {
-        //     var header = sheet[0];
-        //
-        //     var items = new List<object>();
-        //
-        //     var storageCapacity = string.Empty;
-        //     var dataItems = new List<OrderProductDataItem>();
-        //
-        //     void AddNewItem()
-        //     {
-        //         var bd = new OrderProductData(int.Parse(storageCapacity), dataItems.ToArray());
-        //         items.Add(bd);
-        //         dataItems.Clear();
-        //     }
-        //
-        //     for (var i = 1; i < sheet.Count; ++i)
-        //     {
-        //         var workerNum = sheet[i][0];
-        //
-        //         if (!string.IsNullOrEmpty(workerNum) && workerNum != storageCapacity)
-        //         {
-        //             if (storageCapacity.Length > 0)
-        //                 AddNewItem();
-        //             storageCapacity = workerNum;
-        //         }
-        //
-        //         var item = (OrderProductDataItem)GDDDownloader.CreateObjectFromData(typeof(OrderProductDataItem), header, sheet[i]);
-        //         dataItems.Add(item);
-        //     }
-        //     AddNewItem();
-        //     dataStorage.SetData(typeof(OrderProductData), items.ToArray());
-        // }
-
-        /*
-         internal static void CustomBuildingsEffectUpgradesParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-        {
-            var buildingIds = new HashSet<string>();
-            var header = sheet[2];
-            header.ForEach(cell =>
-            {
-                if (cell.ToLower() != "lvl") buildingIds.Add(cell);
-            });
-            var buildingsCount = buildingIds.Count;
-
-            Type[] EffectTypes = new Type[] {
-                typeof(BuildingsQueueCapacityUpgradeData),
-                typeof(BuildingsInnerCapacityUpgradeData)
-            };
-
-            double BaseUpgradeCost;
-            double LevelUpModifier;
-            int Condition;
-            int Effect;
-
-            // Effect -> Building -> Levels
-            var items = new List<BuildingEffectUpgradeLevelData>[EffectTypes.Length, buildingsCount];
-
-            for (int i = 3; i < sheet.Count; ++i)
-            {
-                List<string> row = sheet[i];
-                if (row[0].ToLower() == "lvl") break;
-                for (int effectIndex = 0, effectIndexOffset; effectIndex < EffectTypes.Length; effectIndex++)
-                {
-                    effectIndexOffset = effectIndex * (1 + buildingsCount * 4);
-                    for (int buildingIndex = 0; buildingIndex < buildingsCount; buildingIndex++)
-                    {
-                        BaseUpgradeCost = doubleTryParse(row[effectIndexOffset + buildingIndex + 1]);
-                        LevelUpModifier = doubleTryParse(row[effectIndexOffset + buildingIndex + 1 + buildingsCount]);
-                        Condition = intTryParse(row[effectIndexOffset + buildingIndex + 1 + buildingsCount * 2]);
-                        Effect = intTryParse(row[effectIndexOffset + buildingIndex + 1 + buildingsCount * 3]);
-
-                        if (BaseUpgradeCost == 0 && LevelUpModifier == 0 && Condition == 0 && Effect == 0)
-                        {
-                            continue;
-                        }
-
-                        var item = new BuildingEffectUpgradeLevelData(BaseUpgradeCost, LevelUpModifier, Condition, Effect);
-
-                        if (items[effectIndex, buildingIndex] == null)
-                            items[effectIndex, buildingIndex] = new List<BuildingEffectUpgradeLevelData>();
-                        items[effectIndex, buildingIndex].Add(item);
-                    }
-                }
-            }
-
-            List<string> buildingsNames = sheet[2];
-
-
-            for (int effectIndex = 0; effectIndex < EffectTypes.Length; effectIndex++)
-            {
-                var effectData = new List<BuildingsEffectUpgradeData>();
-                for (int buildingIndex = 0; buildingIndex < buildingsCount; buildingIndex++)
-                {
-                    BuildingsEffectUpgradeData data = (BuildingsEffectUpgradeData)Activator.CreateInstance(
-                        EffectTypes[effectIndex],
-                        new object[] {
-                            buildingsNames[buildingIndex + 1],
-                            items[effectIndex, buildingIndex].ToArray()
-                        }
-                    );
-                    effectData.Add(data);
-                }
-                dataStorage.SetData(EffectTypes[effectIndex], effectData.ToArray());
-            }
-        }
-        */
-
 #region LoaclizationParsers
         // internal static void LocalizationParserBasic(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
         // {
@@ -409,34 +131,36 @@ namespace Data
             });
         }
 
-        private static int intTryParse(string value)
+        internal static void MainCharacterParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
         {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-            try
-            {
-                return int.Parse(value);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Cannot parse " + value + " to int: " + e.ToString());
-                return 0;
-            }
-        }
+            PlayerData playerData = new PlayerData();
 
-        private static double doubleTryParse(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-            try
+            for (int i = 1; i < sheet.Count; ++i)
             {
-                return double.Parse(value);
+                string rowKey = sheet[i][0];
+                string rowValue = sheet[i][1];
+                
+                bool foundField = false;
+                FieldInfo[] fields = playerData.GetType().GetFields();
+                foreach (FieldInfo field in fields)
+                {
+                    if (!string.Equals(field.Name, rowKey, StringComparison.CurrentCultureIgnoreCase))
+                        continue;
+                    Type fieldType = field.FieldType;
+                    if (fieldType == typeof(int))
+                        field.SetValue(playerData, int.Parse(rowValue));
+                    else if (fieldType == typeof(float))
+                        field.SetValue(playerData, float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat));
+                    foundField = true;
+                    break;
+                }
+                if (!foundField)
+                    Debug.LogError("Field not found in PlayerData for row " + rowKey);
             }
-            catch (Exception e)
+            dataStorage.SetData(typeof(PlayerData), new object[]
             {
-                Debug.LogError("Cannot parse " + value + " to double: " + e.ToString());
-                return 0;
-            }
+                playerData
+            });
         }
     }
 
@@ -459,7 +183,7 @@ namespace Data
         void SetData(Type type, object data);
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Range
     {
         public float Left;
@@ -489,12 +213,10 @@ namespace Data
         }
 
         public override string ToString()
-        {
-            return Left + " / " + Right;
-        }
+            => Left + " / " + Right;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class RangeArray
     {
         public double[] Intervals;
@@ -509,9 +231,7 @@ namespace Data
             string[] parts = source.Split('/');
             double[] intervals = new double[parts.Length];
             for (int i = 0; i < parts.Length; i++)
-            {
                 intervals[i] = double.Parse(parts[i].Trim());
-            }
 
             RangeArray rangeArray = new RangeArray(intervals);
 
@@ -519,7 +239,7 @@ namespace Data
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class ObjectArray<T>
     {
         public T[] Intervals;
@@ -536,19 +256,13 @@ namespace Data
             for (int i = 0; i < parts.Length; i++)
             {
                 if (typeof(T) == typeof(string))
-                {
                     intervals[i] = parts[i];
-                }
 
                 if (typeof(T) == typeof(double))
-                {
                     intervals[i] = double.Parse(parts[i].Trim());
-                }
 
                 if (typeof(T) == typeof(int))
-                {
                     intervals[i] = int.Parse(parts[i].Trim());
-                }
             }
 
             ObjectArray<T> objArray = new ObjectArray<T>(intervals);

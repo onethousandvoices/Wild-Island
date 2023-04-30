@@ -1,5 +1,4 @@
-﻿using Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using GoogleSheetsToUnity;
@@ -11,8 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Unity.Burst.Intrinsics;
-using Range = Data.Range;
 
 namespace WildIsland.Data
 {
@@ -35,14 +32,14 @@ namespace WildIsland.Data
             ParseGDDFromExcelAndCopy();
         }
         
-        [UnityEditor.MenuItem("Tools/GDD/Download gdd xlsxs", priority = 27)]
+        // [UnityEditor.MenuItem("Tools/GDD/Download gdd xlsxs", priority = 27)]
         private static async Task LoadGDDXlsxs()
         {
             await DownloadXlsxs();
             Debug.LogError("GDD Xlsxs downloaded");
         }
         
-        [UnityEditor.MenuItem("Tools/GDD/Parse excel with copy", priority = 28)]
+        // [UnityEditor.MenuItem("Tools/GDD/Parse excel with copy", priority = 28)]
         private static void ParseGDDFromExcelAndCopy()
         {
             ParseGDDFromExcel(true);
@@ -80,7 +77,7 @@ namespace WildIsland.Data
                 // LdXlsxFile);
         }
 
-        public static void ParseExcelToGd(Dictionary<string, GameDataBase> gdContainer)
+        private static void ParseExcelToGd(Dictionary<string, GameDataBase> gdContainer)
         {
             SetSeparators();
             ParseExcelToGd(GdXlsxFile, gdContainer, FileGdId.Main);

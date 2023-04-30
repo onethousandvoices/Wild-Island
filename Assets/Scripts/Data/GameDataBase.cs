@@ -10,8 +10,24 @@ using UnityEngine;
 using WildIsland.Data;
 using WildIsland.Utility;
 
-namespace Data
+namespace WildIsland.Data
 {
+    [Serializable]
+    public class GameData : GameDataBase
+    {
+        [SerializeField] private BasicGameData[] _basicGameData = Array.Empty<BasicGameData>();
+        [SerializeField] private PlayerData[] _playerData = Array.Empty<PlayerData>();
+
+        public GameData()
+        {
+            _supportedTypes = new Dictionary<Type, FieldInfo>()
+            {
+                { typeof(BasicGameData), GetFieldByName<GameData>("_basicGameData") },
+                { typeof(PlayerData), GetFieldByName<GameData>("_playerData") }
+            };
+        }
+    }
+    
     [Serializable]
     public class GameDataBase : IGDDDataStorage
     {
@@ -58,6 +74,7 @@ namespace Data
                 Debug.LogError(e.Message);
             }
         }
+        
 
         public void SetData(Type type, object data)
         {
@@ -321,20 +338,6 @@ namespace Data
     }
 
     [Serializable]
-    public class GameData : GameDataBase
-    {
-        [SerializeField] private BasicGameData[] _basicGameData = Array.Empty<BasicGameData>();
-
-        public GameData()
-        {
-            _supportedTypes = new Dictionary<Type, FieldInfo>()
-            {
-                { typeof(BasicGameData), GetFieldByName<GameData>("_basicGameData") },
-            };
-        }
-    }
-
-    [Serializable]
     public class LoadGameData : GameDataBase
     {
         [SerializeField] public SupportedAppVersionData SupportedAppVersionData = null;
@@ -370,5 +373,11 @@ namespace Data
         private readonly BasicGameData[] _bgd;
 
         public BasicGameData Default => _bgd[0];
+    }
+
+    public class PlayerDataContainer : IPartialGameDataContainer
+    {
+        private readonly PlayerData[] _playerData;
+        public PlayerData Default => _playerData[0];
     }
 }

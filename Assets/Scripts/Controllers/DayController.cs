@@ -1,6 +1,6 @@
-﻿using Data;
-using System;
+﻿using System;
 using UnityEngine;
+using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
 

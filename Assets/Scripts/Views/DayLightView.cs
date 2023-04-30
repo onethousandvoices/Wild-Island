@@ -1,5 +1,4 @@
-﻿using NaughtyAttributes;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace WildIsland.Views
 {
@@ -15,7 +14,7 @@ namespace WildIsland.Views
         public float SunIntensity => _sun.intensity;
         public float MoonIntensity => _moon.intensity;
         public Light Sun => _sun;
-        public Light Moon=> _moon;
+        public Light Moon => _moon;
         public AnimationCurve SunCurve => _sunCurve;
         public AnimationCurve MoonCurve => _moonCurve;
         public Material DaySkybox => _daySkybox;
