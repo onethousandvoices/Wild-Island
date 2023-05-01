@@ -51,9 +51,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "TButton",
+                    "name": "CHEAT_Time",
                     "type": "Button",
                     "id": "f95a2ce1-63e4-4fb4-8225-b80057174058",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CHEAT_Damage",
+                    "type": "Button",
+                    "id": "31103bd9-f577-4bc7-a9e6-be146fa57f8a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -255,7 +264,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "TButton",
+                    "action": "CHEAT_Time",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dbb48295-18ca-44ad-9679-7dfcaa1d54d5",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CHEAT_Damage",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

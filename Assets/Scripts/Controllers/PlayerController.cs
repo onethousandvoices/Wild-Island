@@ -24,7 +24,7 @@ namespace WildIsland.Controllers
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
-
+#region Fields
         private DbValue<PlayerData> _data;
         private PlayerData _stats => _data.Value;
         private PlayerData _statsContainer;
@@ -78,7 +78,7 @@ namespace WildIsland.Controllers
         private static readonly int _animIDJump = Animator.StringToHash("Jump");
         private static readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
         private static readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-
+#endregion
         private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
 
@@ -124,15 +124,6 @@ namespace WildIsland.Controllers
         }
 
 #region InitActions
-        private void InitInputActions()
-        {
-            _inputMap = new InputMap();
-            _inputMap.Enable();
-
-            _inputMap.Player.Jump.performed += OnJumpPerformed;
-            _inputMap.Player.TButton.started += OnTButtonPerformed;
-        }
-
         private void SetData()
         {
             _playerInputState = PlayerInputState.Idle;
@@ -192,12 +183,22 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_stats.Fatigue, _statsContainer.Fatigue);
             _viewStatsHolder.PlayerTemperatureStatView.SetRefs(_stats.Temperature, _statsContainer.Temperature);
         }
+
+        private void InitInputActions()
+        {
+            _inputMap = new InputMap();
+            _inputMap.Enable();
+
+            _inputMap.Player.Jump.performed += OnJumpPerformed;
+            _inputMap.Player.CHEAT_Time.started += CHEAT_TimeSpeedUp;
+            _inputMap.Player.CHEAT_Damage.started += CHEAT_Damage;
+        }
 #endregion
 #region Data
         private void UpdateStats()
         {
             _relativeSpeed = _speed / _stats.SprintSpeed.Value;
-            
+
             ProcessHealth();
             ProcessStamina();
             ProcessHunger();
@@ -207,10 +208,49 @@ namespace WildIsland.Controllers
 
         private void ProcessHealth()
         {
-            if (Math.Abs(_stats.TotalHealth - 100f) < 0.01f)
-                return;
+            float hungerMod = 0f;
+            float thirstMod = 0f;
+            float currentHunger = _stats.Hunger.Value;
+            float currentThirst = _stats.Thirst.Value;
+
+            if (currentHunger <= _view.HungerRegenStage1Range.y && currentHunger >= _view.HungerRegenStage1Range.x)
+                hungerMod = _statsContainer.HealthRegenHungerStage1.Value;
+            else if (currentHunger <= _view.HungerRegenStage2Range.y && currentHunger >= _view.HungerRegenStage2Range.x)
+                hungerMod = _statsContainer.HealthRegenHungerStage2.Value;
+            else if (currentHunger <= _view.HungerRegenStage3Range.y && currentHunger >= _view.HungerRegenStage3Range.x)
+                hungerMod = _statsContainer.HealthRegenHungerStage3.Value;
+            else if (currentHunger <= _view.HungerRegenStage4Range.y)
+                hungerMod = _statsContainer.HealthRegenHungerStage4.Value;
+
+            if (currentThirst <= _view.ThirstRegenStage1Range.y && currentThirst >= _view.ThirstRegenStage1Range.x)
+                thirstMod = _statsContainer.HealthRegenThirstStage1.Value;
+            else if (currentThirst <= _view.ThirstRegenStage2Range.y && currentThirst >= _view.ThirstRegenStage2Range.x)
+                thirstMod = _statsContainer.HealthRegenThirstStage2.Value;
+            else if (currentThirst <= _view.ThirstRegenStage3Range.y && currentThirst >= _view.ThirstRegenStage3Range.x)
+                thirstMod = _statsContainer.HealthRegenThirstStage3.Value;
+            else if (currentThirst <= _view.ThirstRegenStage4Range.y)
+                thirstMod = _statsContainer.HealthRegenThirstStage4.Value;
+
+            float currentRegen = _stats.HealthRegen.Value + hungerMod + thirstMod;
+            SetAllHealths(currentRegen * Time.deltaTime);
+        }
+
+        private void SetAllHealths(float value = 0f, bool isRandomizing = false)
+        {
+            bool decreasing = value < 0;
             
-            
+            if (_stats.HeadHealth.Value < _statsContainer.HeadHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerHeadStatView, _stats.HeadHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (_stats.BodyHealth.Value < _statsContainer.BodyHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerBodyStatView, _stats.BodyHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (_stats.LeftArmHealth.Value < _statsContainer.LeftArmHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerLeftArmStatView, _stats.LeftArmHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (_stats.RightArmHealth.Value < _statsContainer.RightArmHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerRightArmStatView, _stats.RightArmHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (_stats.LeftLegHealth.Value < _statsContainer.LeftLegHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerLeftLegStatView, _stats.LeftLegHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (_stats.RightLegHealth.Value < _statsContainer.RightLegHealth.Value || decreasing || isRandomizing)
+                SetStat(_viewStatsHolder.PlayerRightLegStatView, _stats.RightLegHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
         }
 
         private void ProcessStamina()
@@ -218,23 +258,23 @@ namespace WildIsland.Controllers
             if (Math.Abs(_stats.Stamina.Value - _statsContainer.Stamina.Value) < 0.01f ||
                 _playerInputState == PlayerInputState.Jump || _playerInputState == PlayerInputState.Sprint)
                 return;
-            
+
             float currentFatigue = _stats.Fatigue.Value / _statsContainer.Fatigue.Value;
             float currentHunger = _stats.Hunger.Value / _statsContainer.Hunger.Value;
             float currentThirst = _stats.Thirst.Value / _statsContainer.Thirst.Value;
-            
-            float currentRegen = 
+
+            float currentRegen =
                 _statsContainer.StaminaRegen.Value * (1 - _stats.Stamina.Value / _statsContainer.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
 
             SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value + currentRegen * Time.deltaTime);
             _stats.StaminaRegen.Value = currentRegen;
         }
-        
+
         private void ProcessHunger()
         {
             if (_stats.Hunger.Value <= 0)
                 return;
-            
+
             float currentHungerDecrease = _stats.HungerDecrease.Value * _relativeSpeed;
             SetStat(_viewStatsHolder.PlayerHungerStatView, _stats.Hunger.Value - currentHungerDecrease * Time.deltaTime);
         }
@@ -271,12 +311,6 @@ namespace WildIsland.Controllers
             CheckSprint();
         }
 
-        private void OnTButtonPerformed(InputAction.CallbackContext obj)
-        {
-            _isTimeSpeedUp = !_isTimeSpeedUp;
-            Time.timeScale = _isTimeSpeedUp ? 10f : 1f;
-        }
-        
         private void OnJumpPerformed(InputAction.CallbackContext obj)
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
@@ -469,6 +503,18 @@ namespace WildIsland.Controllers
             if (lfAngle > 360f)
                 lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
+        }
+#endregion
+#region Cheats
+        private void CHEAT_TimeSpeedUp(InputAction.CallbackContext obj)
+        {
+            _isTimeSpeedUp = !_isTimeSpeedUp;
+            Time.timeScale = _isTimeSpeedUp ? 10f : 1f;
+        }
+
+        private void CHEAT_Damage(InputAction.CallbackContext obj)
+        {
+            SetAllHealths(isRandomizing: true);
         }
 #endregion
     }

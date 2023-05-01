@@ -601,6 +601,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6256085929051693349}
     m_Modifications:
+    - target: {fileID: 1693245656839757258, guid: 63bfb42344bda17449294476200021ed,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.35
+      objectReference: {fileID: 0}
     - target: {fileID: 3084320780552078506, guid: 63bfb42344bda17449294476200021ed,
         type: 3}
       propertyPath: m_RootOrder
@@ -671,6 +676,21 @@ PrefabInstance:
       propertyPath: _moon
       value: 
       objectReference: {fileID: 6256085928932692345}
+    - target: {fileID: 9139786021683960111, guid: 63bfb42344bda17449294476200021ed,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 9139786021683960111, guid: 63bfb42344bda17449294476200021ed,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 9139786021683960111, guid: 63bfb42344bda17449294476200021ed,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63bfb42344bda17449294476200021ed, type: 3}
 --- !u!114 &4431561040968536916 stripped

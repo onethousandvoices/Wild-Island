@@ -73,9 +73,18 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""TButton"",
+                    ""name"": ""CHEAT_Time"",
                     ""type"": ""Button"",
                     ""id"": ""f95a2ce1-63e4-4fb4-8225-b80057174058"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CHEAT_Damage"",
+                    ""type"": ""Button"",
+                    ""id"": ""31103bd9-f577-4bc7-a9e6-be146fa57f8a"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -277,7 +286,18 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""TButton"",
+                    ""action"": ""CHEAT_Time"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dbb48295-18ca-44ad-9679-7dfcaa1d54d5"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CHEAT_Damage"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -341,7 +361,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
-        m_Player_TButton = m_Player.FindAction("TButton", throwIfNotFound: true);
+        m_Player_CHEAT_Time = m_Player.FindAction("CHEAT_Time", throwIfNotFound: true);
+        m_Player_CHEAT_Damage = m_Player.FindAction("CHEAT_Damage", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -406,7 +427,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Inventory;
-    private readonly InputAction m_Player_TButton;
+    private readonly InputAction m_Player_CHEAT_Time;
+    private readonly InputAction m_Player_CHEAT_Damage;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -416,7 +438,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
-        public InputAction @TButton => m_Wrapper.m_Player_TButton;
+        public InputAction @CHEAT_Time => m_Wrapper.m_Player_CHEAT_Time;
+        public InputAction @CHEAT_Damage => m_Wrapper.m_Player_CHEAT_Damage;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -441,9 +464,12 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Inventory.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
                 @Inventory.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
                 @Inventory.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
-                @TButton.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTButton;
-                @TButton.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTButton;
-                @TButton.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTButton;
+                @CHEAT_Time.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
+                @CHEAT_Time.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
+                @CHEAT_Time.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
+                @CHEAT_Damage.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
+                @CHEAT_Damage.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
+                @CHEAT_Damage.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -463,9 +489,12 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Inventory.started += instance.OnInventory;
                 @Inventory.performed += instance.OnInventory;
                 @Inventory.canceled += instance.OnInventory;
-                @TButton.started += instance.OnTButton;
-                @TButton.performed += instance.OnTButton;
-                @TButton.canceled += instance.OnTButton;
+                @CHEAT_Time.started += instance.OnCHEAT_Time;
+                @CHEAT_Time.performed += instance.OnCHEAT_Time;
+                @CHEAT_Time.canceled += instance.OnCHEAT_Time;
+                @CHEAT_Damage.started += instance.OnCHEAT_Damage;
+                @CHEAT_Damage.performed += instance.OnCHEAT_Damage;
+                @CHEAT_Damage.canceled += instance.OnCHEAT_Damage;
             }
         }
     }
@@ -513,6 +542,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
-        void OnTButton(InputAction.CallbackContext context);
+        void OnCHEAT_Time(InputAction.CallbackContext context);
+        void OnCHEAT_Damage(InputAction.CallbackContext context);
     }
 }

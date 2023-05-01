@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace WildIsland.Data
 {
@@ -35,17 +34,12 @@ namespace WildIsland.Data
         public PlayerHealthRegenThirstStage3 HealthRegenThirstStage3;
         public PlayerHealthRegenThirstStage4 HealthRegenThirstStage4;
 
-        public float TotalHealth
-        {
-            get
-            {
-                float healthSum = HeadHealth.Value + BodyHealth.Value +
+        public float HealthSum => HeadHealth.Value + BodyHealth.Value +
                                   LeftArmHealth.Value + RightArmHealth.Value +
                                   LeftLegHealth.Value + RightLegHealth.Value;
 
-                return healthSum / 6;
-            }
-        }
+        public float CurrentRelativeHealth(float maxHealth)
+            => HealthSum / maxHealth;
     }
 
     [Serializable]
@@ -129,6 +123,6 @@ namespace WildIsland.Data
     [Serializable]
     public abstract class PlayerStat
     {
-        public float Value = 0f;
+        public float Value;
     }
 }
