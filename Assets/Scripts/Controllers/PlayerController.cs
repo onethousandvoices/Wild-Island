@@ -83,7 +83,6 @@ namespace WildIsland.Controllers
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
 
         public Type ContainerType => typeof(PlayerDataContainer);
-
         public void AcquireGameData(IPartialGameDataContainer container)
             => _statsContainer = ((PlayerDataContainer)container).Default;
 
@@ -513,9 +512,7 @@ namespace WildIsland.Controllers
         }
 
         private void CHEAT_Damage(InputAction.CallbackContext obj)
-        {
-            SetAllHealths(isRandomizing: true);
-        }
+            => SetAllHealths(isRandomizing: true);
 #endregion
     }
 }

@@ -1,35 +1,35 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 
 namespace WildIsland.Views
 {
     public class DayLightView : MonoBehaviour
     {
-        [SerializeField] private Light _sun;
-        [SerializeField] private Light _moon;
-        [SerializeField] private AnimationCurve _sunCurve;
-        [SerializeField] private AnimationCurve _moonCurve;
-        [SerializeField] private Material _daySkybox;
-        [SerializeField] private Material _nightSkybox;
+        [field: SerializeField, MinMaxSlider(0f, 100f), HorizontalLine(color: EColor.Blue)] public Vector2 DayTemperatureAffectStage1 { get; private set; }
+        [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 DayTemperatureAffectStage2 { get; private set; }
+        [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 DayTemperatureAffectStage3 { get; private set; }
+        [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 NightTemperatureAffectStage1 { get; private set; }
+        [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 NightTemperatureAffectStage2 { get; private set; }
+        [field: SerializeField, HorizontalLine(color: EColor.Red)] public Light Sun { get; private set; }
+        [field: SerializeField] public Light Moon { get; private set; }
+        [field: SerializeField] public AnimationCurve SunCurve { get; private set; }
+        [field: SerializeField] public AnimationCurve MoonCurve { get; private set; }
+        [field: SerializeField] public Material DaySkybox { get; private set; }
+        [field: SerializeField] public Material NightSkybox { get; private set; }
 
-        public float SunIntensity => _sun.intensity;
-        public float MoonIntensity => _moon.intensity;
-        public Light Sun => _sun;
-        public Light Moon => _moon;
-        public AnimationCurve SunCurve => _sunCurve;
-        public AnimationCurve MoonCurve => _moonCurve;
-        public Material DaySkybox => _daySkybox;
-        public Material NightSkybox => _nightSkybox;
+        public float SunIntensity => Sun.intensity;
+        public float MoonIntensity => Moon.intensity;
 
         public void SetSunParams(float time, float intensity)
         {
-            _sun.transform.rotation = Quaternion.Euler(time * 360f, 180f, 0f);
-            _sun.intensity = intensity;
+            Sun.transform.rotation = Quaternion.Euler(time * 360f, 180f, 0f);
+            Sun.intensity = intensity;
         }
 
         public void SetMoonParams(float time, float intensity)
         {
-            _moon.transform.rotation = Quaternion.Euler(time * 360f + 180f, 180f, 0f);
-            _moon.intensity = intensity;
+            Moon.transform.rotation = Quaternion.Euler(time * 360f + 180f, 180f, 0f);
+            Moon.intensity = intensity;
         }
     }
 }

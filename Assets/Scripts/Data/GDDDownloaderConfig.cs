@@ -18,6 +18,7 @@ namespace WildIsland.Data
         {
             new WorksheetConfig(CustomGDDParsers.BasicSheetParser, FileGdId.Main, "Basic", GameDataId),
             new WorksheetConfig(CustomGDDParsers.MainCharacterParser, FileGdId.Main, "MainCharacter", GameDataId),
+            new WorksheetConfig(CustomGDDParsers.BiomeSheetParser, FileGdId.Main, "Biomes", GameDataId)
 
             // new WorksheetConfig(CustomGDDParsers.LocalizationParserBasic, FileGdId.Localization, "UI", GameDataId),
             // new WorksheetConfig(CustomGDDParsers.LocalizationParserBasic, FileGdId.Localization, "prestige", GameDataId),
@@ -139,7 +140,7 @@ namespace WildIsland.Data
             {
                 string rowKey = sheet[i][0];
                 string rowValue = sheet[i][1];
-                
+
                 bool foundField = false;
                 FieldInfo[] fields = playerData.GetType().GetFields();
                 foreach (FieldInfo field in fields)
@@ -149,7 +150,7 @@ namespace WildIsland.Data
 
                     object stat = Activator.CreateInstance(field.FieldType);
                     stat.GetType().GetField("Value").SetValue(stat, float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat));
-                    
+
                     field.SetValue(playerData, stat);
                     foundField = true;
                     break;
@@ -162,11 +163,45 @@ namespace WildIsland.Data
                 playerData
             });
         }
+
+        internal static void BiomeSheetParser(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
+        {
+            BiomesData biomesData = new BiomesData();
+
+            for (int i = 1; i < sheet.Count; ++i)
+            {
+                string rowKey = sheet[i][0];
+                string biomeTemperature = sheet[i][1];
+                string affectValue = sheet[i][2];
+
+                bool foundField = false;
+                foreach (FieldInfo field in biomesData.GetType().GetFields())
+                {
+                    string fieldName = field.Name.Replace("BiomeData", "").ToLower();
+                    if (!rowKey.Contains(fieldName))
+                        continue;
+                    object data = Activator.CreateInstance(field.FieldType);
+                    Type dataType = data.GetType();
+                    dataType.GetField("Temperature").SetValue(data, int.Parse(biomeTemperature));
+                    dataType.GetField("AffectValue").SetValue(data, float.Parse(affectValue, CultureInfo.InvariantCulture.NumberFormat));
+                    field.SetValue(biomesData, data);
+                    foundField = true;
+                    break;
+                }
+                if (!foundField)
+                    Debug.LogError("Field not found in BasicGameData for row " + rowKey);
+            }
+            dataStorage.SetData(typeof(BiomesData), new object[]
+            {
+                biomesData
+            });
+        }
     }
 
     public enum FileGdId { Main, Localization }
-    
+
     public interface IGDDDataType { }
+
     public interface IGDDDataTypeString : IGDDDataType
     {
         string ID { get; }
@@ -188,6 +223,7 @@ namespace WildIsland.Data
     {
         public float Left;
         public float Right;
+
         public Range(float left, float right)
         {
             Left = left;
@@ -271,4 +307,3 @@ namespace WildIsland.Data
         }
     }
 }
-

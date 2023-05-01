@@ -47,6 +47,8 @@ MonoBehaviour:
   _dayLightView: {fileID: 0}
   _playerView: {fileID: 0}
   _camera: {fileID: 0}
+  _biomeViews:
+  - {fileID: 0}
 --- !u!1 &2805134263311888599
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEditor;
 using UnityEngine;
-using WildIsland.Data;
 using WildIsland.Utility;
 
 namespace WildIsland.Data
@@ -17,17 +16,19 @@ namespace WildIsland.Data
     {
         [SerializeField] private BasicGameData[] _basicGameData = Array.Empty<BasicGameData>();
         [SerializeField] private PlayerData[] _playerData = Array.Empty<PlayerData>();
+        [SerializeField] private BiomesData[] _biomesData = Array.Empty<BiomesData>();
 
         public GameData()
         {
             _supportedTypes = new Dictionary<Type, FieldInfo>()
             {
-                { typeof(BasicGameData), GetFieldByName<GameData>("_basicGameData") },
-                { typeof(PlayerData), GetFieldByName<GameData>("_playerData") }
+                { typeof(BasicGameData), GetFieldByName<GameData>("_basicGameData") }, 
+                { typeof(PlayerData), GetFieldByName<GameData>("_playerData") },
+                { typeof(BiomesData), GetFieldByName<GameData>("_biomesData") }
             };
         }
     }
-    
+
     [Serializable]
     public class GameDataBase : IGDDDataStorage
     {
@@ -74,7 +75,6 @@ namespace WildIsland.Data
                 Debug.LogError(e.Message);
             }
         }
-        
 
         public void SetData(Type type, object data)
         {
@@ -105,9 +105,8 @@ namespace WildIsland.Data
                 throw new NotImplementedException(containerType + " must be derived from IPartialGameDataContainer");
 
             IPartialGameDataContainer container = (IPartialGameDataContainer)Activator.CreateInstance(containerType);
-            foreach (FieldInfo field in containerType.GetFields(
-                         BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
-
+            FieldInfo[] fields = containerType.BaseType!.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            foreach (FieldInfo field in fields)
             {
                 try
                 {
@@ -368,16 +367,15 @@ namespace WildIsland.Data
 
     public interface IPartialGameDataContainer { }
 
-    public class BasicGameDataContainer : IPartialGameDataContainer
+    public abstract class BaseContainer<T> : IPartialGameDataContainer
     {
-        private readonly BasicGameData[] _bgd;
-
-        public BasicGameData Default => _bgd[0];
+        private readonly T[] _gd = Array.Empty<T>();
+        public T Default => _gd[0];
     }
 
-    public class PlayerDataContainer : IPartialGameDataContainer
-    {
-        private readonly PlayerData[] _playerData;
-        public PlayerData Default => _playerData[0];
-    }
+    public class BasicGameDataContainer : BaseContainer<BasicGameData> { }
+
+    public class PlayerDataContainer : BaseContainer<PlayerData> { }
+
+    public class BiomesDataContainer : BaseContainer<BiomesData> { }
 }

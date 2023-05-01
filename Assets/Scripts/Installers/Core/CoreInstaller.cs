@@ -9,6 +9,7 @@ namespace WildIsland.Installers
         {
             Container.BindInterfacesTo<GameDataController>().AsSingle();
             Container.BindInterfacesTo<DayController>().AsSingle();
+            Container.BindInterfacesTo<BiomeController>().AsSingle();
             Container.BindInterfacesTo<PlayerController>().AsSingle();
         }
     }
