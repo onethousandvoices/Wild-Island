@@ -1,26 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using WildIsland.Data;
 using WildIsland.Views;
+using WildIsland.Views.UI;
 using Zenject;
+using PlayerInput = Core.PlayerInput;
 using Random = UnityEngine.Random;
 
 namespace WildIsland.Controllers
 {
+    public enum PlayerInputState : byte
+    {
+        Idle,
+        Run,
+        Sprint,
+        Jump
+    }
+
     public class PlayerController : IInitializable, ITickable, ILateTickable, IDisposable, IGDConsumer
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
+        [Inject] private PlayerViewStatsHolder _viewStatsHolder;
 
         private DbValue<PlayerData> _data;
-        private PlayerData _dataContainer;
+        private PlayerData _stats => _data.Value;
+        private PlayerData _statsContainer;
+        private PlayerInputState _playerInputState;
+        private PlayerInput _playerInput;
+        private InputMap _inputMap;
         private Animator _animator;
         private CharacterController _controller;
-        private Core.PlayerInput _playerInput;
+        private Dictionary<Type, PlayerStat> _statsByType;
 
         private bool _hasAnimator;
-        private bool _lockCameraPosition;
-        private bool _grounded = true;
+        private bool _isLockCameraPosition;
+        private bool _isGrounded = true;
+        private bool _isTimeSpeedUp;
 
         private float _moveSpeed;
         private float _sprintSpeed;
@@ -28,15 +46,18 @@ namespace WildIsland.Controllers
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
         private float _speed;
+        private float _relativeSpeed;
         private float _animationBlend;
         private float _targetRotation;
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
+        private float _staminaJumpCost;
+        private float _staminaSprintCost;
 
         private const float _inputMagnitude = 1f;
-        private const float _speedUpChangeRate = 5f;
+        private const float _speedUpChangeRate = 1.5f;
         private const float _slowDownChangeRate = 10f;
         private const float _rotationSmoothTime = 0.12f;
         private const float _footstepAudioVolume = 0.5f;
@@ -58,22 +79,25 @@ namespace WildIsland.Controllers
         private static readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
         private static readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
 
+        private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
+        private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
+
         public Type ContainerType => typeof(PlayerDataContainer);
 
         public void AcquireGameData(IPartialGameDataContainer container)
-            => _dataContainer = ((PlayerDataContainer)container).Default;
+            => _statsContainer = ((PlayerDataContainer)container).Default;
 
         public void Initialize()
         {
-            _data = new DbValue<PlayerData>("PlayerData", _dataContainer);
-
             SetData();
+            SetStatViews();
+            InitInputActions();
 
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = _view.TryGetComponent(out _animator);
             _controller = _view.GetComponent<CharacterController>();
-            _playerInput = _view.GetComponent<Core.PlayerInput>();
+            _playerInput = new PlayerInput();
 
             _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);
@@ -81,6 +105,9 @@ namespace WildIsland.Controllers
 
         public void Tick()
         {
+            ReadInput();
+            UpdateStats();
+
             JumpAndGravity();
             GroundedCheck();
             Move();
@@ -91,18 +118,193 @@ namespace WildIsland.Controllers
 
         public void Dispose()
         {
-            _data.Save();
+            _inputMap.Dispose();
+            //todo remove container
+            _data.Save(_statsContainer);
+        }
+
+#region InitActions
+        private void InitInputActions()
+        {
+            _inputMap = new InputMap();
+            _inputMap.Enable();
+
+            _inputMap.Player.Jump.performed += OnJumpPerformed;
+            _inputMap.Player.TButton.started += OnTButtonPerformed;
         }
 
         private void SetData()
         {
+            _playerInputState = PlayerInputState.Idle;
+            _data = new DbValue<PlayerData>("PlayerData", _statsContainer);
+
             _jumpTimeoutDelta = _jumpTimeout;
             _fallTimeoutDelta = _fallTimeout;
 
-            _moveSpeed = _data.Value.RegularSpeed;
-            _sprintSpeed = _data.Value.SprintSpeed;
+            _staminaJumpCost = _view.StaminaJumpCost / _statsContainer.Stamina.Value * 100;
+            _staminaSprintCost = _view.StaminaSprintCost / _statsContainer.Stamina.Value * 100;
+
+            _moveSpeed = _data.Value.RegularSpeed.Value;
+            _sprintSpeed = _data.Value.SprintSpeed.Value;
+
+            _statsByType = new Dictionary<Type, PlayerStat>
+            {
+                { typeof(PlayerHeadHealth), _stats.HeadHealth },
+                { typeof(PlayerBodyHealth), _stats.BodyHealth },
+                { typeof(PlayerLeftArmHealth), _stats.LeftArmHealth },
+                { typeof(PlayerRightArmHealth), _stats.RightArmHealth },
+                { typeof(PlayerLeftLegHealth), _stats.LeftLegHealth },
+                { typeof(PlayerRightLegHealth), _stats.RightLegHealth },
+                { typeof(PlayerHealthRegen), _stats.HealthRegen },
+                { typeof(PlayerStamina), _stats.Stamina },
+                { typeof(PlayerStaminaRegen), _stats.StaminaRegen },
+                { typeof(PlayerHunger), _stats.Hunger },
+                { typeof(PlayerHungerDecrease), _stats.HungerDecrease },
+                { typeof(PlayerThirst), _stats.Thirst },
+                { typeof(PlayerThirstDecrease), _stats.ThirstDecrease },
+                { typeof(PlayerFatigue), _stats.Fatigue },
+                { typeof(PlayerFatigueDecrease), _stats.FatigueDecrease },
+                { typeof(PlayerRegularSpeed), _stats.RegularSpeed },
+                { typeof(PlayerSprintSpeed), _stats.SprintSpeed },
+                { typeof(PlayerTemperature), _stats.Temperature },
+                { typeof(PlayerHealthRegenHungerStage1), _stats.HealthRegenHungerStage1 },
+                { typeof(PlayerHealthRegenHungerStage2), _stats.HealthRegenHungerStage2 },
+                { typeof(PlayerHealthRegenHungerStage3), _stats.HealthRegenHungerStage3 },
+                { typeof(PlayerHealthRegenHungerStage4), _stats.HealthRegenHungerStage4 },
+                { typeof(PlayerHealthRegenThirstStage1), _stats.HealthRegenThirstStage1 },
+                { typeof(PlayerHealthRegenThirstStage2), _stats.HealthRegenThirstStage2 },
+                { typeof(PlayerHealthRegenThirstStage3), _stats.HealthRegenThirstStage3 },
+                { typeof(PlayerHealthRegenThirstStage4), _stats.HealthRegenThirstStage4 },
+            };
         }
 
+        private void SetStatViews()
+        {
+            _viewStatsHolder.PlayerBodyStatView.SetRefs(_stats.BodyHealth, _statsContainer.BodyHealth);
+            _viewStatsHolder.PlayerHeadStatView.SetRefs(_stats.HeadHealth, _statsContainer.HeadHealth);
+            _viewStatsHolder.PlayerLeftArmStatView.SetRefs(_stats.LeftLegHealth, _statsContainer.LeftLegHealth);
+            _viewStatsHolder.PlayerRightArmStatView.SetRefs(_stats.RightArmHealth, _statsContainer.RightArmHealth);
+            _viewStatsHolder.PlayerLeftLegStatView.SetRefs(_stats.LeftLegHealth, _statsContainer.LeftLegHealth);
+            _viewStatsHolder.PlayerRightLegStatView.SetRefs(_stats.RightLegHealth, _statsContainer.RightLegHealth);
+            _viewStatsHolder.PlayerStaminaStatView.SetRefs(_stats.Stamina, _statsContainer.Stamina);
+            _viewStatsHolder.PlayerHungerStatView.SetRefs(_stats.Hunger, _statsContainer.Hunger);
+            _viewStatsHolder.PlayerThirstStatView.SetRefs(_stats.Thirst, _statsContainer.Thirst);
+            _viewStatsHolder.PlayerFatigueStatView.SetRefs(_stats.Fatigue, _statsContainer.Fatigue);
+            _viewStatsHolder.PlayerTemperatureStatView.SetRefs(_stats.Temperature, _statsContainer.Temperature);
+        }
+#endregion
+#region Data
+        private void UpdateStats()
+        {
+            _relativeSpeed = _speed / _stats.SprintSpeed.Value;
+            
+            ProcessHealth();
+            ProcessStamina();
+            ProcessHunger();
+            ProcessFatigue();
+            ProcessThirst();
+        }
+
+        private void ProcessHealth()
+        {
+            if (Math.Abs(_stats.TotalHealth - 100f) < 0.01f)
+                return;
+            
+            
+        }
+
+        private void ProcessStamina()
+        {
+            if (Math.Abs(_stats.Stamina.Value - _statsContainer.Stamina.Value) < 0.01f ||
+                _playerInputState == PlayerInputState.Jump || _playerInputState == PlayerInputState.Sprint)
+                return;
+            
+            float currentFatigue = _stats.Fatigue.Value / _statsContainer.Fatigue.Value;
+            float currentHunger = _stats.Hunger.Value / _statsContainer.Hunger.Value;
+            float currentThirst = _stats.Thirst.Value / _statsContainer.Thirst.Value;
+            
+            float currentRegen = 
+                _statsContainer.StaminaRegen.Value * (1 - _stats.Stamina.Value / _statsContainer.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
+
+            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value + currentRegen * Time.deltaTime);
+            _stats.StaminaRegen.Value = currentRegen;
+        }
+        
+        private void ProcessHunger()
+        {
+            if (_stats.Hunger.Value <= 0)
+                return;
+            
+            float currentHungerDecrease = _stats.HungerDecrease.Value * _relativeSpeed;
+            SetStat(_viewStatsHolder.PlayerHungerStatView, _stats.Hunger.Value - currentHungerDecrease * Time.deltaTime);
+        }
+
+        private void ProcessFatigue()
+        {
+            if (_stats.Fatigue.Value <= 0)
+                return;
+
+            float currentFatigueDecrease = _stats.FatigueDecrease.Value * _relativeSpeed;
+            SetStat(_viewStatsHolder.PlayerFatigueStatView, _stats.Fatigue.Value - currentFatigueDecrease * Time.deltaTime);
+        }
+
+        private void ProcessThirst()
+        {
+            if (_stats.Thirst.Value <= 0)
+                return;
+
+            float currentThirstDecrease = _stats.ThirstDecrease.Value * _relativeSpeed;
+            SetStat(_viewStatsHolder.PlayerThirstStatView, _stats.Thirst.Value - currentThirstDecrease * Time.deltaTime);
+        }
+
+        private void SetStat(BasePlayerStatView playerStatView, float value)
+        {
+            _statsByType[playerStatView.TargetStat].Value = value;
+            playerStatView.Update();
+        }
+#endregion
+#region Input
+        private void ReadInput()
+        {
+            _playerInput.SetLook(_inputMap.Player.Look.ReadValue<Vector2>());
+            _playerInput.SetMove(_inputMap.Player.Move.ReadValue<Vector2>());
+            CheckSprint();
+        }
+
+        private void OnTButtonPerformed(InputAction.CallbackContext obj)
+        {
+            _isTimeSpeedUp = !_isTimeSpeedUp;
+            Time.timeScale = _isTimeSpeedUp ? 10f : 1f;
+        }
+        
+        private void OnJumpPerformed(InputAction.CallbackContext obj)
+        {
+            if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
+                return;
+            _playerInput.SetJump(obj.ReadValueAsButton());
+            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value - _staminaJumpCost);
+        }
+
+        private void CheckSprint()
+        {
+            bool isSprinting = _inputMap.Player.Sprint.IsPressed();
+
+            if (!isSprinting)
+            {
+                _playerInput.SetSprint(false);
+                return;
+            }
+
+            if (!_sprintPossible)
+            {
+                _playerInput.SetSprint(false);
+                return;
+            }
+
+            _playerInput.SetSprint(true);
+            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value - _staminaSprintCost * Time.deltaTime);
+        }
+#endregion
 #region Moving
         private void Footstep(AnimationEvent animationEvent)
         {
@@ -123,7 +325,7 @@ namespace WildIsland.Controllers
 
         private void JumpAndGravity()
         {
-            if (_grounded)
+            if (_isGrounded)
             {
                 _fallTimeoutDelta = _fallTimeout;
 
@@ -136,7 +338,7 @@ namespace WildIsland.Controllers
                 if (_verticalVelocity < 0.0f)
                     _verticalVelocity = -2f;
 
-                if (_playerInput.Jump && _jumpTimeoutDelta <= 0.0f)
+                if (_playerInput.Jump && _jumpTimeoutDelta <= 0f)
                 {
                     _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
 
@@ -167,23 +369,43 @@ namespace WildIsland.Controllers
             Vector3 playerPos = _view.transform.position;
             Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _gGroundedOffset,
                 playerPos.z);
-            _grounded = Physics.CheckSphere(spherePosition, _groundedRadius, _view.GroundLayers,
+            _isGrounded = Physics.CheckSphere(spherePosition, _groundedRadius, _view.GroundLayers,
                 QueryTriggerInteraction.Ignore);
 
+            _playerInputState = _isGrounded ? PlayerInputState.Idle : PlayerInputState.Jump;
+
             if (_hasAnimator)
-                _animator.SetBool(_animIDGrounded, _grounded);
+                _animator.SetBool(_animIDGrounded, _isGrounded);
         }
 
         private void Move()
         {
-            float targetSpeed = _playerInput.Sprint ? _sprintSpeed : _moveSpeed;
+            float targetSpeed;
+            PlayerInputState pendingInputState;
+
+            if (_playerInput.Sprint)
+            {
+                targetSpeed = _sprintSpeed;
+                pendingInputState = PlayerInputState.Sprint;
+            }
+            else
+            {
+                targetSpeed = _moveSpeed;
+                pendingInputState = PlayerInputState.Run;
+            }
 
             if (_playerInput.Move == Vector2.zero)
+            {
                 targetSpeed = 0.0f;
+                pendingInputState = PlayerInputState.Idle;
+            }
+
+            if (_isGrounded)
+                _playerInputState = pendingInputState;
 
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
             float multiplier = currentHorizontalSpeed < targetSpeed ? _speedUpChangeRate : _slowDownChangeRate;
-            
+
             if (currentHorizontalSpeed < targetSpeed || currentHorizontalSpeed > targetSpeed)
             {
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * _inputMagnitude,
@@ -194,7 +416,7 @@ namespace WildIsland.Controllers
             else
                 _speed = targetSpeed;
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * multiplier);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * multiplier * 5f);
             if (_animationBlend < 0.01f)
                 _animationBlend = 0f;
 
@@ -213,12 +435,12 @@ namespace WildIsland.Controllers
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-            if (!_grounded)
+            if (!_isGrounded)
                 _speed *= 0.96f;
-            
+
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-            
+
             if (!_hasAnimator)
                 return;
             _animator.SetFloat(_animIDSpeed, _animationBlend);
@@ -227,7 +449,7 @@ namespace WildIsland.Controllers
 
         private void CameraRotation()
         {
-            if (_playerInput.Look.sqrMagnitude >= _threshold && !_lockCameraPosition)
+            if (_playerInput.Look.sqrMagnitude >= _threshold && !_isLockCameraPosition)
             {
                 _cinemachineTargetYaw += _playerInput.Look.x * _deltaTimeMultiplier;
                 _cinemachineTargetPitch += _playerInput.Look.y * _deltaTimeMultiplier;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WildIsland.Data
 {
@@ -7,31 +8,127 @@ namespace WildIsland.Data
     {
         public string ID => "MainCharacter";
 
-        public float HeadHealth = 0;
-        public float BodyHealth = 0;
-        public float LeftArmHealth = 0;
-        public float RightArmHealth = 0;
-        public float LeftLegHealth = 0;
-        public float RightLegHealth = 0;
-        public float HealthRegen = 0;
-        public float Stamina = 0;
-        public float StaminaRegen = 0;
-        public float Hunger = 0;
-        public float HungerDecrease = 0;
-        public float Thirst = 0;
-        public float ThirstDecrease = 0;
-        public float Fatigue = 0;
-        public float FatigueDecrease = 0;
-        public float RegularSpeed = 0;
-        public float SprintSpeed = 0;
-        public float Temperature = 0;
-        public float HealthRegenHungerStage1 = 0;
-        public float HealthRegenHungerStage2 = 0;
-        public float HealthRegenHungerStage3 = 0;
-        public float HealthRegenHungerStage4 = 0;
-        public float HealthRegenThirstStage1 = 0;
-        public float HealthRegenThirstStage2 = 0;
-        public float HealthRegenThirstStage3 = 0;
-        public float HealthRegenThirstStage4 = 0;
+        public PlayerHeadHealth HeadHealth;
+        public PlayerBodyHealth BodyHealth;
+        public PlayerLeftArmHealth LeftArmHealth;
+        public PlayerRightArmHealth RightArmHealth;
+        public PlayerLeftLegHealth LeftLegHealth;
+        public PlayerRightLegHealth RightLegHealth;
+        public PlayerHealthRegen HealthRegen;
+        public PlayerStamina Stamina;
+        public PlayerStaminaRegen StaminaRegen;
+        public PlayerHunger Hunger;
+        public PlayerHungerDecrease HungerDecrease;
+        public PlayerThirst Thirst;
+        public PlayerThirstDecrease ThirstDecrease;
+        public PlayerFatigue Fatigue;
+        public PlayerFatigueDecrease FatigueDecrease;
+        public PlayerRegularSpeed RegularSpeed;
+        public PlayerSprintSpeed SprintSpeed;
+        public PlayerTemperature Temperature;
+        public PlayerHealthRegenHungerStage1 HealthRegenHungerStage1;
+        public PlayerHealthRegenHungerStage2 HealthRegenHungerStage2;
+        public PlayerHealthRegenHungerStage3 HealthRegenHungerStage3;
+        public PlayerHealthRegenHungerStage4 HealthRegenHungerStage4;
+        public PlayerHealthRegenThirstStage1 HealthRegenThirstStage1;
+        public PlayerHealthRegenThirstStage2 HealthRegenThirstStage2;
+        public PlayerHealthRegenThirstStage3 HealthRegenThirstStage3;
+        public PlayerHealthRegenThirstStage4 HealthRegenThirstStage4;
+
+        public float TotalHealth
+        {
+            get
+            {
+                float healthSum = HeadHealth.Value + BodyHealth.Value +
+                                  LeftArmHealth.Value + RightArmHealth.Value +
+                                  LeftLegHealth.Value + RightLegHealth.Value;
+
+                return healthSum / 6;
+            }
+        }
+    }
+
+    [Serializable]
+    public class PlayerHeadHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerBodyHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerLeftArmHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerRightArmHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerLeftLegHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerRightLegHealth : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegen : PlayerStat { }
+
+    [Serializable]
+    public class PlayerStamina : PlayerStat { }
+
+    [Serializable]
+    public class PlayerStaminaRegen : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHunger : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHungerDecrease : PlayerStat { }
+
+    [Serializable]
+    public class PlayerThirst : PlayerStat { }
+
+    [Serializable]
+    public class PlayerThirstDecrease : PlayerStat { }
+
+    [Serializable]
+    public class PlayerFatigue : PlayerStat { }
+
+    [Serializable]
+    public class PlayerFatigueDecrease : PlayerStat { }
+
+    [Serializable]
+    public class PlayerRegularSpeed : PlayerStat { }
+
+    [Serializable]
+    public class PlayerSprintSpeed : PlayerStat { }
+
+    [Serializable]
+    public class PlayerTemperature : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenHungerStage1 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenHungerStage2 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenHungerStage3 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenHungerStage4 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenThirstStage1 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenThirstStage2 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenThirstStage3 : PlayerStat { }
+
+    [Serializable]
+    public class PlayerHealthRegenThirstStage4 : PlayerStat { }
+
+    [Serializable]
+    public abstract class PlayerStat
+    {
+        public float Value = 0f;
     }
 }

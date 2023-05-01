@@ -146,11 +146,11 @@ namespace WildIsland.Data
                 {
                     if (!string.Equals(field.Name, rowKey, StringComparison.CurrentCultureIgnoreCase))
                         continue;
-                    Type fieldType = field.FieldType;
-                    if (fieldType == typeof(int))
-                        field.SetValue(playerData, int.Parse(rowValue));
-                    else if (fieldType == typeof(float))
-                        field.SetValue(playerData, float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat));
+
+                    object stat = Activator.CreateInstance(field.FieldType);
+                    stat.GetType().GetField("Value").SetValue(stat, float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat));
+                    
+                    field.SetValue(playerData, stat);
                     foundField = true;
                     break;
                 }
