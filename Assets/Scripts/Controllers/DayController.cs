@@ -1,6 +1,6 @@
-﻿using Data;
-using System;
+﻿using System;
 using UnityEngine;
+using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
 
@@ -21,10 +21,9 @@ namespace WildIsland.Controllers
         private float _dayDuration;
         private float _nightDuration;
 
+        public Type ContainerType => typeof(BasicGameDataContainer);
         public void AcquireGameData(IPartialGameDataContainer container)
             => _daySettings = ((BasicGameDataContainer)container).Default.DaySettingsData;
-
-        public Type ContainerType => typeof(BasicGameDataContainer);
 
         public void Initialize()
         {

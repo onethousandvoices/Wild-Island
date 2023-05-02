@@ -1,6 +1,6 @@
-﻿using Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using WildIsland.Data;
 using Zenject;
 
 namespace WildIsland.Controllers
