@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Effects;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -32,13 +33,16 @@ namespace WildIsland.Controllers
         private PlayerInput _playerInput;
         private InputMap _inputMap;
         private Animator _animator;
-        private CharacterController _controller;
-        private Dictionary<Type, PlayerStat> _statsByType;
+        private CharacterController _characterController;
+        private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
+        private List<BaseEffect> _effects;
+        private List<BaseEffect> _nativeEffects;
 
         private bool _hasAnimator;
         private bool _isLockCameraPosition;
         private bool _isGrounded = true;
         private bool _isTimeSpeedUp;
+        private bool _isFrameRate60;
 
         private float _moveSpeed;
         private float _sprintSpeed;
@@ -56,6 +60,7 @@ namespace WildIsland.Controllers
         private float _staminaJumpCost;
         private float _staminaSprintCost;
 
+        private const float _inAirVelocityReduction = 0.98f;
         private const float _inputMagnitude = 1f;
         private const float _speedUpChangeRate = 1.5f;
         private const float _slowDownChangeRate = 10f;
@@ -83,33 +88,26 @@ namespace WildIsland.Controllers
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
 
         public Type ContainerType => typeof(PlayerDataContainer);
+
         public void AcquireGameData(IPartialGameDataContainer container)
             => _statsContainer = ((PlayerDataContainer)container).Default;
 
         public void Initialize()
         {
-            SetData();
-            SetStatViews();
+            InitView();
             InitInputActions();
-
-            _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-
-            _hasAnimator = _view.TryGetComponent(out _animator);
-            _controller = _view.GetComponent<CharacterController>();
-            _playerInput = new PlayerInput();
-
-            _view.SetOnLandCallback(Land);
-            _view.SetOnFootStepCallback(Footstep);
+            SetData();
         }
 
         public void Tick()
         {
-            ReadInput();
             UpdateStats();
-
-            JumpAndGravity();
+            ProcessEffects();
             GroundedCheck();
+
+            ReadInput();
             Move();
+            JumpAndGravity();
         }
 
         public void LateTick()
@@ -127,6 +125,8 @@ namespace WildIsland.Controllers
         {
             _playerInputState = PlayerInputState.Idle;
             _data = new DbValue<PlayerData>("PlayerData", _statsContainer);
+            //todo test
+            _stats.Temperature.Value++;
 
             _jumpTimeoutDelta = _jumpTimeout;
             _fallTimeoutDelta = _fallTimeout;
@@ -137,35 +137,24 @@ namespace WildIsland.Controllers
             _moveSpeed = _data.Value.RegularSpeed.Value;
             _sprintSpeed = _data.Value.SprintSpeed.Value;
 
-            _statsByType = new Dictionary<Type, PlayerStat>
+            _statViewPairs = new Dictionary<PlayerStat, BasePlayerStatView>
             {
-                { typeof(PlayerHeadHealth), _stats.HeadHealth },
-                { typeof(PlayerBodyHealth), _stats.BodyHealth },
-                { typeof(PlayerLeftArmHealth), _stats.LeftArmHealth },
-                { typeof(PlayerRightArmHealth), _stats.RightArmHealth },
-                { typeof(PlayerLeftLegHealth), _stats.LeftLegHealth },
-                { typeof(PlayerRightLegHealth), _stats.RightLegHealth },
-                { typeof(PlayerHealthRegen), _stats.HealthRegen },
-                { typeof(PlayerStamina), _stats.Stamina },
-                { typeof(PlayerStaminaRegen), _stats.StaminaRegen },
-                { typeof(PlayerHunger), _stats.Hunger },
-                { typeof(PlayerHungerDecrease), _stats.HungerDecrease },
-                { typeof(PlayerThirst), _stats.Thirst },
-                { typeof(PlayerThirstDecrease), _stats.ThirstDecrease },
-                { typeof(PlayerFatigue), _stats.Fatigue },
-                { typeof(PlayerFatigueDecrease), _stats.FatigueDecrease },
-                { typeof(PlayerRegularSpeed), _stats.RegularSpeed },
-                { typeof(PlayerSprintSpeed), _stats.SprintSpeed },
-                { typeof(PlayerTemperature), _stats.Temperature },
-                { typeof(PlayerHealthRegenHungerStage1), _stats.HealthRegenHungerStage1 },
-                { typeof(PlayerHealthRegenHungerStage2), _stats.HealthRegenHungerStage2 },
-                { typeof(PlayerHealthRegenHungerStage3), _stats.HealthRegenHungerStage3 },
-                { typeof(PlayerHealthRegenHungerStage4), _stats.HealthRegenHungerStage4 },
-                { typeof(PlayerHealthRegenThirstStage1), _stats.HealthRegenThirstStage1 },
-                { typeof(PlayerHealthRegenThirstStage2), _stats.HealthRegenThirstStage2 },
-                { typeof(PlayerHealthRegenThirstStage3), _stats.HealthRegenThirstStage3 },
-                { typeof(PlayerHealthRegenThirstStage4), _stats.HealthRegenThirstStage4 },
+                { _stats.HeadHealth, _viewStatsHolder.PlayerHeadStatView },
+                { _stats.BodyHealth, _viewStatsHolder.PlayerBodyStatView },
+                { _stats.LeftArmHealth, _viewStatsHolder.PlayerLeftArmStatView },
+                { _stats.RightArmHealth, _viewStatsHolder.PlayerRightArmStatView },
+                { _stats.LeftLegHealth, _viewStatsHolder.PlayerLeftLegStatView },
+                { _stats.RightLegHealth, _viewStatsHolder.PlayerRightLegStatView },
+                { _stats.Stamina, _viewStatsHolder.PlayerStaminaStatView },
+                { _stats.Hunger, _viewStatsHolder.PlayerHungerStatView },
+                { _stats.Thirst, _viewStatsHolder.PlayerThirstStatView },
+                { _stats.Fatigue, _viewStatsHolder.PlayerFatigueStatView },
             };
+
+            _effects = new List<BaseEffect>();
+            _nativeEffects = _effects;
+
+            SetStatViews();
         }
 
         private void SetStatViews()
@@ -180,18 +169,73 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerHungerStatView.SetRefs(_stats.Hunger, _statsContainer.Hunger);
             _viewStatsHolder.PlayerThirstStatView.SetRefs(_stats.Thirst, _statsContainer.Thirst);
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_stats.Fatigue, _statsContainer.Fatigue);
-            _viewStatsHolder.PlayerTemperatureStatView.SetRefs(_stats.Temperature, _statsContainer.Temperature);
         }
 
         private void InitInputActions()
         {
+            _playerInput = new PlayerInput();
             _inputMap = new InputMap();
             _inputMap.Enable();
 
             _inputMap.Player.Jump.performed += OnJumpPerformed;
             _inputMap.Player.CHEAT_Time.started += CHEAT_TimeSpeedUp;
             _inputMap.Player.CHEAT_Damage.started += CHEAT_Damage;
+            _inputMap.Player.CHEAT_FrameRate.started += CHEAT_FrameRateChange;
         }
+
+        private void InitView()
+        {
+            _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
+
+            _hasAnimator = _view.TryGetComponent(out _animator);
+            _characterController = _view.GetComponent<CharacterController>();
+
+            _view.SetOnLandCallback(Land);
+            _view.SetOnFootStepCallback(Footstep);
+            _view.SetEffectCallbacks(OnEffectApply, OnEffectRemove);
+        }
+#endregion
+#region EffectProcessor
+        private void ProcessEffects()
+        {
+            _nativeEffects = _effects;
+            foreach (BaseEffect effect in _nativeEffects)
+            {
+                if (!effect.IsApplying())
+                    continue;
+
+                switch (effect)
+                {
+                    case BiomeEffect biomeEffect:
+                        if (biomeEffect.Data.Temperature < _stats.Temperature.Value)
+                        {
+                            float currentEffect =
+                                Math.Abs(biomeEffect.Data.Temperature - _stats.Temperature.Value) * _stats.HungerDecrease.Value;
+                            SetStat(_stats.Hunger, -currentEffect, true);
+                        }
+                        else if (biomeEffect.Data.Temperature > _stats.Temperature.Value)
+                        {
+                            float currentEffect =
+                                Math.Abs(biomeEffect.Data.Temperature - _stats.Temperature.Value) * _stats.ThirstDecrease.Value;
+                            SetStat(_stats.Thirst, -currentEffect, true);
+                        }
+                        Debug.Log("biome effect tick");
+                        break;
+                    case PeriodicEffect periodicEffect:
+                        break;
+                    case PermanentEffect permanentEffect:
+                        break;
+                    case TemporaryEffect temporaryEffect:
+                        break;
+                }
+            }
+        }
+
+        private void OnEffectApply(BaseEffect effect)
+            => _effects.Add(effect);
+
+        private void OnEffectRemove(BaseEffect effect)
+            => _effects.Remove(effect);
 #endregion
 #region Data
         private void UpdateStats()
@@ -237,19 +281,19 @@ namespace WildIsland.Controllers
         private void SetAllHealths(float value = 0f, bool isRandomizing = false)
         {
             bool decreasing = value < 0;
-            
+
             if (_stats.HeadHealth.Value < _statsContainer.HeadHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerHeadStatView, _stats.HeadHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
             if (_stats.BodyHealth.Value < _statsContainer.BodyHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerBodyStatView, _stats.BodyHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
             if (_stats.LeftArmHealth.Value < _statsContainer.LeftArmHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerLeftArmStatView, _stats.LeftArmHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
             if (_stats.RightArmHealth.Value < _statsContainer.RightArmHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerRightArmStatView, _stats.RightArmHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
             if (_stats.LeftLegHealth.Value < _statsContainer.LeftLegHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerLeftLegStatView, _stats.LeftLegHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
             if (_stats.RightLegHealth.Value < _statsContainer.RightLegHealth.Value || decreasing || isRandomizing)
-                SetStat(_viewStatsHolder.PlayerRightLegStatView, _stats.RightLegHealth.Value + value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+                SetStat(_stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
         }
 
         private void ProcessStamina()
@@ -265,7 +309,7 @@ namespace WildIsland.Controllers
             float currentRegen =
                 _statsContainer.StaminaRegen.Value * (1 - _stats.Stamina.Value / _statsContainer.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
 
-            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value + currentRegen * Time.deltaTime);
+            SetStat(_stats.Stamina, currentRegen * Time.deltaTime);
             _stats.StaminaRegen.Value = currentRegen;
         }
 
@@ -275,7 +319,7 @@ namespace WildIsland.Controllers
                 return;
 
             float currentHungerDecrease = _stats.HungerDecrease.Value * _relativeSpeed;
-            SetStat(_viewStatsHolder.PlayerHungerStatView, _stats.Hunger.Value - currentHungerDecrease * Time.deltaTime);
+            SetStat(_stats.Hunger, -currentHungerDecrease * Time.deltaTime);
         }
 
         private void ProcessFatigue()
@@ -284,7 +328,7 @@ namespace WildIsland.Controllers
                 return;
 
             float currentFatigueDecrease = _stats.FatigueDecrease.Value * _relativeSpeed;
-            SetStat(_viewStatsHolder.PlayerFatigueStatView, _stats.Fatigue.Value - currentFatigueDecrease * Time.deltaTime);
+            SetStat(_stats.Fatigue, -currentFatigueDecrease * Time.deltaTime);
         }
 
         private void ProcessThirst()
@@ -293,13 +337,18 @@ namespace WildIsland.Controllers
                 return;
 
             float currentThirstDecrease = _stats.ThirstDecrease.Value * _relativeSpeed;
-            SetStat(_viewStatsHolder.PlayerThirstStatView, _stats.Thirst.Value - currentThirstDecrease * Time.deltaTime);
+            SetStat(_stats.Thirst, -currentThirstDecrease * Time.deltaTime);
         }
 
-        private void SetStat(BasePlayerStatView playerStatView, float value)
+        private void SetStat(PlayerStat stat, float value, bool forceDebugShow = false)
         {
-            _statsByType[playerStatView.TargetStat].Value = value;
-            playerStatView.Update();
+            stat.Value += value;
+            if (stat.Value < 0)
+                stat.Value = 0;
+            _statViewPairs.TryGetValue(stat, out BasePlayerStatView statView);
+            if (statView == null)
+                return;
+            statView.UpdateDebugValue(value, forceDebugShow);
         }
 #endregion
 #region Input
@@ -315,7 +364,7 @@ namespace WildIsland.Controllers
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
             _playerInput.SetJump(obj.ReadValueAsButton());
-            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value - _staminaJumpCost);
+            SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }
 
         private void CheckSprint()
@@ -335,7 +384,7 @@ namespace WildIsland.Controllers
             }
 
             _playerInput.SetSprint(true);
-            SetStat(_viewStatsHolder.PlayerStaminaStatView, _stats.Stamina.Value - _staminaSprintCost * Time.deltaTime);
+            SetStat(_stats.Stamina, -_staminaSprintCost * Time.deltaTime, true);
         }
 #endregion
 #region Moving
@@ -346,14 +395,14 @@ namespace WildIsland.Controllers
             if (_view.FootstepAudioClips.Length <= 0)
                 return;
             int index = Random.Range(0, _view.FootstepAudioClips.Length);
-            AudioSource.PlayClipAtPoint(_view.FootstepAudioClips[index], _view.transform.TransformPoint(_controller.center), _footstepAudioVolume);
+            AudioSource.PlayClipAtPoint(_view.FootstepAudioClips[index], _view.transform.TransformPoint(_characterController.center), _footstepAudioVolume);
         }
 
         private void Land(AnimationEvent animationEvent)
         {
             if (!(animationEvent.animatorClipInfo.weight > 0.5f))
                 return;
-            AudioSource.PlayClipAtPoint(_view.LandingAudioClip, _view.transform.TransformPoint(_controller.center), _footstepAudioVolume);
+            AudioSource.PlayClipAtPoint(_view.LandingAudioClip, _view.transform.TransformPoint(_characterController.center), _footstepAudioVolume);
         }
 
         private void JumpAndGravity()
@@ -436,7 +485,7 @@ namespace WildIsland.Controllers
             if (_isGrounded)
                 _playerInputState = pendingInputState;
 
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            float currentHorizontalSpeed = new Vector3(_characterController.velocity.x, 0.0f, _characterController.velocity.z).magnitude;
             float multiplier = currentHorizontalSpeed < targetSpeed ? _speedUpChangeRate : _slowDownChangeRate;
 
             if (currentHorizontalSpeed < targetSpeed || currentHorizontalSpeed > targetSpeed)
@@ -469,10 +518,10 @@ namespace WildIsland.Controllers
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             if (!_isGrounded)
-                _speed *= 0.96f;
+                _speed *= _inAirVelocityReduction;
 
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            _characterController.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                                      new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             if (!_hasAnimator)
                 return;
@@ -513,6 +562,12 @@ namespace WildIsland.Controllers
 
         private void CHEAT_Damage(InputAction.CallbackContext obj)
             => SetAllHealths(isRandomizing: true);
+
+        private void CHEAT_FrameRateChange(InputAction.CallbackContext obj)
+        {
+            _isFrameRate60 = !_isFrameRate60;
+            Application.targetFrameRate = _isFrameRate60 ? 60 : 150;
+        }
 #endregion
     }
 }

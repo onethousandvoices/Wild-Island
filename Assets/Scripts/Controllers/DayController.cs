@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Views.UI;
 using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
@@ -9,6 +10,7 @@ namespace WildIsland.Controllers
     public class DayController : IInitializable, ITickable, IGDConsumer
     {
         [Inject] private DayLightView _view;
+        [Inject] private DayTimerView _dayTimer;
 
         private BasicGameData.DaySettings _daySettings;
 
@@ -44,6 +46,9 @@ namespace WildIsland.Controllers
                 _dayTime = 0;
                 _nightTime = 0;
             }
+            
+            _dayTimer.SetDayTime(_dayTime);
+            _dayTimer.SetNightTime(_nightTime);
             
             float evaluation = (_dayTime + _nightTime) / 2;
 
