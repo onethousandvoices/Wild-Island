@@ -89,6 +89,15 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CHEAT_FrameRate"",
+                    ""type"": ""Button"",
+                    ""id"": ""cb6b0eab-c919-4667-879a-71944e0f8be0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -300,6 +309,17 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""action"": ""CHEAT_Damage"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6198fba9-842a-473c-995c-4ed8aa6527f1"",
+                    ""path"": ""<Keyboard>/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CHEAT_FrameRate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -363,6 +383,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
         m_Player_CHEAT_Time = m_Player.FindAction("CHEAT_Time", throwIfNotFound: true);
         m_Player_CHEAT_Damage = m_Player.FindAction("CHEAT_Damage", throwIfNotFound: true);
+        m_Player_CHEAT_FrameRate = m_Player.FindAction("CHEAT_FrameRate", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -429,6 +450,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Inventory;
     private readonly InputAction m_Player_CHEAT_Time;
     private readonly InputAction m_Player_CHEAT_Damage;
+    private readonly InputAction m_Player_CHEAT_FrameRate;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -440,6 +462,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
         public InputAction @CHEAT_Time => m_Wrapper.m_Player_CHEAT_Time;
         public InputAction @CHEAT_Damage => m_Wrapper.m_Player_CHEAT_Damage;
+        public InputAction @CHEAT_FrameRate => m_Wrapper.m_Player_CHEAT_FrameRate;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -470,6 +493,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @CHEAT_Damage.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
                 @CHEAT_Damage.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
                 @CHEAT_Damage.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
+                @CHEAT_FrameRate.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
+                @CHEAT_FrameRate.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
+                @CHEAT_FrameRate.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -495,6 +521,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @CHEAT_Damage.started += instance.OnCHEAT_Damage;
                 @CHEAT_Damage.performed += instance.OnCHEAT_Damage;
                 @CHEAT_Damage.canceled += instance.OnCHEAT_Damage;
+                @CHEAT_FrameRate.started += instance.OnCHEAT_FrameRate;
+                @CHEAT_FrameRate.performed += instance.OnCHEAT_FrameRate;
+                @CHEAT_FrameRate.canceled += instance.OnCHEAT_FrameRate;
             }
         }
     }
@@ -544,5 +573,6 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnInventory(InputAction.CallbackContext context);
         void OnCHEAT_Time(InputAction.CallbackContext context);
         void OnCHEAT_Damage(InputAction.CallbackContext context);
+        void OnCHEAT_FrameRate(InputAction.CallbackContext context);
     }
 }

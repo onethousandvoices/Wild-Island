@@ -5,9 +5,12 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class BiomeController : IInitializable, ITickable, IGDConsumer
+    public class BiomeController : IInitializable, IGDConsumer
     {
         [Inject] private ForestBiomeView _forest;
+        [Inject] private WinterBiomeView _winter;
+        [Inject] private DesertBiomeView _desert;
+        [Inject] private SwampBiomeView _swamp;
         
         private BiomesData _data;
 
@@ -18,10 +21,9 @@ namespace WildIsland.Controllers
         public void Initialize()
         {
             _forest.SetData(_data.ForestBiomeData);
-        }
-
-        public void Tick()
-        {
+            _winter.SetData(_data.WinterBiomeData);
+            _desert.SetData(_data.DesertBiomeData);
+            _swamp.SetData(_data.SwampBiomeData);
         }
     }
 }

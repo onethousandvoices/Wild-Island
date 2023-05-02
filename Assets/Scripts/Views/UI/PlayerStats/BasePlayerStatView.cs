@@ -1,4 +1,4 @@
-﻿using System;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using WildIsland.Data;
@@ -10,19 +10,50 @@ namespace WildIsland.Views.UI
         private Slider _slider;
         private PlayerStat _current;
         private PlayerStat _max;
+        private TextMeshProUGUI _debugText;
 
-        public abstract Type TargetStat { get; }
-
+        private const float _baseDebugDelay = 0.07f;
+        private float _currentDebugDelay;
+        
         public void SetRefs(PlayerStat current, PlayerStat max)
         {
             _current = current;
             _max = max;
+            _currentDebugDelay = _baseDebugDelay;
+        }
+
+        public void UpdateDebugValue(float debug_currentValue, bool forceShow)
+        {
+            if (forceShow)
+            {
+                _currentDebugDelay = _baseDebugDelay * 6f;
+                _debugText.color = Color.red;
+                _debugText.text = debug_currentValue.ToString("N" + 3);
+                return;
+            }
+            
+            _currentDebugDelay -= Time.deltaTime;
+            if (_currentDebugDelay > 0)
+                return;
+            _currentDebugDelay = _baseDebugDelay;
+            _debugText.color = Color.white;
+            _debugText.text = debug_currentValue.ToString("N" + 3);
         }
 
         public void Update()
             => _slider.value = _current.Value / _max.Value;
 
         private void OnValidate()
-            => _slider = GetComponentInChildren<Slider>();
+        {
+            _slider = GetComponentInChildren<Slider>();
+
+            foreach (Transform child in transform)
+            {
+                if (child.name != "Debug")
+                    continue;
+
+                _debugText = child.GetComponentInChildren<TextMeshProUGUI>();
+            }
+        }
     }
 }

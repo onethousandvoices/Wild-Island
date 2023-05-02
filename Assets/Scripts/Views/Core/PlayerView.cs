@@ -1,11 +1,12 @@
-﻿using NaughtyAttributes;
+﻿using Effects;
+using NaughtyAttributes;
 using System;
 using UnityEngine;
 
 namespace WildIsland.Views
 {
     [RequireComponent(typeof(CharacterController), typeof(Animator))]
-    public class PlayerView : MonoBehaviour
+    public class PlayerView : MonoBehaviour, IEffectReceiver
     {
         [field: SerializeField, HorizontalLine(color: EColor.Blue), MinMaxSlider(0f, 100f)] public Vector2 HungerRegenStage1Range { get; private set; }
         [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 HungerRegenStage2Range { get; private set; }
@@ -24,6 +25,14 @@ namespace WildIsland.Views
 
         private Action<AnimationEvent> OnLandCallback;
         private Action<AnimationEvent> OnFootStepCallback;
+        public Action<BaseEffect> OnEffectApplied { get; private set; }
+        public Action<BaseEffect> OnEffectRemoved { get; private set; }
+
+        public void SetEffectCallbacks(Action<BaseEffect> apply, Action<BaseEffect> remove)
+        {
+            OnEffectApplied = apply;
+            OnEffectRemoved = remove;
+        }
 
         public void SetOnLandCallback(Action<AnimationEvent> callback)
             => OnLandCallback = callback;
@@ -36,5 +45,11 @@ namespace WildIsland.Views
 
         private void OnLand(AnimationEvent animationEvent)
             => OnLandCallback?.Invoke(animationEvent);
+    }
+
+    public interface IEffectReceiver
+    {
+        public Action<BaseEffect> OnEffectApplied { get; }
+        public Action<BaseEffect> OnEffectRemoved { get; }
     }
 }

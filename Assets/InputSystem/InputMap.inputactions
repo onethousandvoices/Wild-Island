@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CHEAT_FrameRate",
+                    "type": "Button",
+                    "id": "cb6b0eab-c919-4667-879a-71944e0f8be0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -276,6 +285,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "CHEAT_Damage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6198fba9-842a-473c-995c-4ed8aa6527f1",
+                    "path": "<Keyboard>/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CHEAT_FrameRate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

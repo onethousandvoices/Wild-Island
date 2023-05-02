@@ -14,7 +14,6 @@ namespace WildIsland.Views.UI
         [field: SerializeField] public PlayerHungerStatView PlayerHungerStatView { get; private set; }
         [field: SerializeField] public PlayerThirstStatView PlayerThirstStatView { get; private set; }
         [field: SerializeField] public PlayerFatigueStatView PlayerFatigueStatView { get; private set; }
-        [field: SerializeField] public PlayerTemperatureStatView PlayerTemperatureStatView { get; private set; }
         
         private void OnValidate()
         {
@@ -28,7 +27,6 @@ namespace WildIsland.Views.UI
             PlayerHungerStatView = GetComponentInChildren<PlayerHungerStatView>();
             PlayerThirstStatView = GetComponentInChildren<PlayerThirstStatView>();
             PlayerFatigueStatView = GetComponentInChildren<PlayerFatigueStatView>();
-            PlayerTemperatureStatView = GetComponentInChildren<PlayerTemperatureStatView>();
 
             // var gos = GetComponentsInChildren<Transform>();
             //

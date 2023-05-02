@@ -44,7 +44,7 @@ namespace WildIsland.Data
             public readonly string GameDataId;
             public readonly Action<WorksheetConfig, List<List<string>>, IGDDDataStorage> CustomAction;
 
-            public WorksheetConfig(System.Type DataType, FileGdId SheetID, string TableID, string gdId)
+            public WorksheetConfig(Type DataType, FileGdId SheetID, string TableID, string gdId)
             {
                 this.DataType = DataType;
                 this.SheetID = SheetID;
@@ -172,7 +172,7 @@ namespace WildIsland.Data
             {
                 string rowKey = sheet[i][0];
                 string biomeTemperature = sheet[i][1];
-                string affectValue = sheet[i][2];
+                string effectValue = sheet[i][2];
 
                 bool foundField = false;
                 foreach (FieldInfo field in biomesData.GetType().GetFields())
@@ -183,7 +183,7 @@ namespace WildIsland.Data
                     object data = Activator.CreateInstance(field.FieldType);
                     Type dataType = data.GetType();
                     dataType.GetField("Temperature").SetValue(data, int.Parse(biomeTemperature));
-                    dataType.GetField("AffectValue").SetValue(data, float.Parse(affectValue, CultureInfo.InvariantCulture.NumberFormat));
+                    dataType.GetField("EffectValue").SetValue(data, float.Parse(effectValue, CultureInfo.InvariantCulture.NumberFormat));
                     field.SetValue(biomesData, data);
                     foundField = true;
                     break;

@@ -29,6 +29,6 @@ namespace WildIsland.Data
     public class BiomeData
     {
         public float Temperature;
-        public float AffectValue;
+        public float EffectValue;
     }
 }
