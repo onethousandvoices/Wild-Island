@@ -28,7 +28,7 @@ namespace WildIsland.Controllers
 #region Fields
         private DbValue<PlayerData> _data;
         private PlayerData _stats => _data.Value;
-        private PlayerData _statsContainer;
+        private PlayerData _statsDefault;
         private PlayerInputState _playerInputState;
         private PlayerInput _playerInput;
         private InputMap _inputMap;
@@ -68,7 +68,7 @@ namespace WildIsland.Controllers
         private const float _footstepAudioVolume = 0.5f;
         private const float _jumpHeight = 1.7f;
         private const float _gravity = -15f;
-        private const float _jumpTimeout = 0.5f;
+        private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
         private const float _gGroundedOffset = -0.14f;
         private const float _groundedRadius = 0.28f;
@@ -90,7 +90,7 @@ namespace WildIsland.Controllers
         public Type ContainerType => typeof(PlayerDataContainer);
 
         public void AcquireGameData(IPartialGameDataContainer container)
-            => _statsContainer = ((PlayerDataContainer)container).Default;
+            => _statsDefault = ((PlayerDataContainer)container).Default;
 
         public void Initialize()
         {
@@ -117,22 +117,20 @@ namespace WildIsland.Controllers
         {
             _inputMap.Dispose();
             //todo remove container
-            _data.Save(_statsContainer);
+            _data.Save(_statsDefault);
         }
 
 #region InitActions
         private void SetData()
         {
             _playerInputState = PlayerInputState.Idle;
-            _data = new DbValue<PlayerData>("PlayerData", _statsContainer);
-            //todo test
-            _stats.Temperature.Value++;
+            _data = new DbValue<PlayerData>("PlayerData", _statsDefault);
 
             _jumpTimeoutDelta = _jumpTimeout;
             _fallTimeoutDelta = _fallTimeout;
 
-            _staminaJumpCost = _view.StaminaJumpCost / _statsContainer.Stamina.Value * 100;
-            _staminaSprintCost = _view.StaminaSprintCost / _statsContainer.Stamina.Value * 100;
+            _staminaJumpCost = _view.StaminaJumpCost / _statsDefault.Stamina.Value * 100;
+            _staminaSprintCost = _view.StaminaSprintCost / _statsDefault.Stamina.Value * 100;
 
             _moveSpeed = _data.Value.RegularSpeed.Value;
             _sprintSpeed = _data.Value.SprintSpeed.Value;
@@ -159,16 +157,16 @@ namespace WildIsland.Controllers
 
         private void SetStatViews()
         {
-            _viewStatsHolder.PlayerBodyStatView.SetRefs(_stats.BodyHealth, _statsContainer.BodyHealth);
-            _viewStatsHolder.PlayerHeadStatView.SetRefs(_stats.HeadHealth, _statsContainer.HeadHealth);
-            _viewStatsHolder.PlayerLeftArmStatView.SetRefs(_stats.LeftLegHealth, _statsContainer.LeftLegHealth);
-            _viewStatsHolder.PlayerRightArmStatView.SetRefs(_stats.RightArmHealth, _statsContainer.RightArmHealth);
-            _viewStatsHolder.PlayerLeftLegStatView.SetRefs(_stats.LeftLegHealth, _statsContainer.LeftLegHealth);
-            _viewStatsHolder.PlayerRightLegStatView.SetRefs(_stats.RightLegHealth, _statsContainer.RightLegHealth);
-            _viewStatsHolder.PlayerStaminaStatView.SetRefs(_stats.Stamina, _statsContainer.Stamina);
-            _viewStatsHolder.PlayerHungerStatView.SetRefs(_stats.Hunger, _statsContainer.Hunger);
-            _viewStatsHolder.PlayerThirstStatView.SetRefs(_stats.Thirst, _statsContainer.Thirst);
-            _viewStatsHolder.PlayerFatigueStatView.SetRefs(_stats.Fatigue, _statsContainer.Fatigue);
+            _viewStatsHolder.PlayerBodyStatView.SetRefs(_stats.BodyHealth, _statsDefault.BodyHealth);
+            _viewStatsHolder.PlayerHeadStatView.SetRefs(_stats.HeadHealth, _statsDefault.HeadHealth);
+            _viewStatsHolder.PlayerLeftArmStatView.SetRefs(_stats.LeftLegHealth, _statsDefault.LeftLegHealth);
+            _viewStatsHolder.PlayerRightArmStatView.SetRefs(_stats.RightArmHealth, _statsDefault.RightArmHealth);
+            _viewStatsHolder.PlayerLeftLegStatView.SetRefs(_stats.LeftLegHealth, _statsDefault.LeftLegHealth);
+            _viewStatsHolder.PlayerRightLegStatView.SetRefs(_stats.RightLegHealth, _statsDefault.RightLegHealth);
+            _viewStatsHolder.PlayerStaminaStatView.SetRefs(_stats.Stamina, _statsDefault.Stamina);
+            _viewStatsHolder.PlayerHungerStatView.SetRefs(_stats.Hunger, _statsDefault.Hunger);
+            _viewStatsHolder.PlayerThirstStatView.SetRefs(_stats.Thirst, _statsDefault.Thirst);
+            _viewStatsHolder.PlayerFatigueStatView.SetRefs(_stats.Fatigue, _statsDefault.Fatigue);
         }
 
         private void InitInputActions()
@@ -201,29 +199,9 @@ namespace WildIsland.Controllers
             _nativeEffects = _effects;
             foreach (BaseEffect effect in _nativeEffects)
             {
-                if (!effect.IsApplying())
-                    continue;
-
                 switch (effect)
                 {
-                    case BiomeEffect biomeEffect:
-                        if (biomeEffect.Data.Temperature < _stats.Temperature.Value)
-                        {
-                            float currentEffect =
-                                Math.Abs(biomeEffect.Data.Temperature - _stats.Temperature.Value) * _stats.HungerDecrease.Value;
-                            SetStat(_stats.Hunger, -currentEffect, true);
-                        }
-                        else if (biomeEffect.Data.Temperature > _stats.Temperature.Value)
-                        {
-                            float currentEffect =
-                                Math.Abs(biomeEffect.Data.Temperature - _stats.Temperature.Value) * _stats.ThirstDecrease.Value;
-                            SetStat(_stats.Thirst, -currentEffect, true);
-                        }
-                        Debug.Log("biome effect tick");
-                        break;
                     case PeriodicEffect periodicEffect:
-                        break;
-                    case PermanentEffect permanentEffect:
                         break;
                     case TemporaryEffect temporaryEffect:
                         break;
@@ -232,10 +210,28 @@ namespace WildIsland.Controllers
         }
 
         private void OnEffectApply(BaseEffect effect)
-            => _effects.Add(effect);
+        {
+            if (effect is PermanentEffect permanentEffect)
+            {
+                PlayerStat[] affectedStats = permanentEffect.Apply(_stats);
+                foreach (PlayerStat stat in affectedStats)
+                    SetStat(stat, forceDebugShow: true);
+                return;
+            }
+            _effects.Add(effect);
+        }
 
         private void OnEffectRemove(BaseEffect effect)
-            => _effects.Remove(effect);
+        {
+            if (effect is PermanentEffect permanentEffect)
+            {
+                PlayerStat[] affectedStats = permanentEffect.Remove(_stats);
+                foreach (PlayerStat stat in affectedStats)
+                    SetStat(stat, forceDebugShow: true);
+                return;
+            }
+            _effects.Remove(effect);
+        }
 #endregion
 #region Data
         private void UpdateStats()
@@ -257,22 +253,22 @@ namespace WildIsland.Controllers
             float currentThirst = _stats.Thirst.Value;
 
             if (currentHunger <= _view.HungerRegenStage1Range.y && currentHunger >= _view.HungerRegenStage1Range.x)
-                hungerMod = _statsContainer.HealthRegenHungerStage1.Value;
+                hungerMod = _statsDefault.HealthRegenHungerStage1.Value;
             else if (currentHunger <= _view.HungerRegenStage2Range.y && currentHunger >= _view.HungerRegenStage2Range.x)
-                hungerMod = _statsContainer.HealthRegenHungerStage2.Value;
+                hungerMod = _statsDefault.HealthRegenHungerStage2.Value;
             else if (currentHunger <= _view.HungerRegenStage3Range.y && currentHunger >= _view.HungerRegenStage3Range.x)
-                hungerMod = _statsContainer.HealthRegenHungerStage3.Value;
+                hungerMod = _statsDefault.HealthRegenHungerStage3.Value;
             else if (currentHunger <= _view.HungerRegenStage4Range.y)
-                hungerMod = _statsContainer.HealthRegenHungerStage4.Value;
+                hungerMod = _statsDefault.HealthRegenHungerStage4.Value;
 
             if (currentThirst <= _view.ThirstRegenStage1Range.y && currentThirst >= _view.ThirstRegenStage1Range.x)
-                thirstMod = _statsContainer.HealthRegenThirstStage1.Value;
+                thirstMod = _statsDefault.HealthRegenThirstStage1.Value;
             else if (currentThirst <= _view.ThirstRegenStage2Range.y && currentThirst >= _view.ThirstRegenStage2Range.x)
-                thirstMod = _statsContainer.HealthRegenThirstStage2.Value;
+                thirstMod = _statsDefault.HealthRegenThirstStage2.Value;
             else if (currentThirst <= _view.ThirstRegenStage3Range.y && currentThirst >= _view.ThirstRegenStage3Range.x)
-                thirstMod = _statsContainer.HealthRegenThirstStage3.Value;
+                thirstMod = _statsDefault.HealthRegenThirstStage3.Value;
             else if (currentThirst <= _view.ThirstRegenStage4Range.y)
-                thirstMod = _statsContainer.HealthRegenThirstStage4.Value;
+                thirstMod = _statsDefault.HealthRegenThirstStage4.Value;
 
             float currentRegen = _stats.HealthRegen.Value + hungerMod + thirstMod;
             SetAllHealths(currentRegen * Time.deltaTime);
@@ -282,35 +278,34 @@ namespace WildIsland.Controllers
         {
             bool decreasing = value < 0;
 
-            if (_stats.HeadHealth.Value < _statsContainer.HeadHealth.Value || decreasing || isRandomizing)
+            if (_stats.HeadHealth.Value < _statsDefault.HeadHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
-            if (_stats.BodyHealth.Value < _statsContainer.BodyHealth.Value || decreasing || isRandomizing)
+            if (_stats.BodyHealth.Value < _statsDefault.BodyHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
-            if (_stats.LeftArmHealth.Value < _statsContainer.LeftArmHealth.Value || decreasing || isRandomizing)
+            if (_stats.LeftArmHealth.Value < _statsDefault.LeftArmHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
-            if (_stats.RightArmHealth.Value < _statsContainer.RightArmHealth.Value || decreasing || isRandomizing)
+            if (_stats.RightArmHealth.Value < _statsDefault.RightArmHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
-            if (_stats.LeftLegHealth.Value < _statsContainer.LeftLegHealth.Value || decreasing || isRandomizing)
+            if (_stats.LeftLegHealth.Value < _statsDefault.LeftLegHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
-            if (_stats.RightLegHealth.Value < _statsContainer.RightLegHealth.Value || decreasing || isRandomizing)
+            if (_stats.RightLegHealth.Value < _statsDefault.RightLegHealth.Value || decreasing || isRandomizing)
                 SetStat(_stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
         }
 
         private void ProcessStamina()
         {
-            if (Math.Abs(_stats.Stamina.Value - _statsContainer.Stamina.Value) < 0.01f ||
+            if (Math.Abs(_stats.Stamina.Value - _statsDefault.Stamina.Value) < 0.01f ||
                 _playerInputState == PlayerInputState.Jump || _playerInputState == PlayerInputState.Sprint)
                 return;
 
-            float currentFatigue = _stats.Fatigue.Value / _statsContainer.Fatigue.Value;
-            float currentHunger = _stats.Hunger.Value / _statsContainer.Hunger.Value;
-            float currentThirst = _stats.Thirst.Value / _statsContainer.Thirst.Value;
+            float currentFatigue = _stats.Fatigue.Value / _statsDefault.Fatigue.Value;
+            float currentHunger = _stats.Hunger.Value / _statsDefault.Hunger.Value;
+            float currentThirst = _stats.Thirst.Value / _statsDefault.Thirst.Value;
 
             float currentRegen =
-                _statsContainer.StaminaRegen.Value * (1 - _stats.Stamina.Value / _statsContainer.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
+                _stats.StaminaRegen.Value * (1 - _stats.Stamina.Value / _statsDefault.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
 
             SetStat(_stats.Stamina, currentRegen * Time.deltaTime);
-            _stats.StaminaRegen.Value = currentRegen;
         }
 
         private void ProcessHunger()
@@ -318,8 +313,8 @@ namespace WildIsland.Controllers
             if (_stats.Hunger.Value <= 0)
                 return;
 
-            float currentHungerDecrease = _stats.HungerDecrease.Value * _relativeSpeed;
-            SetStat(_stats.Hunger, -currentHungerDecrease * Time.deltaTime);
+            float currentHungerDecrease = _stats.HungerDecrease.Value + _relativeSpeed;
+            SetStat(_stats.Hunger, -currentHungerDecrease * Time.deltaTime, true);
         }
 
         private void ProcessFatigue()
@@ -327,8 +322,8 @@ namespace WildIsland.Controllers
             if (_stats.Fatigue.Value <= 0)
                 return;
 
-            float currentFatigueDecrease = _stats.FatigueDecrease.Value * _relativeSpeed;
-            SetStat(_stats.Fatigue, -currentFatigueDecrease * Time.deltaTime);
+            float currentFatigueDecrease = _stats.FatigueDecrease.Value + _relativeSpeed;
+            SetStat(_stats.Fatigue, -currentFatigueDecrease * Time.deltaTime, true);
         }
 
         private void ProcessThirst()
@@ -336,11 +331,11 @@ namespace WildIsland.Controllers
             if (_stats.Thirst.Value <= 0)
                 return;
 
-            float currentThirstDecrease = _stats.ThirstDecrease.Value * _relativeSpeed;
-            SetStat(_stats.Thirst, -currentThirstDecrease * Time.deltaTime);
+            float currentThirstDecrease = _stats.ThirstDecrease.Value + _relativeSpeed;
+            SetStat(_stats.Thirst, -currentThirstDecrease * Time.deltaTime, true);
         }
 
-        private void SetStat(PlayerStat stat, float value, bool forceDebugShow = false)
+        private void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {
             stat.Value += value;
             if (stat.Value < 0)
@@ -557,7 +552,7 @@ namespace WildIsland.Controllers
         private void CHEAT_TimeSpeedUp(InputAction.CallbackContext obj)
         {
             _isTimeSpeedUp = !_isTimeSpeedUp;
-            Time.timeScale = _isTimeSpeedUp ? 10f : 1f;
+            Time.timeScale = _isTimeSpeedUp ? 100f : 1f;
         }
 
         private void CHEAT_Damage(InputAction.CallbackContext obj)

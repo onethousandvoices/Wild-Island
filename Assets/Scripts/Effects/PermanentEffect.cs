@@ -1,10 +1,10 @@
-﻿namespace Effects
+﻿using System;
+using WildIsland.Data;
+
+namespace Effects
 {
     public class PermanentEffect : BaseEffect
     {
-        public PermanentEffect(params PlayerDataEffect[] effects) : base(effects) { }
-
-        public override bool IsApplying()
-            => true;
+        public PermanentEffect(Func<PlayerData, PlayerStat[]> apply, Func<PlayerData, PlayerStat[]> remove) : base(apply, remove) { }
     }
 }

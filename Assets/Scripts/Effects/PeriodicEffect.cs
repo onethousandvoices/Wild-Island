@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using WildIsland.Data;
 
 namespace Effects
 {
@@ -7,19 +8,10 @@ namespace Effects
         private readonly float _period;
         private float _currentCooldown;
 
-        protected PeriodicEffect(float period, params PlayerDataEffect[] effects) : base(effects)
+        public PeriodicEffect(float period, Func<PlayerData,  PlayerStat[]> apply, Func<PlayerData,  PlayerStat[]> remove) : base(apply, remove)
         {
             _period = period;
             _currentCooldown = _period;
-        }
-
-        public override bool IsApplying()
-        {
-            _currentCooldown -= Time.deltaTime;
-            if (_currentCooldown > 0)
-                return false;
-            _currentCooldown = _period;
-            return true;
         }
     }
 }
