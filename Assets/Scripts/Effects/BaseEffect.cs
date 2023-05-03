@@ -1,31 +1,23 @@
-﻿using WildIsland.Data;
+﻿using System;
+using WildIsland.Data;
 
 namespace Effects
 {
     public abstract class BaseEffect
     {
-        public readonly PlayerDataEffect[] Effects;
+        private readonly Func<PlayerData, PlayerStat[]> _onApply;
+        private readonly Func<PlayerData, PlayerStat[]> _onRemove;
 
-        public abstract bool IsApplying();
-        
-        protected BaseEffect(params PlayerDataEffect[] effects)
+        public virtual PlayerStat[] Apply(PlayerData data)
+            => _onApply(data);
+
+        public virtual PlayerStat[] Remove(PlayerData data)
+            => _onRemove(data);
+
+        protected BaseEffect(Func<PlayerData, PlayerStat[]> apply, Func<PlayerData, PlayerStat[]> remove)
         {
-            Effects = new PlayerDataEffect[effects.Length];
-
-            for (int i = 0; i < effects.Length; i++)
-                Effects[i] = effects[i];
-        }
-    }
-
-    public class PlayerDataEffect
-    {
-        public readonly PlayerStat PlayerStat;
-        public readonly float EffectValue;
-
-        public PlayerDataEffect(PlayerStat stat, float effectValue)
-        {
-            PlayerStat = stat;
-            EffectValue = effectValue;
+            _onApply = apply;
+            _onRemove = remove;
         }
     }
 }

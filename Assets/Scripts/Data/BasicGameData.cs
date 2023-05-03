@@ -20,16 +20,16 @@ namespace WildIsland.Data
             [SheetColumnName("A3")]
             public readonly int DayTemperatureAffectStage1 = 0;
             
-            [SheetColumnName("A3")]
+            [SheetColumnName("A4")]
             public readonly int DayTemperatureAffectStage2 = 0;
             
-            [SheetColumnName("A3")]
+            [SheetColumnName("A5")]
             public readonly int DayTemperatureAffectStage3 = 0;
             
-            [SheetColumnName("A3")]
+            [SheetColumnName("A6")]
             public readonly int NightTemperatureAffectStage1 = 0;
             
-            [SheetColumnName("A3")]
+            [SheetColumnName("A7")]
             public readonly int NightTemperatureAffectStage2 = 0;
         }
         
