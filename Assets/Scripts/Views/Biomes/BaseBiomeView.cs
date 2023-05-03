@@ -1,11 +1,10 @@
 ﻿using Effects;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using WildIsland.Data;
+using WildIsland.Utility;
 using WildIsland.Views;
 using Zenject;
 
@@ -16,11 +15,10 @@ namespace Views.Biomes
         [Inject] private Camera _cam;
 
         private BiomeData _data;
-        private PermanentEffect _biomeEffect;
-        private List<(PlayerStat, float)> _affectedStats;
+        private BiomeEffect _biomeEffect;
+        private AffectedStats _affectedStats;
         private TextMeshProUGUI _text;
         private Canvas _canvas;
-        private PlayerStat[] ConvertAffectedToArray => _affectedStats.Select(x => x.Item1).ToArray();
 
         private float _previousMod;
 
@@ -28,8 +26,8 @@ namespace Views.Biomes
         {
             _data = data;
             _text.text = _data.Temperature.ToString(CultureInfo.InvariantCulture);
-            _biomeEffect = new PermanentEffect(ApplyEffect, RemoveEffect);
-            _affectedStats = new List<(PlayerStat, float)>();
+            _biomeEffect = new BiomeEffect(ApplyEffect, RemoveEffect);
+            _affectedStats = new AffectedStats();
         }
 
         private PlayerStat[] ApplyEffect(PlayerData playerData)
@@ -40,42 +38,33 @@ namespace Views.Biomes
             {
                 float currentEffect =
                     Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.HungerDecrease.Value;
-                _affectedStats.Add((playerData.HungerDecrease, currentEffect));
+                _affectedStats.Add(new Tuple<PlayerStat, float>(playerData.HungerDecrease, currentEffect));
             }
             else if (_data.Temperature > playerData.Temperature.Value)
             {
                 float currentEffect =
                     Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.ThirstDecrease.Value;
-                _affectedStats.Add((playerData.ThirstDecrease, currentEffect));
+                _affectedStats.Add(new Tuple<PlayerStat, float>(playerData.ThirstDecrease, currentEffect));
             }
 
-            foreach ((PlayerStat, float) pair in _affectedStats)
-                pair.Item1.Value += pair.Item2;
-
-            return ConvertAffectedToArray;
+            return _affectedStats.ApplyReturnStats;
         }
 
         private PlayerStat[] RemoveEffect(PlayerData playerData)
-        {
-            foreach ((PlayerStat, float) pair in _affectedStats)
-                playerData.GetStatByType(pair.Item1.GetType()).Value -= pair.Item2;
-            return ConvertAffectedToArray;
-        }
+            => _affectedStats.RevertReturnStats;
 
         private void OnTriggerEnter(Collider other)
         {
             if (!other.TryGetComponent(out IEffectReceiver receiver))
                 return;
             receiver.OnEffectApplied?.Invoke(_biomeEffect);
-            Debug.Log($"{name} affecting");
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (!other.TryGetComponent(out IEffectReceiver receiver))
                 return;
-            receiver.OnEffectRemoved?.Invoke(_biomeEffect);
-            Debug.Log($"{name} removing effect");
+            receiver.OnEffectRemoved?.Invoke(typeof(BiomeEffect));
         }
 
         public void UpdateTemperature(float mod)

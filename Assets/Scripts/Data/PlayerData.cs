@@ -40,64 +40,6 @@ namespace WildIsland.Data
 
         public float CurrentRelativeHealth(float maxHealth)
             => HealthSum / maxHealth;
-
-        public PlayerStat GetStatByType(Type type)
-        {
-            if (type == typeof(PlayerHeadHealth))
-                return HeadHealth;
-            if (type == typeof(PlayerBodyHealth))
-                return BodyHealth;
-            if (type == typeof(PlayerLeftArmHealth))
-                return LeftArmHealth;
-            if (type == typeof(PlayerRightArmHealth))
-                return RightArmHealth;
-            if (type == typeof(PlayerLeftLegHealth))
-                return LeftLegHealth;
-            if (type == typeof(PlayerRightLegHealth))
-                return RightLegHealth;
-            if (type == typeof(PlayerHealthRegen))
-                return HealthRegen;
-            if (type == typeof(PlayerStamina))
-                return Stamina;
-            if (type == typeof(PlayerStaminaRegen))
-                return StaminaRegen;
-            if (type == typeof(PlayerHunger))
-                return Hunger;
-            if (type == typeof(PlayerHungerDecrease))
-                return HungerDecrease;
-            if (type == typeof(PlayerThirst))
-                return Thirst;
-            if (type == typeof(PlayerThirstDecrease))
-                return ThirstDecrease;
-            if (type == typeof(PlayerFatigue))
-                return Fatigue;
-            if (type == typeof(PlayerFatigueDecrease))
-                return FatigueDecrease;
-            if (type == typeof(PlayerRegularSpeed))
-                return RegularSpeed;
-            if (type == typeof(PlayerSprintSpeed))
-                return SprintSpeed;
-            if (type == typeof(PlayerTemperature))
-                return Temperature;
-            if (type == typeof(PlayerHealthRegenHungerStage1))
-                return HealthRegenHungerStage1;
-            if (type == typeof(PlayerHealthRegenHungerStage2))
-                return HealthRegenHungerStage2;
-            if (type == typeof(PlayerHealthRegenHungerStage3))
-                return HealthRegenHungerStage3;
-            if (type == typeof(PlayerHealthRegenHungerStage4))
-                return HealthRegenHungerStage4;
-            if (type == typeof(PlayerHealthRegenThirstStage1))
-                return HealthRegenThirstStage1;
-            if (type == typeof(PlayerHealthRegenThirstStage2))
-                return HealthRegenThirstStage2;
-            if (type == typeof(PlayerHealthRegenThirstStage3))
-                return HealthRegenThirstStage3;
-            if (type == typeof(PlayerHealthRegenThirstStage4))
-                return HealthRegenThirstStage4;
-
-            return null;
-        }
     }
 
     [Serializable]
@@ -119,40 +61,40 @@ namespace WildIsland.Data
     public class PlayerRightLegHealth : PlayerStat { }
 
     [Serializable]
-    public class PlayerHealthRegen : PlayerStat { }
+    public class PlayerHealthRegen : VolatilePlayerStat { }
 
     [Serializable]
     public class PlayerStamina : PlayerStat { }
 
     [Serializable]
-    public class PlayerStaminaRegen : PlayerStat { }
+    public class PlayerStaminaRegen : VolatilePlayerStat { }
 
     [Serializable]
     public class PlayerHunger : PlayerStat { }
 
     [Serializable]
-    public class PlayerHungerDecrease : PlayerStat { }
+    public class PlayerHungerDecrease : VolatilePlayerStat { }
 
     [Serializable]
     public class PlayerThirst : PlayerStat { }
 
     [Serializable]
-    public class PlayerThirstDecrease : PlayerStat { }
+    public class PlayerThirstDecrease : VolatilePlayerStat { }
 
     [Serializable]
     public class PlayerFatigue : PlayerStat { }
 
     [Serializable]
-    public class PlayerFatigueDecrease : PlayerStat { }
+    public class PlayerFatigueDecrease : VolatilePlayerStat { }
 
     [Serializable]
-    public class PlayerRegularSpeed : PlayerStat { }
+    public class PlayerRegularSpeed : VolatilePlayerStat { }
 
     [Serializable]
-    public class PlayerSprintSpeed : PlayerStat { }
+    public class PlayerSprintSpeed : VolatilePlayerStat { }
 
     [Serializable]
-    public class PlayerTemperature : PlayerStat { }
+    public class PlayerTemperature : VolatilePlayerStat { }
 
     [Serializable]
     public class PlayerHealthRegenHungerStage1 : PlayerStat { }
@@ -177,6 +119,9 @@ namespace WildIsland.Data
 
     [Serializable]
     public class PlayerHealthRegenThirstStage4 : PlayerStat { }
+
+    [Serializable]
+    public abstract class VolatilePlayerStat : PlayerStat { }
 
     [Serializable]
     public abstract class PlayerStat

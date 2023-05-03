@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using WildIsland.Data;
+using WildIsland.Utility;
 using WildIsland.Views;
 using WildIsland.Views.UI;
 using Zenject;
@@ -36,7 +37,7 @@ namespace WildIsland.Controllers
         private CharacterController _characterController;
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
         private List<BaseEffect> _effects;
-        private List<BaseEffect> _nativeEffects;
+        private BaseEffect[] _nativeEffects;
 
         private bool _hasAnimator;
         private bool _isLockCameraPosition;
@@ -116,7 +117,7 @@ namespace WildIsland.Controllers
         public void Dispose()
         {
             _inputMap.Dispose();
-            //todo remove container
+            //todo remove default
             _data.Save(_statsDefault);
         }
 
@@ -150,7 +151,7 @@ namespace WildIsland.Controllers
             };
 
             _effects = new List<BaseEffect>();
-            _nativeEffects = _effects;
+            _nativeEffects = Array.Empty<BaseEffect>();
 
             SetStatViews();
         }
@@ -179,6 +180,8 @@ namespace WildIsland.Controllers
             _inputMap.Player.CHEAT_Time.started += CHEAT_TimeSpeedUp;
             _inputMap.Player.CHEAT_Damage.started += CHEAT_Damage;
             _inputMap.Player.CHEAT_FrameRate.started += CHEAT_FrameRateChange;
+            _inputMap.Player.CHEAT_PeriodicEffect.started += CHEAT_PeriodicEffectApply;
+            _inputMap.Player.CHEAT_TemporaryEffect.started += CHEAT_TemporaryEffectApply;
         }
 
         private void InitView()
@@ -190,47 +193,48 @@ namespace WildIsland.Controllers
 
             _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);
-            _view.SetEffectCallbacks(OnEffectApply, OnEffectRemove);
+            _view.SetEffectCallbacks(EffectApply, EffectRemove);
         }
 #endregion
 #region EffectProcessor
         private void ProcessEffects()
         {
-            _nativeEffects = _effects;
+            _nativeEffects = new BaseEffect[_effects.Count];
+            _effects.CopyTo(_nativeEffects);
+            
             foreach (BaseEffect effect in _nativeEffects)
             {
-                switch (effect)
+                if (effect is PermanentEffect permanentEffect)
                 {
-                    case PeriodicEffect periodicEffect:
-                        break;
-                    case TemporaryEffect temporaryEffect:
-                        break;
+                    if (permanentEffect.Process())
+                        SetStats(permanentEffect.Apply(_stats));
+                }
+                else 
+                {
+                    if (effect.Process())
+                        SetStats(effect.Apply(_stats));
+                    else if (effect.IsExecuted)
+                        EffectRemove(effect.GetType());
                 }
             }
         }
 
-        private void OnEffectApply(BaseEffect effect)
+        private void EffectApply(BaseEffect effect)
+            => _effects.Add(effect);
+
+        private void EffectRemove(Type effectType)
         {
-            if (effect is PermanentEffect permanentEffect)
-            {
-                PlayerStat[] affectedStats = permanentEffect.Apply(_stats);
-                foreach (PlayerStat stat in affectedStats)
-                    SetStat(stat, forceDebugShow: true);
-                return;
-            }
-            _effects.Add(effect);
+            BaseEffect target = _effects.Find(x => x.GetType() == effectType);
+            target.Remove(_stats);
+            _effects.Remove(target);
         }
 
-        private void OnEffectRemove(BaseEffect effect)
+        private void SetStats(PlayerStat[] affectedStats)
         {
-            if (effect is PermanentEffect permanentEffect)
-            {
-                PlayerStat[] affectedStats = permanentEffect.Remove(_stats);
-                foreach (PlayerStat stat in affectedStats)
-                    SetStat(stat, forceDebugShow: true);
+            if (affectedStats == null)
                 return;
-            }
-            _effects.Remove(effect);
+            foreach (PlayerStat stat in affectedStats)
+                SetStat(stat, forceDebugShow: true);
         }
 #endregion
 #region Data
@@ -279,17 +283,17 @@ namespace WildIsland.Controllers
             bool decreasing = value < 0;
 
             if (_stats.HeadHealth.Value < _statsDefault.HeadHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
             if (_stats.BodyHealth.Value < _statsDefault.BodyHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
             if (_stats.LeftArmHealth.Value < _statsDefault.LeftArmHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
             if (_stats.RightArmHealth.Value < _statsDefault.RightArmHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
             if (_stats.LeftLegHealth.Value < _statsDefault.LeftLegHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
             if (_stats.RightLegHealth.Value < _statsDefault.RightLegHealth.Value || decreasing || isRandomizing)
-                SetStat(_stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f), true);
+                SetStat(_stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
         }
 
         private void ProcessStamina()
@@ -343,7 +347,8 @@ namespace WildIsland.Controllers
             _statViewPairs.TryGetValue(stat, out BasePlayerStatView statView);
             if (statView == null)
                 return;
-            statView.UpdateDebugValue(value, forceDebugShow);
+            float perSecondsMult = Mathf.Abs(value) < 1 ? Time.deltaTime : 1;
+            statView.UpdateDebugValue(value / perSecondsMult, forceDebugShow);
         }
 #endregion
 #region Input
@@ -563,6 +568,40 @@ namespace WildIsland.Controllers
             _isFrameRate60 = !_isFrameRate60;
             Application.targetFrameRate = _isFrameRate60 ? 60 : 150;
         }
+
+        private void CHEAT_TemporaryEffectApply(InputAction.CallbackContext obj)
+        {
+            TestTemporaryEffect test = new TestTemporaryEffect(5f, TempApply, TempRemove);
+            _effects.Add(test);
+        }
+
+        private AffectedStats tempAffected;
+
+        private PlayerStat[] TempApply(PlayerData playerData)
+        {
+            tempAffected = new AffectedStats { new Tuple<PlayerStat, float>(_stats.HungerDecrease, 3) };
+            return tempAffected.ApplyReturnStats;
+        }
+
+        private PlayerStat[] TempRemove(PlayerData arg)
+            => tempAffected.RevertReturnStats;
+
+        private AffectedStats periodAffected;
+
+        private void CHEAT_PeriodicEffectApply(InputAction.CallbackContext obj)
+        {
+            TestPeriodicEffect test = new TestPeriodicEffect(1f, 3f, PeriodicApply, PeriodicRemove);
+            _effects.Add(test);
+        }
+
+        private PlayerStat[] PeriodicApply(PlayerData arg)
+        {
+            periodAffected = new AffectedStats { new Tuple<PlayerStat, float>(_stats.HeadHealth, -10) };
+            return periodAffected.ApplyReturnStats;
+        }
+
+        private PlayerStat[] PeriodicRemove(PlayerData arg)
+            => periodAffected.RevertReturnStats;
 #endregion
     }
 }

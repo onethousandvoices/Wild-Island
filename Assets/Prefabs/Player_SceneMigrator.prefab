@@ -783,8 +783,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -89.81763, y: 0}
-  m_SizeDelta: {x: 179.63525, y: 96.4739}
+  m_AnchoredPosition: {x: -181.91772, y: -105.91516}
+  m_SizeDelta: {x: 363.8355, y: 308.3042}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1795181447514629710
 GameObject:
@@ -1259,7 +1259,11 @@ MonoBehaviour:
 
     K - Damage Player
 
-'
+    P
+    - Periodic damage to head for 3 secs every 1 secs
+
+    O -Temporary hunger decrease
+    for 3 secs'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1286,7 +1290,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.1
+  m_fontSize: 29.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

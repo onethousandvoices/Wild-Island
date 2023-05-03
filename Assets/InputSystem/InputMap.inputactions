@@ -76,6 +76,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CHEAT_PeriodicEffect",
+                    "type": "Button",
+                    "id": "f786fc01-3643-4c14-80e9-afadad0f16ef",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CHEAT_TemporaryEffect",
+                    "type": "Button",
+                    "id": "a2d04fe5-71ab-436d-ad5e-6275a884d26c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -296,6 +314,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "CHEAT_FrameRate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "63940570-0d77-44ea-9683-7d256440deab",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CHEAT_PeriodicEffect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f24a3162-4eac-4181-9c52-2199bf136f71",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CHEAT_TemporaryEffect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
