@@ -26,9 +26,9 @@ namespace WildIsland.Views
         private Action<AnimationEvent> OnLandCallback;
         private Action<AnimationEvent> OnFootStepCallback;
         public Action<BaseEffect> OnEffectApplied { get; private set; }
-        public Action<BaseEffect> OnEffectRemoved { get; private set; }
+        public Action<Type> OnEffectRemoved { get; private set; }
 
-        public void SetEffectCallbacks(Action<BaseEffect> apply, Action<BaseEffect> remove)
+        public void SetEffectCallbacks(Action<BaseEffect> apply, Action<Type> remove)
         {
             OnEffectApplied = apply;
             OnEffectRemoved = remove;
@@ -50,6 +50,6 @@ namespace WildIsland.Views
     public interface IEffectReceiver
     {
         public Action<BaseEffect> OnEffectApplied { get; }
-        public Action<BaseEffect> OnEffectRemoved { get; }
+        public Action<Type> OnEffectRemoved { get; }
     }
 }

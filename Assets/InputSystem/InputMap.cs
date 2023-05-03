@@ -98,6 +98,24 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CHEAT_PeriodicEffect"",
+                    ""type"": ""Button"",
+                    ""id"": ""f786fc01-3643-4c14-80e9-afadad0f16ef"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CHEAT_TemporaryEffect"",
+                    ""type"": ""Button"",
+                    ""id"": ""a2d04fe5-71ab-436d-ad5e-6275a884d26c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -320,6 +338,28 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""action"": ""CHEAT_FrameRate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""63940570-0d77-44ea-9683-7d256440deab"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CHEAT_PeriodicEffect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f24a3162-4eac-4181-9c52-2199bf136f71"",
+                    ""path"": ""<Keyboard>/o"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CHEAT_TemporaryEffect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -384,6 +424,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_Player_CHEAT_Time = m_Player.FindAction("CHEAT_Time", throwIfNotFound: true);
         m_Player_CHEAT_Damage = m_Player.FindAction("CHEAT_Damage", throwIfNotFound: true);
         m_Player_CHEAT_FrameRate = m_Player.FindAction("CHEAT_FrameRate", throwIfNotFound: true);
+        m_Player_CHEAT_PeriodicEffect = m_Player.FindAction("CHEAT_PeriodicEffect", throwIfNotFound: true);
+        m_Player_CHEAT_TemporaryEffect = m_Player.FindAction("CHEAT_TemporaryEffect", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -451,6 +493,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_CHEAT_Time;
     private readonly InputAction m_Player_CHEAT_Damage;
     private readonly InputAction m_Player_CHEAT_FrameRate;
+    private readonly InputAction m_Player_CHEAT_PeriodicEffect;
+    private readonly InputAction m_Player_CHEAT_TemporaryEffect;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -463,6 +507,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         public InputAction @CHEAT_Time => m_Wrapper.m_Player_CHEAT_Time;
         public InputAction @CHEAT_Damage => m_Wrapper.m_Player_CHEAT_Damage;
         public InputAction @CHEAT_FrameRate => m_Wrapper.m_Player_CHEAT_FrameRate;
+        public InputAction @CHEAT_PeriodicEffect => m_Wrapper.m_Player_CHEAT_PeriodicEffect;
+        public InputAction @CHEAT_TemporaryEffect => m_Wrapper.m_Player_CHEAT_TemporaryEffect;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -496,6 +542,12 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @CHEAT_FrameRate.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
                 @CHEAT_FrameRate.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
                 @CHEAT_FrameRate.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
+                @CHEAT_PeriodicEffect.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
+                @CHEAT_PeriodicEffect.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
+                @CHEAT_PeriodicEffect.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
+                @CHEAT_TemporaryEffect.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
+                @CHEAT_TemporaryEffect.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
+                @CHEAT_TemporaryEffect.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -524,6 +576,12 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @CHEAT_FrameRate.started += instance.OnCHEAT_FrameRate;
                 @CHEAT_FrameRate.performed += instance.OnCHEAT_FrameRate;
                 @CHEAT_FrameRate.canceled += instance.OnCHEAT_FrameRate;
+                @CHEAT_PeriodicEffect.started += instance.OnCHEAT_PeriodicEffect;
+                @CHEAT_PeriodicEffect.performed += instance.OnCHEAT_PeriodicEffect;
+                @CHEAT_PeriodicEffect.canceled += instance.OnCHEAT_PeriodicEffect;
+                @CHEAT_TemporaryEffect.started += instance.OnCHEAT_TemporaryEffect;
+                @CHEAT_TemporaryEffect.performed += instance.OnCHEAT_TemporaryEffect;
+                @CHEAT_TemporaryEffect.canceled += instance.OnCHEAT_TemporaryEffect;
             }
         }
     }
@@ -574,5 +632,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnCHEAT_Time(InputAction.CallbackContext context);
         void OnCHEAT_Damage(InputAction.CallbackContext context);
         void OnCHEAT_FrameRate(InputAction.CallbackContext context);
+        void OnCHEAT_PeriodicEffect(InputAction.CallbackContext context);
+        void OnCHEAT_TemporaryEffect(InputAction.CallbackContext context);
     }
 }
