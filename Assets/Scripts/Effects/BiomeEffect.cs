@@ -5,6 +5,6 @@ namespace Effects
 {
     public class BiomeEffect : PermanentEffect
     {
-        public BiomeEffect(Func<PlayerData, PlayerStat[]> apply, Func<PlayerData, PlayerStat[]> remove) : base(apply, remove) { }
+        public BiomeEffect(Action<PlayerData> apply) : base(apply) { }
     }
 }

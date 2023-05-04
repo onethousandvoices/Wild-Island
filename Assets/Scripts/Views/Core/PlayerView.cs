@@ -23,10 +23,15 @@ namespace WildIsland.Views
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
         [field: SerializeField] public GameObject CinemachineCameraTarget { get; private set; }
 
+        private CharacterController _characterController;
+        
         private Action<AnimationEvent> OnLandCallback;
         private Action<AnimationEvent> OnFootStepCallback;
+        
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
+        
+        public CharacterController CharacterController => _characterController ??= GetComponent<CharacterController>();
 
         public void SetEffectCallbacks(Action<BaseEffect> apply, Action<Type> remove)
         {

@@ -16,7 +16,6 @@ namespace Views.Biomes
 
         private BiomeData _data;
         private BiomeEffect _biomeEffect;
-        private AffectedStats _affectedStats;
         private TextMeshProUGUI _text;
         private Canvas _canvas;
 
@@ -26,32 +25,24 @@ namespace Views.Biomes
         {
             _data = data;
             _text.text = _data.Temperature.ToString(CultureInfo.InvariantCulture);
-            _biomeEffect = new BiomeEffect(ApplyEffect, RemoveEffect);
-            _affectedStats = new AffectedStats();
+            _biomeEffect = new BiomeEffect(ApplyEffect);
         }
 
-        private PlayerStat[] ApplyEffect(PlayerData playerData)
+        private void ApplyEffect(PlayerData playerData)
         {
-            _affectedStats.Clear();
-
             if (_data.Temperature < playerData.Temperature.Value)
             {
                 float currentEffect =
                     Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.HungerDecrease.Value;
-                _affectedStats.Add(new Tuple<PlayerStat, float>(playerData.HungerDecrease, currentEffect));
+                _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.HungerDecrease, currentEffect));
             }
             else if (_data.Temperature > playerData.Temperature.Value)
             {
                 float currentEffect =
                     Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.ThirstDecrease.Value;
-                _affectedStats.Add(new Tuple<PlayerStat, float>(playerData.ThirstDecrease, currentEffect));
+                _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.ThirstDecrease, currentEffect));
             }
-
-            return _affectedStats.ApplyReturnStats;
         }
-
-        private PlayerStat[] RemoveEffect(PlayerData playerData)
-            => _affectedStats.RevertReturnStats;
 
         private void OnTriggerEnter(Collider other)
         {
