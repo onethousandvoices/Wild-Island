@@ -6,7 +6,7 @@ namespace Effects
 {
     public abstract class TemporaryEffect : BaseEffect
     {
-        protected TemporaryEffect(float duration, Action<PlayerData> apply) : base(apply)
+        protected TemporaryEffect(float duration, Action<PlayerData> apply = null) : base(apply)
             => CurrentDuration = duration;
         
         public override bool Process()

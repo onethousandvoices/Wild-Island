@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using WildIsland.Controllers;
-using WildIsland.Data;
 using WildIsland.Utility;
 using Zenject;
 
@@ -37,26 +36,16 @@ namespace WildIsland.Processors
 
         public void CHEAT_TemporaryEffectApply(InputAction.CallbackContext obj)
         {
-            _testTemporary = new TestTemporaryEffect(5f, TempApply);
-            _effectProcessor.AddEffect(_testTemporary);
-        }
-
-        private void TempApply(PlayerData playerData)
-        {
-            _testTemporary.AffectedStats.Clear();
+            _testTemporary = new TestTemporaryEffect(5f);
             _testTemporary.AffectedStats.Add(new AffectedStat(_player.Stats.HungerDecrease, 3));
+            _effectProcessor.AddEffect(_testTemporary);
         }
 
         public void CHEAT_PeriodicEffectApply(InputAction.CallbackContext obj)
         {
-            _testPeriodic = new TestPeriodicEffect(1f, 3f, PeriodicApply);
-            _effectProcessor.AddEffect(_testPeriodic);
-        }
-
-        private void PeriodicApply(PlayerData arg)
-        {
-            _testPeriodic.AffectedStats.Clear();
+            _testPeriodic = new TestPeriodicEffect(1f, 3f);
             _testPeriodic.AffectedStats.Add(new AffectedStat(_player.Stats.HeadHealth, -10));
+            _effectProcessor.AddEffect(_testPeriodic);
         }
     }
     

@@ -5,6 +5,6 @@ namespace Effects
 {
     public class TestTemporaryEffect : TemporaryEffect
     {
-        public TestTemporaryEffect(float duration, Action<PlayerData> apply) : base(duration, apply) { }
+        public TestTemporaryEffect(float duration, Action<PlayerData> apply = null) : base(duration, apply) { }
     }
 }

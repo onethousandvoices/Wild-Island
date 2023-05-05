@@ -17,7 +17,7 @@ namespace Effects
         
         public bool IsExecuted { get; protected set; }
 
-        protected BaseEffect(Action<PlayerData> apply)
+        protected BaseEffect(Action<PlayerData> apply = null)
         {
             _onApply = apply;
             AffectedStats = new AffectedStats();
