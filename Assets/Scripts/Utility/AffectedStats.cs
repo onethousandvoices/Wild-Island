@@ -6,27 +6,27 @@ namespace WildIsland.Utility
 {
     public class AffectedStats : List<AffectedStat>
     {
-        public PlayerStat[] ReturnArray => this.Select(x => x.Stat).ToArray();
+        private PlayerStat[] ReturnArray => this.Select(x => x.Stat).ToArray();
 
         public PlayerStat[] ApplyReturnStats
         {
             get
             {
                 foreach (AffectedStat pair in this)
-                    pair.Stat.Value += pair.Value;
+                    pair.Stat.ApplyValue(pair.Value);
                 return ReturnArray;
             }
         }
-        
+
         public void RevertClear()
         {
             foreach (AffectedStat pair in this)
             {
                 if (pair.Stat is not VolatilePlayerStat)
                     continue;
-                pair.Stat.Value -= pair.Value;
+                pair.Stat.ApplyValue(-pair.Value);
             }
-            
+
             Clear();
         }
     }

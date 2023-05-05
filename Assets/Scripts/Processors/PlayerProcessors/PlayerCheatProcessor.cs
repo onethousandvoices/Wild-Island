@@ -1,11 +1,12 @@
 ﻿using Effects;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Utility;
 using Zenject;
 
-namespace WildIsland.Controllers
+namespace WildIsland.Processors
 {
     public class PlayerCheatProcessor : IGetCheats
     {

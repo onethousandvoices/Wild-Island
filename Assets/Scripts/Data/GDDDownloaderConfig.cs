@@ -149,7 +149,10 @@ namespace WildIsland.Data
                         continue;
 
                     object stat = Activator.CreateInstance(field.FieldType);
-                    stat.GetType().GetField("Value").SetValue(stat, float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat));
+                    object value = float.Parse(rowValue, CultureInfo.InvariantCulture.NumberFormat);
+                    
+                    stat.GetType().GetProperty("Value")!.SetValue(stat, value);
+                    stat.GetType().GetProperty("Default")!.SetValue(stat, value);
 
                     field.SetValue(playerData, stat);
                     foundField = true;

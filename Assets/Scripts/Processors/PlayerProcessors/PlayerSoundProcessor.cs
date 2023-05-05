@@ -2,15 +2,15 @@
 using WildIsland.Views;
 using Zenject;
 
-namespace WildIsland.Controllers
+namespace WildIsland.Processors
 {
-    public class PlayerSoundProcessor : BaseProcessor, IInitializable
+    public class PlayerSoundProcessor : PlayerProcessor
     {
         [Inject] private PlayerView _view;
         
         private const float _footstepAudioVolume = 0.5f;
 
-        public void Initialize()
+        public override void Initialize()
         {
             _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);

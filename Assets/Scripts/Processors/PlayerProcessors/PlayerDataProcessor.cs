@@ -1,13 +1,14 @@
 ﻿using System;
 using UnityEngine;
+using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
 using Random = UnityEngine.Random;
 
-namespace WildIsland.Controllers
+namespace WildIsland.Processors
 {
-    public class PlayerDataProcessor : BaseProcessor, IDataProcessor, IInitializable, ITickableProcessor, IDisposable, IGetPlayerStats, IGDConsumer
+    public class PlayerDataProcessor : PlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerInputState _inputState;
@@ -16,21 +17,23 @@ namespace WildIsland.Controllers
         [Inject] private IGetPlayerStats _player;
 
         private DbValue<PlayerData> _data;
-
-        public PlayerData Stats => _data.Value;
-        public PlayerData Default { get; private set; }
-
+        private PlayerData _dataContainer;
         private float _relativeSpeed;
 
+        public PlayerData Stats => _data.Value;
+
         public Type ContainerType => typeof(PlayerDataContainer);
-
+        
         public void AcquireGameData(IPartialGameDataContainer container)
-            => Default = ((PlayerDataContainer)container).Default;
+            => _dataContainer = ((PlayerDataContainer)container).Default;
 
-        public void Initialize()
-            => _data = new DbValue<PlayerData>("PlayerData", Default);
+        public override void Initialize()
+        {
+            _data = new DbValue<PlayerData>("PlayerData", _dataContainer);
+            Stats.SetDefaults();
+        }
 
-        public void Tick()
+        public override void Tick()
         {
             _relativeSpeed = _playerSpeed.CurrentSpeed / _player.Stats.SprintSpeed.Value;
 
@@ -47,24 +50,24 @@ namespace WildIsland.Controllers
             float thirstMod = 0f;
             float currentHunger = _player.Stats.Hunger.Value;
             float currentThirst = _player.Stats.Thirst.Value;
-
+            
             if (currentHunger <= _view.HungerRegenStage1Range.y && currentHunger >= _view.HungerRegenStage1Range.x)
-                hungerMod = _player.Default.HealthRegenHungerStage1.Value;
+                hungerMod = _player.Stats.HealthRegenHungerStage1.Default;
             else if (currentHunger <= _view.HungerRegenStage2Range.y && currentHunger >= _view.HungerRegenStage2Range.x)
-                hungerMod = _player.Default.HealthRegenHungerStage2.Value;
+                hungerMod = _player.Stats.HealthRegenHungerStage2.Default;
             else if (currentHunger <= _view.HungerRegenStage3Range.y && currentHunger >= _view.HungerRegenStage3Range.x)
-                hungerMod = _player.Default.HealthRegenHungerStage3.Value;
+                hungerMod = _player.Stats.HealthRegenHungerStage3.Default;
             else if (currentHunger <= _view.HungerRegenStage4Range.y)
-                hungerMod = _player.Default.HealthRegenHungerStage4.Value;
+                hungerMod = _player.Stats.HealthRegenHungerStage4.Default;
 
             if (currentThirst <= _view.ThirstRegenStage1Range.y && currentThirst >= _view.ThirstRegenStage1Range.x)
-                thirstMod = _player.Default.HealthRegenThirstStage1.Value;
+                thirstMod = _player.Stats.HealthRegenThirstStage1.Default;
             else if (currentThirst <= _view.ThirstRegenStage2Range.y && currentThirst >= _view.ThirstRegenStage2Range.x)
-                thirstMod = _player.Default.HealthRegenThirstStage2.Value;
+                thirstMod = _player.Stats.HealthRegenThirstStage2.Default;
             else if (currentThirst <= _view.ThirstRegenStage3Range.y && currentThirst >= _view.ThirstRegenStage3Range.x)
-                thirstMod = _player.Default.HealthRegenThirstStage3.Value;
+                thirstMod = _player.Stats.HealthRegenThirstStage3.Default;
             else if (currentThirst <= _view.ThirstRegenStage4Range.y)
-                thirstMod = _player.Default.HealthRegenThirstStage4.Value;
+                thirstMod = _player.Stats.HealthRegenThirstStage4.Default;
 
             float currentRegen = _player.Stats.HealthRegen.Value + hungerMod + thirstMod;
             SetAllHealths(currentRegen * Time.deltaTime);
@@ -74,32 +77,32 @@ namespace WildIsland.Controllers
         {
             bool decreasing = value < 0;
 
-            if (_player.Stats.HeadHealth.Value < _player.Default.HeadHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.HeadHealth.Value < _player.Stats.HeadHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.BodyHealth.Value < _player.Default.BodyHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.BodyHealth.Value < _player.Stats.BodyHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.LeftArmHealth.Value < _player.Default.LeftArmHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.LeftArmHealth.Value < _player.Stats.LeftArmHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.RightArmHealth.Value < _player.Default.RightArmHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.RightArmHealth.Value < _player.Stats.RightArmHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.LeftLegHealth.Value < _player.Default.LeftLegHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.LeftLegHealth.Value < _player.Stats.LeftLegHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.RightLegHealth.Value < _player.Default.RightLegHealth.Value || decreasing || isRandomizing)
+            if (_player.Stats.RightLegHealth.Value < _player.Stats.RightLegHealth.Default || decreasing || isRandomizing)
                 _statSetter.SetStat(_player.Stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
         }
 
         private void ProcessStamina()
         {
-            if (Math.Abs(_player.Stats.Stamina.Value - _player.Default.Stamina.Value) < 0.01f ||
+            if (Math.Abs(_player.Stats.Stamina.Value - _player.Stats.Stamina.Default) < 0.01f ||
                 _inputState.State == PlayerInputState.Jump || _inputState.State == PlayerInputState.Sprint)
                 return;
 
-            float currentFatigue = _player.Stats.Fatigue.Value / _player.Default.Fatigue.Value;
-            float currentHunger = _player.Stats.Hunger.Value / _player.Default.Hunger.Value;
-            float currentThirst = _player.Stats.Thirst.Value / _player.Default.Thirst.Value;
+            float currentFatigue = _player.Stats.Fatigue.Value / _player.Stats.Fatigue.Default;
+            float currentHunger = _player.Stats.Hunger.Value / _player.Stats.Hunger.Default;
+            float currentThirst = _player.Stats.Thirst.Value / _player.Stats.Thirst.Default;
 
             float currentRegen =
-                _player.Stats.StaminaRegen.Value * (1 - _player.Stats.Stamina.Value / _player.Default.Stamina.Value) * currentFatigue * currentHunger * currentThirst;
+                _player.Stats.StaminaRegen.Value * (1 - _player.Stats.Stamina.Value / _player.Stats.Stamina.Default) * currentFatigue * currentHunger * currentThirst;
 
             _statSetter.SetStat(_player.Stats.Stamina, currentRegen * Time.deltaTime);
         }
@@ -132,10 +135,7 @@ namespace WildIsland.Controllers
         }
 
         public void Dispose()
-        {
-            //todo remove default
-            _data.Save(Default);
-        }
+            => _data.Save();
     }
 
     public interface IDataProcessor

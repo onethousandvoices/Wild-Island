@@ -1,13 +1,14 @@
 ﻿using Effects;
 using System;
 using System.Collections.Generic;
+using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
 
-namespace WildIsland.Controllers
+namespace WildIsland.Processors
 {
-    public class PlayerEffectProcessor : BaseProcessor, IEffectProcessor, ITickableProcessor, IInitializable
+    public class PlayerEffectProcessor : PlayerProcessor, IEffectProcessor
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
@@ -16,7 +17,7 @@ namespace WildIsland.Controllers
         private List<BaseEffect> _effects;
         private BaseEffect[] _nativeEffects;
 
-        public void Initialize()
+        public override void Initialize()
         {
             _effects = new List<BaseEffect>();
             _nativeEffects = Array.Empty<BaseEffect>();
@@ -37,7 +38,7 @@ namespace WildIsland.Controllers
             _effects.Remove(target);
         }
 
-        public void Tick()
+        public override void Tick()
         {
             if (_effects.Count < 1)
                 return;

@@ -1,12 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
 using Zenject;
 using PlayerInput = Core.PlayerInput;
 
-namespace WildIsland.Controllers
+namespace WildIsland.Processors
 {
     public enum PlayerInputState : byte
     {
@@ -16,7 +17,7 @@ namespace WildIsland.Controllers
         Jump
     }
     
-    public class PlayerInputProcessor : BaseProcessor, IPlayerSpeed, IPlayerInputState, ITickableProcessor, ILateTickable, IInitializable, IDisposable
+    public class PlayerInputProcessor : PlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
@@ -59,7 +60,7 @@ namespace WildIsland.Controllers
         private const float _gravity = -15f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
-        private const float _gGroundedOffset = -0.14f;
+        private const float _groundedOffset = -0.14f;
         private const float _groundedRadius = 0.28f;
         private const float _topClamp = 70f;
         private const float _bottomClamp = -30f;
@@ -79,7 +80,7 @@ namespace WildIsland.Controllers
         public PlayerInputState State { get; private set; }
         public float CurrentSpeed { get; private set; }
 
-        public void Initialize()
+        public override void Initialize()
         {
             State = PlayerInputState.Idle;
             _stats = _playerStats.Stats;
@@ -87,8 +88,8 @@ namespace WildIsland.Controllers
             _jumpTimeoutDelta = _jumpTimeout;
             _fallTimeoutDelta = _fallTimeout;
 
-            _staminaJumpCost = _view.StaminaJumpCost / _playerStats.Default.Stamina.Value * 100;
-            _staminaSprintCost = _view.StaminaSprintCost / _playerStats.Default.Stamina.Value * 100;
+            _staminaJumpCost = _view.StaminaJumpCost / _playerStats.Stats.Stamina.Default * 100;
+            _staminaSprintCost = _view.StaminaSprintCost / _playerStats.Stats.Stamina.Default * 100;
 
             _moveSpeed = _stats.RegularSpeed.Value;
             _sprintSpeed = _stats.SprintSpeed.Value;
@@ -111,7 +112,7 @@ namespace WildIsland.Controllers
         public void Dispose()
             => _inputMap.Dispose();
 
-        public void Tick()
+        public override void Tick()
         {
             ReadInput();
             GroundedCheck();
@@ -201,7 +202,7 @@ namespace WildIsland.Controllers
         private void GroundedCheck()
         {
             Vector3 playerPos = _view.transform.position;
-            Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _gGroundedOffset,
+            Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _groundedOffset,
                 playerPos.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _groundedRadius, _view.GroundLayers,
                 QueryTriggerInteraction.Ignore);

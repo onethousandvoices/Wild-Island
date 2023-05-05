@@ -14,7 +14,7 @@ namespace Views.Biomes
     {
         [Inject] private Camera _cam;
 
-        private BiomeData _data;
+        private BiomeData _biomeData;
         private BiomeEffect _biomeEffect;
         private TextMeshProUGUI _text;
         private Canvas _canvas;
@@ -23,23 +23,23 @@ namespace Views.Biomes
 
         public void Init(BiomeData data)
         {
-            _data = data;
-            _text.text = _data.Temperature.ToString(CultureInfo.InvariantCulture);
+            _biomeData = data;
+            _text.text = _biomeData.Temperature.ToString(CultureInfo.InvariantCulture);
             _biomeEffect = new BiomeEffect(ApplyEffect);
         }
 
         private void ApplyEffect(PlayerData playerData)
         {
-            if (_data.Temperature < playerData.Temperature.Value)
+            if (_biomeData.Temperature < playerData.Temperature.Value)
             {
                 float currentEffect =
-                    Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.HungerDecrease.Value;
+                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * playerData.HungerDecrease.Value;
                 _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.HungerDecrease, currentEffect));
             }
-            else if (_data.Temperature > playerData.Temperature.Value)
+            else if (_biomeData.Temperature > playerData.Temperature.Value)
             {
                 float currentEffect =
-                    Math.Abs(_data.Temperature - playerData.Temperature.Value) * playerData.ThirstDecrease.Value;
+                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * playerData.ThirstDecrease.Value;
                 _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.ThirstDecrease, currentEffect));
             }
         }
@@ -61,12 +61,12 @@ namespace Views.Biomes
         public void UpdateTemperature(float mod)
         {
             if (_previousMod < 0)
-                _data.Temperature += Math.Abs(_previousMod);
+                _biomeData.Temperature += Math.Abs(_previousMod);
             else
-                _data.Temperature -= _previousMod;
-            _data.Temperature += mod;
+                _biomeData.Temperature -= _previousMod;
+            _biomeData.Temperature += mod;
             _previousMod = mod;
-            _text.text = _data.Temperature.ToString(CultureInfo.InvariantCulture);
+            _text.text = _biomeData.Temperature.ToString(CultureInfo.InvariantCulture);
         }
 
         private void FixedUpdate()

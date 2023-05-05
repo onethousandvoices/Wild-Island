@@ -1,6 +1,6 @@
-﻿namespace WildIsland.Controllers
+﻿namespace WildIsland.Processors
 {
-    public class BaseProcessor
+    public class BaseProcessor : IBaseProcessor
     {
         public bool Enabled { get; private set; }
 
@@ -11,8 +11,9 @@
             => Enabled = false;
     }
 
-    public interface ITickableProcessor
+    public interface IBaseProcessor
     {
-        public void Tick();
+        public void Enable();
+        public void Disable();
     }
 }
