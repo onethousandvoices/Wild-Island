@@ -2,13 +2,12 @@
 
 namespace WildIsland.Processors
 {
-    public class PlayerProcessor : BaseProcessor, IPlayerProcessor
+    public abstract class PlayerProcessor : BaseProcessor, IInitializable
     {
         public virtual void Initialize() { }
-        public virtual void Tick() { }
     }
 
-    public interface IPlayerProcessor : IInitializable
+    public interface IPlayerProcessor : IBaseProcessor
     {
         public void Tick();
     }

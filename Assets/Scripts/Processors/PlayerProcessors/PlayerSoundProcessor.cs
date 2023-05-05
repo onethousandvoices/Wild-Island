@@ -15,8 +15,8 @@ namespace WildIsland.Processors
             _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);
         }
-        
-        public void Footstep(AnimationEvent animationEvent)
+
+        private void Footstep(AnimationEvent animationEvent)
         {
             if (!(animationEvent.animatorClipInfo.weight > 0.5f))
                 return;
@@ -26,7 +26,7 @@ namespace WildIsland.Processors
             AudioSource.PlayClipAtPoint(_view.FootstepAudioClips[index], _view.transform.TransformPoint(_view.CharacterController.center), _footstepAudioVolume);
         }
 
-        public void Land(AnimationEvent animationEvent)
+        private void Land(AnimationEvent animationEvent)
         {
             if (!(animationEvent.animatorClipInfo.weight > 0.5f))
                 return;

@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace WildIsland.Processors
 {
-    public class PlayerDataProcessor : PlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
+    public class PlayerDataProcessor : PlayerProcessor, IPlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerInputState _inputState;
@@ -33,8 +33,11 @@ namespace WildIsland.Processors
             Stats.SetDefaults();
         }
 
-        public override void Tick()
+        public void Tick()
         {
+            if (!Enabled)
+                return;
+            
             _relativeSpeed = _playerSpeed.CurrentSpeed / _player.Stats.SprintSpeed.Value;
 
             ProcessHealth();

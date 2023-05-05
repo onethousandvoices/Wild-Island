@@ -17,7 +17,7 @@ namespace WildIsland.Processors
         Jump
     }
     
-    public class PlayerInputProcessor : PlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
+    public class PlayerInputProcessor : PlayerProcessor, IPlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
@@ -112,8 +112,11 @@ namespace WildIsland.Processors
         public void Dispose()
             => _inputMap.Dispose();
 
-        public override void Tick()
+        public void Tick()
         {
+            if (!Enabled)
+                return;
+            
             ReadInput();
             GroundedCheck();
             Move();

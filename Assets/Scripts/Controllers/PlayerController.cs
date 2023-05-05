@@ -11,7 +11,7 @@ namespace WildIsland.Controllers
     {
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
         [Inject] private IGetPlayerStats _player;
-        [Inject] private List<IPlayerProcessor> _tickableProcessors;
+        [Inject] private List<IPlayerProcessor> _playerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
 
@@ -45,7 +45,7 @@ namespace WildIsland.Controllers
 
         public void Tick()
         {
-            foreach (IPlayerProcessor processor in _tickableProcessors)
+            foreach (IPlayerProcessor processor in _playerProcessors)
                 processor.Tick();
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 using Views.Biomes;
 using WildIsland.Data;
 using Zenject;
@@ -17,6 +16,7 @@ namespace WildIsland.Controllers
         private BiomesData _data;
 
         public Type ContainerType => typeof(BiomesDataContainer);
+
         public void AcquireGameData(IPartialGameDataContainer container)
             => _data = ((BiomesDataContainer)container).Default;
 
@@ -38,7 +38,6 @@ namespace WildIsland.Controllers
 
         public void UpdateBiomesTemperature(float temperatureAffect)
         {
-            Debug.Log("biome temps updated");
             foreach (BaseBiomeView biome in _biomes)
                 biome.UpdateTemperature(temperatureAffect);
         }
