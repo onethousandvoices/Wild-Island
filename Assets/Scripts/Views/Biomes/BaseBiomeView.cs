@@ -33,13 +33,13 @@ namespace Views.Biomes
             if (_biomeData.Temperature < playerData.Temperature.Value)
             {
                 float currentEffect =
-                    playerData.Hunger.Value - Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
+                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
                 _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.HungerDecrease, currentEffect));
             }
             else if (_biomeData.Temperature > playerData.Temperature.Value)
             {
                 float currentEffect =
-                    playerData.Thirst.Value - Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
+                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
                 _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.ThirstDecrease, currentEffect));
             }
         }
