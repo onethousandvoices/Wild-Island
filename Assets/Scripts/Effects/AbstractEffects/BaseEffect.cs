@@ -1,23 +1,26 @@
 ﻿using System;
 using WildIsland.Data;
+using WildIsland.Utility;
 
 namespace Effects
 {
     public abstract class BaseEffect
     {
-        private readonly Func<PlayerData, PlayerStat[]> _onApply;
-        private readonly Func<PlayerData, PlayerStat[]> _onRemove;
-
+        public readonly AffectedStats AffectedStats;
+        
+        private readonly Action<PlayerData> _onApply;
+        
         private bool _isInstantApplied;
 
         public float CurrentCooldown { get; protected set; }
         public float CurrentDuration { get; protected set; }
+        
         public bool IsExecuted { get; protected set; }
 
-        protected BaseEffect(Func<PlayerData, PlayerStat[]> apply, Func<PlayerData, PlayerStat[]> remove)
+        protected BaseEffect(Action<PlayerData> apply = null)
         {
             _onApply = apply;
-            _onRemove = remove;
+            AffectedStats = new AffectedStats();
         }
 
         protected bool InstantApply()
@@ -30,13 +33,17 @@ namespace Effects
         
         public abstract bool Process();
         
-        public virtual PlayerStat[] Apply(PlayerData data)
-            => _onApply(data);
+        public PlayerStat[] Apply(PlayerData data)
+        {
+            _onApply?.Invoke(data);
+            return AffectedStats.ApplyReturnStats;
+        }
 
-        public PlayerStat[] Remove(PlayerData data)
+        public void Remove(PlayerData data)
         {
             IsExecuted = false;
-            return _onRemove(data);
+            _isInstantApplied = false;
+            AffectedStats.RevertClear();
         }
     }
 }

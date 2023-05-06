@@ -9,7 +9,7 @@ namespace Effects
         private readonly float _period;
         private float _duration;
 
-        protected PeriodicEffect(float period, float duration, Func<PlayerData, PlayerStat[]> apply, Func<PlayerData, PlayerStat[]> remove) : base(apply, remove)
+        protected PeriodicEffect(float period, float duration, Action<PlayerData> apply = null) : base(apply)
         {
             _period = period;
             _duration = duration;

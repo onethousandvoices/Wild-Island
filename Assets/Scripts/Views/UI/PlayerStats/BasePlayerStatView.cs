@@ -8,17 +8,15 @@ namespace WildIsland.Views.UI
     public abstract class BasePlayerStatView : MonoBehaviour
     {
         private Slider _slider;
-        private PlayerStat _current;
-        private PlayerStat _max;
+        private PlayerStat _stat;
         private TextMeshProUGUI _debugText;
 
         private const float _baseDebugDelay = 0.07f;
         private float _currentDebugDelay;
         
-        public void SetRefs(PlayerStat current, PlayerStat max)
+        public void SetRefs(PlayerStat stat)
         {
-            _current = current;
-            _max = max;
+            _stat = stat;
             _currentDebugDelay = _baseDebugDelay;
         }
 
@@ -41,7 +39,7 @@ namespace WildIsland.Views.UI
         }
 
         public void Update()
-            => _slider.value = _current.Value / _max.Value;
+            => _slider.value = _stat.Value / _stat.Default;
 
         private void OnValidate()
         {

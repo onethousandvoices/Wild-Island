@@ -1,34 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using WildIsland.Data;
 
 namespace WildIsland.Utility
 {
-    public class AffectedStats : List<Tuple<PlayerStat, float>>
+    public class AffectedStats : List<AffectedStat>
     {
+        private PlayerStat[] ReturnArray => this.Select(x => x.Stat).ToArray();
+
         public PlayerStat[] ApplyReturnStats
         {
             get
             {
-                foreach (Tuple<PlayerStat, float> pair in this)
-                    pair.Item1.Value += pair.Item2;
-                return this.Select(x => x.Item1).ToArray();
+                foreach (AffectedStat pair in this)
+                    pair.Stat.ApplyValue(pair.Value);
+                return ReturnArray;
             }
         }
 
-        public PlayerStat[] RevertReturnStats
+        public void RevertClear()
         {
-            get
+            foreach (AffectedStat pair in this)
             {
-                foreach (Tuple<PlayerStat, float> pair in this)
-                {
-                    if (pair.Item1 is not VolatilePlayerStat) 
-                        continue;
-                    pair.Item1.Value -= pair.Item2;
-                }
-                return this.Select(x => x.Item1).ToArray();
+                if (pair.Stat is not VolatilePlayerStat)
+                    continue;
+                pair.Stat.ApplyValue(-pair.Value);
             }
+
+            Clear();
+        }
+    }
+
+    public class AffectedStat
+    {
+        public readonly PlayerStat Stat;
+        public readonly float Value;
+
+        public AffectedStat(PlayerStat stat, float value)
+        {
+            Stat = stat;
+            Value = value;
         }
     }
 }
