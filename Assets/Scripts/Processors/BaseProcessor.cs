@@ -4,7 +4,7 @@ namespace WildIsland.Processors
 {
     public abstract class BaseProcessor : IBaseProcessor
     {
-        public bool Enabled { get; private set; }
+        protected bool Enabled { get; private set; }
 
         public void Enable()
             => Enabled = true;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using WildIsland.Data;
 using WildIsland.Processors;
@@ -41,13 +42,12 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerHungerStatView.SetRefs(_player.Stats.Hunger);
             _viewStatsHolder.PlayerThirstStatView.SetRefs(_player.Stats.Thirst);
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_player.Stats.Fatigue);
+
+            _playerProcessors.ForEach(x => x.Enable());
         }
 
         public void Tick()
-        {
-            foreach (IPlayerProcessor processor in _playerProcessors)
-                processor.Tick();
-        }
+            => _playerProcessors.ForEach(x => x.Tick());
 
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {

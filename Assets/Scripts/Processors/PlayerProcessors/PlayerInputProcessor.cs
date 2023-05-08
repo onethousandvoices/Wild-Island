@@ -33,8 +33,6 @@ namespace WildIsland.Processors
         private bool _hasAnimator;
         private bool _isLockCameraPosition;
         private bool _isGrounded = true;
-        private bool _isTimeSpeedUp;
-        private bool _isFrameRate60;
 
         private float _moveSpeed;
         private float _sprintSpeed;
