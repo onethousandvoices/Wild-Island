@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace WildIsland.Views
 {
-    [RequireComponent(typeof(CharacterController), typeof(Animator))]
+    [RequireComponent(typeof(Rigidbody), typeof(Animator))]
     public class PlayerView : MonoBehaviour, IEffectReceiver
     {
         [field: SerializeField, HorizontalLine(color: EColor.Blue), MinMaxSlider(0f, 100f)] public Vector2 HungerRegenStage1Range { get; private set; }
@@ -22,8 +22,16 @@ namespace WildIsland.Views
         [field: SerializeField] public AudioClip[] FootstepAudioClips { get; private set; }
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
         [field: SerializeField] public GameObject CinemachineCameraTarget { get; private set; }
+        [field: SerializeField] public PhysicMaterial SlipperyMaterial { get; private set; }
+        [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
 
-        private CharacterController _characterController;
+        private void OnDrawGizmos()
+        {
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - 0.05f, transform.position.z);
+            Gizmos.DrawSphere(spherePosition, 0.15f);
+        }
+
+        private Rigidbody _rb;
         
         private Action<AnimationEvent> OnLandCallback;
         private Action<AnimationEvent> OnFootStepCallback;
@@ -31,8 +39,8 @@ namespace WildIsland.Views
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
         
-        public CharacterController CharacterController => _characterController ??= GetComponent<CharacterController>();
-
+        public Rigidbody Rb => _rb ??= GetComponent<Rigidbody>();
+        
         public void SetEffectCallbacks(Action<BaseEffect> apply, Action<Type> remove)
         {
             OnEffectApplied = apply;

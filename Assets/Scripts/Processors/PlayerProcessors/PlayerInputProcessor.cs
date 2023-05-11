@@ -16,8 +16,8 @@ namespace WildIsland.Processors
         Sprint,
         Jump
     }
-    
-    public class PlayerInputProcessor : PlayerProcessor, IPlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
+
+    public class PlayerInputProcessor : PlayerProcessor, IFixedPlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
@@ -29,8 +29,8 @@ namespace WildIsland.Processors
         private PlayerInput _playerInput;
         private InputMap _inputMap;
         private Animator _animator;
+        private CapsuleCollider _capsuleCollider;
 
-        private bool _hasAnimator;
         private bool _isLockCameraPosition;
         private bool _isGrounded = true;
 
@@ -43,26 +43,23 @@ namespace WildIsland.Processors
         private float _animationBlend;
         private float _targetRotation;
         private float _rotationVelocity;
-        private float _verticalVelocity;
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
         private float _staminaJumpCost;
         private float _staminaSprintCost;
 
-        private const float _inAirVelocityReduction = 0.98f;
+        private const float _inAirVelocityReduction = 0.95f;
         private const float _inputMagnitude = 1f;
-        private const float _speedUpChangeRate = 1.5f;
-        private const float _slowDownChangeRate = 10f;
+        private const float _speedUpChangeRate = 1.1f;
+        private const float _slowDownChangeRate = 8.8f;
         private const float _rotationSmoothTime = 0.12f;
-        private const float _jumpHeight = 1.7f;
-        private const float _gravity = -15f;
+        private const float _jumpHeight = 6f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
-        private const float _groundedOffset = -0.14f;
-        private const float _groundedRadius = 0.28f;
+        private const float _groundedOffset = 0.05f;
+        private const float _groundCheckSphereRadius = 0.15f;
         private const float _topClamp = 70f;
         private const float _bottomClamp = -30f;
-        private const float _terminalVelocity = 53f;
         private const float _threshold = 0.01f;
         private const float _deltaTimeMultiplier = 1f;
 
@@ -92,7 +89,8 @@ namespace WildIsland.Processors
             _moveSpeed = _stats.RegularSpeed.Value;
             _sprintSpeed = _stats.SprintSpeed.Value;
 
-            _hasAnimator = _view.TryGetComponent(out _animator);
+            _capsuleCollider = _view.GetComponent<CapsuleCollider>();
+            _animator = _view.GetComponent<Animator>();
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _playerInput = new PlayerInput();
@@ -100,6 +98,7 @@ namespace WildIsland.Processors
             _inputMap.Enable();
 
             _inputMap.Player.Jump.performed += OnJumpPerformed;
+
             _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
             _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
             _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
@@ -114,11 +113,18 @@ namespace WildIsland.Processors
         {
             if (!Enabled)
                 return;
-            
+
             ReadInput();
-            GroundedCheck();
+        }
+
+        public void FixedTick()
+        {
+            if (!Enabled)
+                return;
+
             Move();
             JumpAndGravity();
+            GroundedCheck();
         }
 
         public void LateTick()
@@ -135,6 +141,9 @@ namespace WildIsland.Processors
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
+            Vector3 jumpForces = Vector3.up * _jumpHeight;
+            _view.Rb.AddForce(jumpForces, ForceMode.VelocityChange);
+
             _playerInput.SetJump(obj.ReadValueAsButton());
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }
@@ -165,22 +174,11 @@ namespace WildIsland.Processors
             {
                 _fallTimeoutDelta = _fallTimeout;
 
-                if (_hasAnimator)
-                {
-                    _animator.SetBool(_animIDJump, false);
-                    _animator.SetBool(_animIDFreeFall, false);
-                }
-
-                if (_verticalVelocity < 0.0f)
-                    _verticalVelocity = -2f;
+                _animator.SetBool(_animIDJump, false);
+                _animator.SetBool(_animIDFreeFall, false);
 
                 if (_playerInput.Jump && _jumpTimeoutDelta <= 0f)
-                {
-                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-
-                    if (_hasAnimator)
-                        _animator.SetBool(_animIDJump, true);
-                }
+                    _animator.SetBool(_animIDJump, true);
 
                 if (_jumpTimeoutDelta >= 0.0f)
                     _jumpTimeoutDelta -= Time.deltaTime;
@@ -191,27 +189,26 @@ namespace WildIsland.Processors
 
                 if (_fallTimeoutDelta >= 0.0f)
                     _fallTimeoutDelta -= Time.deltaTime;
-                else if (_hasAnimator)
-                    _animator.SetBool(_animIDFreeFall, true);
+
+                _animator.SetBool(_animIDFreeFall, true);
                 _playerInput.ResetJump();
             }
-
-            if (_verticalVelocity < _terminalVelocity)
-                _verticalVelocity += _gravity * Time.deltaTime;
         }
 
         private void GroundedCheck()
         {
             Vector3 playerPos = _view.transform.position;
-            Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _groundedOffset,
-                playerPos.z);
-            _isGrounded = Physics.CheckSphere(spherePosition, _groundedRadius, _view.GroundLayers,
-                QueryTriggerInteraction.Ignore);
+            Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _groundedOffset, playerPos.z);
+            _isGrounded = Physics.CheckSphere(spherePosition, _groundCheckSphereRadius, _view.GroundLayers, QueryTriggerInteraction.Ignore);
+
+            if (_isGrounded && _playerInput.Move.sqrMagnitude == 0)
+                _capsuleCollider.material = _view.FrictionMaterial;
+            else
+                _capsuleCollider.material = _view.SlipperyMaterial;
 
             State = _isGrounded ? PlayerInputState.Idle : PlayerInputState.Jump;
 
-            if (_hasAnimator)
-                _animator.SetBool(_animIDGrounded, _isGrounded);
+            _animator.SetBool(_animIDGrounded, _isGrounded);
         }
 
         private void Move()
@@ -239,20 +236,14 @@ namespace WildIsland.Processors
             if (_isGrounded)
                 State = pendingInputState;
 
-            float currentHorizontalSpeed = new Vector3(_view.CharacterController.velocity.x, 0.0f, _view.CharacterController.velocity.z).magnitude;
-            float multiplier = currentHorizontalSpeed < targetSpeed ? _speedUpChangeRate : _slowDownChangeRate;
+            float modifier = _playerInput.Move.sqrMagnitude > 0 ? _speedUpChangeRate : _slowDownChangeRate;
 
-            if (currentHorizontalSpeed < targetSpeed || currentHorizontalSpeed > targetSpeed)
-            {
-                CurrentSpeed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * _inputMagnitude,
-                    Time.deltaTime * multiplier);
+            CurrentSpeed = Mathf.Lerp(CurrentSpeed, targetSpeed * _inputMagnitude,
+                Time.deltaTime * modifier);
 
-                CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
-            }
-            else
-                CurrentSpeed = targetSpeed;
+            CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * multiplier * 5f);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * modifier * 5f);
             if (_animationBlend < 0.01f)
                 _animationBlend = 0f;
 
@@ -274,13 +265,29 @@ namespace WildIsland.Processors
             if (!_isGrounded)
                 CurrentSpeed *= _inAirVelocityReduction;
 
-            _view.CharacterController.Move(targetDirection.normalized * (CurrentSpeed * Time.deltaTime) +
-                                           new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            Vector3 currentVelocity = _view.Rb.velocity;
+            targetDirection *= CurrentSpeed;
 
-            if (!_hasAnimator)
-                return;
+            Vector3 velocityChange = targetDirection - currentVelocity;
+            velocityChange = new Vector3(velocityChange.x, 0f, velocityChange.z);
+            velocityChange = AdjustSlopeVelocity(velocityChange);
+            velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
+
+            _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
+            
             _animator.SetFloat(_animIDSpeed, _animationBlend);
             _animator.SetFloat(_animIDMotionSpeed, _inputMagnitude);
+        }
+
+        private Vector3 AdjustSlopeVelocity(Vector3 velocity)
+        {
+            Ray ray = new Ray(_view.transform.position, Vector3.down);
+            if (!Physics.Raycast(ray, out RaycastHit slopeHit, 0.2f))
+                return velocity;
+            Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, slopeHit.normal);
+            Vector3 adjustedVelocity = slopeRotation * velocity;
+
+            return adjustedVelocity.y < 0 ? adjustedVelocity : velocity;
         }
 
         private void CameraRotation()
@@ -307,7 +314,7 @@ namespace WildIsland.Processors
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
     }
-    
+
     public interface IPlayerSpeed
     {
         public float CurrentSpeed { get; }

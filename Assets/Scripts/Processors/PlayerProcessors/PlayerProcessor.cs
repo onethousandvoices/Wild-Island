@@ -11,4 +11,9 @@ namespace WildIsland.Processors
     {
         public void Tick();
     }
+
+    public interface IFixedPlayerProcessor : IPlayerProcessor
+    {
+        public void FixedTick();
+    }
 }

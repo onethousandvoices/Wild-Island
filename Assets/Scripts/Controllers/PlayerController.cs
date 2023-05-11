@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using WildIsland.Data;
 using WildIsland.Processors;
@@ -8,11 +7,12 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class PlayerController : IInitializable, ITickable, IPlayerStatSetter
+    public class PlayerController : IInitializable, ITickable, IFixedTickable, IPlayerStatSetter
     {
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
         [Inject] private IGetPlayerStats _player;
         [Inject] private List<IPlayerProcessor> _playerProcessors;
+        [Inject] private List<IFixedPlayerProcessor> _fixedPlayerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
 
@@ -48,6 +48,9 @@ namespace WildIsland.Controllers
 
         public void Tick()
             => _playerProcessors.ForEach(x => x.Tick());
+        
+        public void FixedTick()
+            => _fixedPlayerProcessors.ForEach(x => x.FixedTick());
 
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {

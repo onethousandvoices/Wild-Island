@@ -1,6 +1,4 @@
-﻿using Zenject;
-
-namespace WildIsland.Processors
+﻿namespace WildIsland.Processors
 {
     public abstract class BaseProcessor : IBaseProcessor
     {
