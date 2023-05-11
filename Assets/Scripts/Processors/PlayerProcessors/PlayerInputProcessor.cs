@@ -99,6 +99,8 @@ namespace WildIsland.Processors
 
             _inputMap.Player.Jump.performed += OnJumpPerformed;
 
+            Cursor.lockState = CursorLockMode.Locked;
+            
             _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
             _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
             _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
@@ -141,9 +143,7 @@ namespace WildIsland.Processors
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
-            Vector3 jumpForces = Vector3.up * _jumpHeight;
-            _view.Rb.AddForce(jumpForces, ForceMode.VelocityChange);
-
+            _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _jumpHeight, _view.Rb.velocity.z);
             _playerInput.SetJump(obj.ReadValueAsButton());
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }

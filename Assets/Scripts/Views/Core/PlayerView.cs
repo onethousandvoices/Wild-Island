@@ -24,13 +24,7 @@ namespace WildIsland.Views
         [field: SerializeField] public GameObject CinemachineCameraTarget { get; private set; }
         [field: SerializeField] public PhysicMaterial SlipperyMaterial { get; private set; }
         [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
-
-        private void OnDrawGizmos()
-        {
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - 0.05f, transform.position.z);
-            Gizmos.DrawSphere(spherePosition, 0.15f);
-        }
-
+        
         private Rigidbody _rb;
         
         private Action<AnimationEvent> OnLandCallback;
