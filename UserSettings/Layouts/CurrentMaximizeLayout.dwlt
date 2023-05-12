@@ -26,7 +26,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 18760
+  controlID: 19037
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -286,9 +286,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 3.7606444, y: 1.551189, z: 4.3539314}
+    m_Target: {x: 3.3558383, y: 0.6559036, z: 4.7352424}
     speed: 2
-    m_Value: {x: 3.7606444, y: 1.551189, z: 4.3539314}
+    m_Value: {x: 3.3558383, y: 0.6559036, z: 4.7352424}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -335,9 +335,9 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.0070022102, y: 0.99052274, z: -0.12628752, w: -0.055232022}
+    m_Target: {x: -0.004703326, y: 0.9842323, z: -0.17535256, w: -0.026787048}
     speed: 2
-    m_Value: {x: -0.0071909744, y: 0.990348, z: -0.1262653, w: -0.05671254}
+    m_Value: {x: -0.0047430075, y: 0.9838691, z: -0.1768109, w: -0.02677727}
   m_Size:
     m_Target: 0.16031261
     speed: 2
@@ -390,7 +390,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 200}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 18761
+  controlID: 19015
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -419,7 +419,7 @@ MonoBehaviour:
   - {fileID: 6}
   - {fileID: 7}
   m_Selected: 0
-  m_LastSelected: 2
+  m_LastSelected: 1
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -3560,7 +3560,7 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: 46140100
       m_LastClickedID: 0
       m_ExpandedIDs: 8255ffff
       m_RenameOverlay:
@@ -3654,21 +3654,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Materials
+    - Assets/Resources/Textures
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/Materials
+  - Assets/Resources/Textures
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Unity_projects\Wild_island
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 9e030100
-    m_LastClickedID: 66462
+    m_SelectedIDs: a8030100
+    m_LastClickedID: 66472
     m_ExpandedIDs: 000000002afb000032fb000038fb0000260e010000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -3722,8 +3722,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
+    m_SelectedInstanceIDs: 46140100
+    m_LastClickedInstanceID: 70726
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 
     m_RenameOverlay:
