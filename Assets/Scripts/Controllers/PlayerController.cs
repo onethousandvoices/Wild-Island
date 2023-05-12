@@ -7,11 +7,12 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class PlayerController : IInitializable, ITickable, IPlayerStatSetter
+    public class PlayerController : IInitializable, ITickable, IFixedTickable, IPlayerStatSetter
     {
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
         [Inject] private IGetPlayerStats _player;
         [Inject] private List<IPlayerProcessor> _playerProcessors;
+        [Inject] private List<IFixedPlayerProcessor> _fixedPlayerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
 
@@ -41,13 +42,15 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerHungerStatView.SetRefs(_player.Stats.Hunger);
             _viewStatsHolder.PlayerThirstStatView.SetRefs(_player.Stats.Thirst);
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_player.Stats.Fatigue);
+
+            _playerProcessors.ForEach(x => x.Enable());
         }
 
         public void Tick()
-        {
-            foreach (IPlayerProcessor processor in _playerProcessors)
-                processor.Tick();
-        }
+            => _playerProcessors.ForEach(x => x.Tick());
+        
+        public void FixedTick()
+            => _fixedPlayerProcessors.ForEach(x => x.FixedTick());
 
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {

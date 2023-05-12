@@ -23,7 +23,7 @@ namespace WildIsland.Processors
         public PlayerData Stats => _data.Value;
 
         public Type ContainerType => typeof(PlayerDataContainer);
-        
+
         public void AcquireGameData(IPartialGameDataContainer container)
             => _dataContainer = ((PlayerDataContainer)container).Default;
 
@@ -37,7 +37,7 @@ namespace WildIsland.Processors
         {
             if (!Enabled)
                 return;
-            
+
             _relativeSpeed = _playerSpeed.CurrentSpeed / _player.Stats.SprintSpeed.Value;
 
             ProcessHealth();
@@ -53,7 +53,7 @@ namespace WildIsland.Processors
             float thirstMod = 0f;
             float currentHunger = _player.Stats.Hunger.Value;
             float currentThirst = _player.Stats.Thirst.Value;
-            
+
             if (currentHunger <= _view.HungerRegenStage1Range.y && currentHunger >= _view.HungerRegenStage1Range.x)
                 hungerMod = _player.Stats.HealthRegenHungerStage1.Default;
             else if (currentHunger <= _view.HungerRegenStage2Range.y && currentHunger >= _view.HungerRegenStage2Range.x)
