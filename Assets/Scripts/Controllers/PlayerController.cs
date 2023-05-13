@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using WildIsland.Data;
 using WildIsland.Processors;
@@ -15,6 +16,7 @@ namespace WildIsland.Controllers
         [Inject] private List<IFixedPlayerProcessor> _fixedPlayerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
+        private List<BasePlayerStatView> _basePlayerStatViews;
 
         public void Initialize()
         {
@@ -46,11 +48,16 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_player.Stats.Fatigue);
 
             _playerProcessors.ForEach(x => x.Enable());
+            _basePlayerStatViews = _statViewPairs.Values.ToList();
+            _basePlayerStatViews.ForEach(x => x.Init());
         }
 
         public void Tick()
-            => _playerProcessors.ForEach(x => x.Tick());
-        
+        {
+            _playerProcessors.ForEach(x => x.Tick());
+            _basePlayerStatViews.ForEach(x => x.UpdateValue());
+        }
+
         public void FixedTick()
             => _fixedPlayerProcessors.ForEach(x => x.FixedTick());
 

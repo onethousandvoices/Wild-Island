@@ -13,7 +13,10 @@ namespace WildIsland.Views.UI
 
         private const float _baseDebugDelay = 0.07f;
         private float _currentDebugDelay;
-        
+
+        public void Init()
+            => OnValidate();
+
         public void SetRefs(PlayerStat stat)
         {
             _stat = stat;
@@ -29,7 +32,7 @@ namespace WildIsland.Views.UI
                 _debugText.text = debug_currentValue.ToString("N" + 3);
                 return;
             }
-            
+
             _currentDebugDelay -= Time.deltaTime;
             if (_currentDebugDelay > 0)
                 return;
@@ -37,10 +40,10 @@ namespace WildIsland.Views.UI
             _debugText.color = Color.white;
             _debugText.text = debug_currentValue.ToString("N" + 3);
         }
-
-        public void Update()
+        
+        public void UpdateValue()
             => _slider.value = _stat.Value / _stat.Default;
-
+        
         private void OnValidate()
         {
             _slider = GetComponentInChildren<Slider>();

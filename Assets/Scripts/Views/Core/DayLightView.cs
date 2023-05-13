@@ -16,10 +16,9 @@ namespace WildIsland.Views
         [field: SerializeField] public AnimationCurve MoonCurve { get; private set; }
         [field: SerializeField] public Material DaySkybox { get; private set; }
         [field: SerializeField] public Material NightSkybox { get; private set; }
-
-        public float SunIntensity => Sun.intensity;
-        public float MoonIntensity => Moon.intensity;
-
+        [field: SerializeField] public Color DayAmbientLight { get; private set; }
+        [field: SerializeField] public Color NightAmbientLight { get; private set; }
+        
         public void SetSunParams(float time, float intensity)
         {
             Sun.transform.rotation = Quaternion.Euler(time * 360f, 180f, 0f);

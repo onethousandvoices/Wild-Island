@@ -141,7 +141,7 @@ namespace WildIsland.Processors
 
         public void Dispose()
             => _data.Save();
-
+#if UNITY_EDITOR
         [MenuItem("Debug/Clear Save")]
         public static void ClearSave()
         {
@@ -154,8 +154,10 @@ namespace WildIsland.Processors
                 Debug.Log("Reload assemblies");
             }
         }
-
+#endif
+#if UNITY_EDITOR
         [MenuItem("Debug/Open save folder")]
+#endif
         public static void OpenSaveFolder()
         {
             System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace("/", "\\"));

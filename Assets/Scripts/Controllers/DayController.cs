@@ -14,15 +14,16 @@ namespace WildIsland.Controllers
         [Inject] private IBiomeDayAffect _biomeController;
 
         private BasicGameData.DaySettings _daySettings;
+        private Material _skyBoxMaterial;
 
         private float _dayTime;
         private float _nightTime;
-        private float _sunIntensity;
-        private float _moonIntensity;
         private float _skyboxLerp;
         private float _dayDuration;
         private float _nightDuration;
         private float _currentTemperatureMod;
+        
+        private static readonly int GlobalSunDirection = Shader.PropertyToID("GlobalSunDirection");
 
         public Type ContainerType => typeof(BasicGameDataContainer);
 
@@ -33,12 +34,14 @@ namespace WildIsland.Controllers
         {
             _dayDuration = _daySettings.DayTimer;
             _nightDuration = _daySettings.NightTimer;
-            _sunIntensity = _view.SunIntensity;
-            _moonIntensity = _view.MoonIntensity;
+
+            _skyBoxMaterial = new Material(_view.DaySkybox);
         }
 
         public void Tick()
         {
+            return;
+            
             CheckTemperatureEffectRanges();
 
             if (_dayTime < 1)
@@ -54,10 +57,15 @@ namespace WildIsland.Controllers
             _dayTimer.SetDayTime(_dayTime);
             _dayTimer.SetNightTime(_nightTime);
 
+            float dotProduct = Vector3.Dot(_view.Sun.transform.forward, Vector3.down);
+            float sunIntensity = Mathf.Lerp(0f, 1f, dotProduct);
+            float moonIntensity = Mathf.Lerp(0.5f, 0f, dotProduct);
+            RenderSettings.ambientLight = Color.Lerp(_view.DayAmbientLight, _view.NightAmbientLight, dotProduct);
+            
             float evaluation = (_dayTime + _nightTime) / 2;
 
-            _view.SetSunParams(evaluation, _sunIntensity * _view.SunCurve.Evaluate(_dayTime));
-            _view.SetMoonParams(evaluation, _moonIntensity * _view.MoonCurve.Evaluate(_nightTime));
+            _view.SetSunParams(evaluation, sunIntensity);
+            _view.SetMoonParams(evaluation, moonIntensity);
 
             _skyboxLerp = evaluation switch
                           {
@@ -66,8 +74,12 @@ namespace WildIsland.Controllers
                               _       => _skyboxLerp
                           };
 
-            RenderSettings.skybox.Lerp(_view.DaySkybox, _view.NightSkybox, _skyboxLerp);
+            _skyBoxMaterial.Lerp(_view.DaySkybox, _view.NightSkybox, _skyboxLerp);
+            RenderSettings.skybox = _skyBoxMaterial;
             RenderSettings.sun = evaluation > 0.5f ? _view.Moon : _view.Sun;
+
+            Shader.SetGlobalVector(GlobalSunDirection, -(evaluation > 0.5f ? _view.Moon : _view.Sun).transform.forward);
+
             DynamicGI.UpdateEnvironment();
         }
 
@@ -93,7 +105,7 @@ namespace WildIsland.Controllers
                 else if (nightRelativeValue < _view.NightTemperatureAffectStage2.y && nightRelativeValue > _view.NightTemperatureAffectStage2.x)
                     _currentTemperatureMod = _daySettings.NightTemperatureAffectStage2;
             }
-            
+
             if (Math.Abs(_currentTemperatureMod - previousValue) > 0.01f)
                 DayBiomeEffectChanged();
         }
