@@ -15922,7 +15922,8 @@ MonoBehaviour:
   <ThirstRegenStage3Range>k__BackingField: {x: 26, y: 50}
   <ThirstRegenStage4Range>k__BackingField: {x: 0, y: 25}
   <StaminaJumpCost>k__BackingField: 1
-  <StaminaSprintCost>k__BackingField: 20
+  <StaminaSprintCost>k__BackingField: 1
+  <JumpHeight>k__BackingField: 1
   <LandingAudioClip>k__BackingField: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2,
     type: 3}
   <FootstepAudioClips>k__BackingField:

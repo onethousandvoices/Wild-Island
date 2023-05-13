@@ -4332,6 +4332,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7609091868858603891, guid: b163c812c7cea7d48a433403ae0966eb,
+        type: 3}
+      propertyPath: <JumpHeight>k__BackingField
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b163c812c7cea7d48a433403ae0966eb, type: 3}
 --- !u!224 &7620849034231863077

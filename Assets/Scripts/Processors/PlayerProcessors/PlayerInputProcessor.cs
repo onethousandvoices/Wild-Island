@@ -54,7 +54,6 @@ namespace WildIsland.Processors
         private const float _speedUpChangeRate = 1.1f;
         private const float _slowDownChangeRate = 7f;
         private const float _rotationSmoothTime = 0.12f;
-        private const float _jumpHeight = 6f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
         private const float _groundedOffset = 0.05f;
@@ -68,7 +67,6 @@ namespace WildIsland.Processors
         private static readonly int _animIDGrounded = Animator.StringToHash("Grounded");
         private static readonly int _animIDJump = Animator.StringToHash("Jump");
         private static readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
-        private static readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
 
         private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
@@ -148,7 +146,7 @@ namespace WildIsland.Processors
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
-            _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _jumpHeight, _view.Rb.velocity.z);
+            _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _view.JumpHeight, _view.Rb.velocity.z);
             _playerInput.SetJump(obj.ReadValueAsButton());
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }
@@ -245,11 +243,11 @@ namespace WildIsland.Processors
             float modifier = _playerInput.Move.sqrMagnitude > 0 ? _speedUpChangeRate : _slowDownChangeRate;
 
             CurrentSpeed = Mathf.Lerp(rbSpeed, targetSpeed * _inputMagnitude,
-                Time.deltaTime * modifier);
+                Time.fixedDeltaTime * modifier);
 
             CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * modifier * 5f);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * modifier * 5f);
             if (_animationBlend < 0.01f)
                 _animationBlend = 0f;
 
@@ -282,7 +280,6 @@ namespace WildIsland.Processors
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
             
             _animator.SetFloat(_animIDSpeed, _animationBlend);
-            _animator.SetFloat(_animIDMotionSpeed, _inputMagnitude);
         }
 
         private Vector3 AdjustSlopeVelocity(Vector3 velocity)
