@@ -1,5 +1,7 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows;
 using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
@@ -139,6 +141,25 @@ namespace WildIsland.Processors
 
         public void Dispose()
             => _data.Save();
+
+        [MenuItem("Debug/Clear Save")]
+        public static void ClearSave()
+        {
+            try
+            {
+                File.Delete(MainDataBase.Path);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Reload assemblies");
+            }
+        }
+
+        [MenuItem("Debug/Open save folder")]
+        public static void OpenSaveFolder()
+        {
+            System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace("/", "\\"));
+        }
     }
 
     public interface IDataProcessor

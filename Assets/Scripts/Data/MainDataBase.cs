@@ -8,14 +8,14 @@ namespace WildIsland.Data
 {
     public static class MainDataBase
     {
-        private static readonly string _path = Path.Combine(Application.persistentDataPath, "main.db");
+        public static readonly string Path = System.IO.Path.Combine(Application.persistentDataPath, "main.db");
         private static readonly Dictionary<Type, object> _collections;
         private static readonly LiteDatabase _db;
 
         static MainDataBase()
         {
             BsonMapper.Global.IncludeFields = true;
-            _db = new LiteDatabase(_path);
+            _db = new LiteDatabase(Path);
             _collections = new Dictionary<Type, object>();
 
             BsonMapper.Global.IncludeFields = true;
