@@ -73,6 +73,15 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Esc"",
+                    ""type"": ""Button"",
+                    ""id"": ""dfa089d2-d6fc-4e58-962f-dc5488ce80cb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""CHEAT_Time"",
                     ""type"": ""Button"",
                     ""id"": ""f95a2ce1-63e4-4fb4-8225-b80057174058"",
@@ -360,6 +369,17 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""action"": ""CHEAT_TemporaryEffect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e98d6451-d220-44ed-acb4-becaf9ab4207"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -421,6 +441,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
+        m_Player_Esc = m_Player.FindAction("Esc", throwIfNotFound: true);
         m_Player_CHEAT_Time = m_Player.FindAction("CHEAT_Time", throwIfNotFound: true);
         m_Player_CHEAT_Damage = m_Player.FindAction("CHEAT_Damage", throwIfNotFound: true);
         m_Player_CHEAT_FrameRate = m_Player.FindAction("CHEAT_FrameRate", throwIfNotFound: true);
@@ -490,6 +511,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Inventory;
+    private readonly InputAction m_Player_Esc;
     private readonly InputAction m_Player_CHEAT_Time;
     private readonly InputAction m_Player_CHEAT_Damage;
     private readonly InputAction m_Player_CHEAT_FrameRate;
@@ -504,6 +526,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
+        public InputAction @Esc => m_Wrapper.m_Player_Esc;
         public InputAction @CHEAT_Time => m_Wrapper.m_Player_CHEAT_Time;
         public InputAction @CHEAT_Damage => m_Wrapper.m_Player_CHEAT_Damage;
         public InputAction @CHEAT_FrameRate => m_Wrapper.m_Player_CHEAT_FrameRate;
@@ -533,6 +556,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Inventory.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
                 @Inventory.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
                 @Inventory.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInventory;
+                @Esc.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
+                @Esc.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
+                @Esc.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
                 @CHEAT_Time.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
                 @CHEAT_Time.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
                 @CHEAT_Time.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
@@ -567,6 +593,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Inventory.started += instance.OnInventory;
                 @Inventory.performed += instance.OnInventory;
                 @Inventory.canceled += instance.OnInventory;
+                @Esc.started += instance.OnEsc;
+                @Esc.performed += instance.OnEsc;
+                @Esc.canceled += instance.OnEsc;
                 @CHEAT_Time.started += instance.OnCHEAT_Time;
                 @CHEAT_Time.performed += instance.OnCHEAT_Time;
                 @CHEAT_Time.canceled += instance.OnCHEAT_Time;
@@ -629,6 +658,7 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
+        void OnEsc(InputAction.CallbackContext context);
         void OnCHEAT_Time(InputAction.CallbackContext context);
         void OnCHEAT_Damage(InputAction.CallbackContext context);
         void OnCHEAT_FrameRate(InputAction.CallbackContext context);
