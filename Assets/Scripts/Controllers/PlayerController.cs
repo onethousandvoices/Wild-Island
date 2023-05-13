@@ -18,6 +18,8 @@ namespace WildIsland.Controllers
 
         public void Initialize()
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            
             _statViewPairs = new Dictionary<PlayerStat, BasePlayerStatView>
             {
                 { _player.Stats.HeadHealth, _viewStatsHolder.PlayerHeadStatView },
@@ -66,10 +68,5 @@ namespace WildIsland.Controllers
     public interface IPlayerStatSetter
     {
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false);
-    }
-
-    public interface IGetPlayerStats
-    {
-        public PlayerData Stats { get; }
     }
 }

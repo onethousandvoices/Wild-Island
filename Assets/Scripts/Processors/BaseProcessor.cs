@@ -17,4 +17,13 @@
         public void Disable();
     }
     
+    public interface IPlayerProcessor : IBaseProcessor
+    {
+        public void Tick();
+    }
+
+    public interface IFixedPlayerProcessor : IPlayerProcessor
+    {
+        public void FixedTick();
+    }
 }
