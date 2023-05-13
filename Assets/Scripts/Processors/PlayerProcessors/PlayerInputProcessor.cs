@@ -49,7 +49,6 @@ namespace WildIsland.Processors
         private float _staminaJumpCost;
         private float _staminaSprintCost;
 
-        private const float _inAirVelocityReduction = 0.95f;
         private const float _inputMagnitude = 1f;
         private const float _speedUpChangeRate = 1.1f;
         private const float _slowDownChangeRate = 7f;
@@ -138,7 +137,10 @@ namespace WildIsland.Processors
         private void ReadInput()
         {
             _playerInput.SetLook(_inputMap.Player.Look.ReadValue<Vector2>());
-            _playerInput.SetMove(_inputMap.Player.Move.ReadValue<Vector2>());
+            Vector2 move = _inputMap.Player.Move.ReadValue<Vector2>();
+            if (_playerInput.Sprint)
+                move = Vector2.up;
+            _playerInput.SetMove(move);
             CheckSprint();
         }
 
@@ -146,6 +148,7 @@ namespace WildIsland.Processors
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
+            _playerInput.SetLastMove(_inputMap.Player.Move.ReadValue<Vector2>());
             _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _view.JumpHeight, _view.Rb.velocity.z);
             _playerInput.SetJump(obj.ReadValueAsButton());
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
@@ -161,7 +164,7 @@ namespace WildIsland.Processors
                 return;
             }
 
-            if (!_sprintPossible)
+            if (!_sprintPossible || _playerInput.Move != Vector2.up)
             {
                 _playerInput.SetSprint(false);
                 return;
@@ -251,9 +254,11 @@ namespace WildIsland.Processors
             if (_animationBlend < 0.01f)
                 _animationBlend = 0f;
 
-            Vector3 inputDirection = new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized;
+            Vector3 inputDirection = _isGrounded
+                                         ? new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized
+                                         : new Vector3(_playerInput.LastMove.x, 0.0f, _playerInput.LastMove.y).normalized;
 
-            if (_playerInput.Move != Vector2.zero)
+            if (_playerInput.Move != Vector2.zero && _isGrounded)
             {
                 _targetRotation = _mainCamera.transform.eulerAngles.y;
 
@@ -262,11 +267,19 @@ namespace WildIsland.Processors
 
                 _view.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
+            
+            float horizontalVelocity = new Vector2(_playerInput.Move.x, 0f).magnitude;
 
-            Vector3 targetDirection = Quaternion.Euler(_playerInput.Move.x, _targetRotation, _playerInput.Move.y) * inputDirection;
+            if (horizontalVelocity > 0)
+                CurrentSpeed *= _view.HorizontalVelocityReduction;
 
+            if (_playerInput.Move.y < 0)
+                CurrentSpeed *= _view.BackwardsVelocityReduction;
+            
             if (!_isGrounded)
-                CurrentSpeed *= _inAirVelocityReduction;
+                CurrentSpeed *= _view.InAirVelocityReduction;
+            
+            Vector3 targetDirection = Quaternion.Euler(0f, _targetRotation, 0f) * inputDirection;
 
             Vector3 currentVelocity = _view.Rb.velocity;
             targetDirection *= CurrentSpeed;
@@ -277,7 +290,6 @@ namespace WildIsland.Processors
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
 
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
-
             _animator.SetFloat(_animIDSpeed, _animationBlend);
         }
 
