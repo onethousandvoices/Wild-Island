@@ -30,7 +30,6 @@ namespace WildIsland.Processors
         public void Initialize()
         {
             _data = new DbValue<PlayerData>("PlayerData", _dataContainer);
-            Debug.Log(_data.Value.RegularSpeed.Value);
             Stats.SetDefaults();
         }
 

@@ -124,17 +124,17 @@ namespace WildIsland.Processors
             _playerInput = new PlayerInput();
             _inputMap = new InputMap();
             _inputMap.Enable();
-            
+
             _inputMap.Player.Jump.performed += OnJumpPerformed;
             _inputMap.Player.Inventory.performed += _inventory.ShowInventory;
-            
+
             _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
             _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
             _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
             _inputMap.Player.CHEAT_PeriodicEffect.started += _cheats.CHEAT_PeriodicEffectApply;
             _inputMap.Player.CHEAT_TemporaryEffect.started += _cheats.CHEAT_TemporaryEffectApply;
         }
-        
+
         private void ReadInput()
         {
             _playerInput.SetLook(_inputMap.Player.Look.ReadValue<Vector2>());
@@ -252,11 +252,10 @@ namespace WildIsland.Processors
                 _animationBlend = 0f;
 
             Vector3 inputDirection = new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized;
-            
+
             if (_playerInput.Move != Vector2.zero)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
+                _targetRotation = _mainCamera.transform.eulerAngles.y;
 
                 float rotation = Mathf.SmoothDampAngle(_view.transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     _rotationSmoothTime);
@@ -264,7 +263,7 @@ namespace WildIsland.Processors
                 _view.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            Vector3 targetDirection = Quaternion.Euler(_playerInput.Move.x, _targetRotation, _playerInput.Move.y) * inputDirection;
 
             if (!_isGrounded)
                 CurrentSpeed *= _inAirVelocityReduction;
@@ -278,7 +277,7 @@ namespace WildIsland.Processors
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
 
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            
+
             _animator.SetFloat(_animIDSpeed, _animationBlend);
         }
 
