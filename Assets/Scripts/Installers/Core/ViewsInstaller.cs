@@ -11,7 +11,7 @@ namespace WildIsland.Installers
         [SerializeField] private PlayerView _playerView;
         [SerializeField] private Camera _camera;
         [SerializeField] private BaseBiomeView[] _biomeViews;
-        
+
         public override void InstallBindings()
         {
             Container.Bind<DayLightView>().FromInstance(_dayLightView).AsSingle();
@@ -19,7 +19,11 @@ namespace WildIsland.Installers
             Container.Bind<Camera>().FromInstance(_camera).AsSingle();
 
             foreach (BaseBiomeView view in _biomeViews)
+            {
+                if (view == null)
+                    continue;
                 Container.Bind(view.GetType()).FromInstance(view).AsSingle();
+            }
         }
     }
 }
