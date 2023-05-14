@@ -82,45 +82,27 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CHEAT_Time"",
+                    ""name"": ""Console"",
                     ""type"": ""Button"",
-                    ""id"": ""f95a2ce1-63e4-4fb4-8225-b80057174058"",
+                    ""id"": ""757d7280-21e0-490a-a085-9f68bff417d2"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CHEAT_Damage"",
+                    ""name"": ""ReturnButton"",
                     ""type"": ""Button"",
-                    ""id"": ""31103bd9-f577-4bc7-a9e6-be146fa57f8a"",
+                    ""id"": ""0e7865c9-e7b7-487a-930d-9b03199c5e0c"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CHEAT_FrameRate"",
+                    ""name"": ""ArrowUp"",
                     ""type"": ""Button"",
-                    ""id"": ""cb6b0eab-c919-4667-879a-71944e0f8be0"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""CHEAT_PeriodicEffect"",
-                    ""type"": ""Button"",
-                    ""id"": ""f786fc01-3643-4c14-80e9-afadad0f16ef"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""CHEAT_TemporaryEffect"",
-                    ""type"": ""Button"",
-                    ""id"": ""a2d04fe5-71ab-436d-ad5e-6275a884d26c"",
+                    ""id"": ""a0578cd8-3207-47cf-8d95-a6d4a831ebbf"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -317,67 +299,45 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""62bc8473-bc2f-49fe-b2fe-546b32e6f07d"",
-                    ""path"": ""<Keyboard>/t"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CHEAT_Time"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""dbb48295-18ca-44ad-9679-7dfcaa1d54d5"",
-                    ""path"": ""<Keyboard>/k"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CHEAT_Damage"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6198fba9-842a-473c-995c-4ed8aa6527f1"",
-                    ""path"": ""<Keyboard>/y"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CHEAT_FrameRate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""63940570-0d77-44ea-9683-7d256440deab"",
-                    ""path"": ""<Keyboard>/p"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CHEAT_PeriodicEffect"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f24a3162-4eac-4181-9c52-2199bf136f71"",
-                    ""path"": ""<Keyboard>/o"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CHEAT_TemporaryEffect"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""e98d6451-d220-44ed-acb4-becaf9ab4207"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75314a5a-f543-4a98-a522-9be2bd8b0a76"",
+                    ""path"": ""<Keyboard>/backquote"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Console"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""91b89a2e-3dfd-409c-ad9a-b7f7ea811352"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReturnButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bf21e5c8-4c6f-4d5b-9354-2af7fee50976"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ArrowUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -442,11 +402,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
         m_Player_Esc = m_Player.FindAction("Esc", throwIfNotFound: true);
-        m_Player_CHEAT_Time = m_Player.FindAction("CHEAT_Time", throwIfNotFound: true);
-        m_Player_CHEAT_Damage = m_Player.FindAction("CHEAT_Damage", throwIfNotFound: true);
-        m_Player_CHEAT_FrameRate = m_Player.FindAction("CHEAT_FrameRate", throwIfNotFound: true);
-        m_Player_CHEAT_PeriodicEffect = m_Player.FindAction("CHEAT_PeriodicEffect", throwIfNotFound: true);
-        m_Player_CHEAT_TemporaryEffect = m_Player.FindAction("CHEAT_TemporaryEffect", throwIfNotFound: true);
+        m_Player_Console = m_Player.FindAction("Console", throwIfNotFound: true);
+        m_Player_ReturnButton = m_Player.FindAction("ReturnButton", throwIfNotFound: true);
+        m_Player_ArrowUp = m_Player.FindAction("ArrowUp", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -512,11 +470,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Inventory;
     private readonly InputAction m_Player_Esc;
-    private readonly InputAction m_Player_CHEAT_Time;
-    private readonly InputAction m_Player_CHEAT_Damage;
-    private readonly InputAction m_Player_CHEAT_FrameRate;
-    private readonly InputAction m_Player_CHEAT_PeriodicEffect;
-    private readonly InputAction m_Player_CHEAT_TemporaryEffect;
+    private readonly InputAction m_Player_Console;
+    private readonly InputAction m_Player_ReturnButton;
+    private readonly InputAction m_Player_ArrowUp;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -527,11 +483,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
         public InputAction @Esc => m_Wrapper.m_Player_Esc;
-        public InputAction @CHEAT_Time => m_Wrapper.m_Player_CHEAT_Time;
-        public InputAction @CHEAT_Damage => m_Wrapper.m_Player_CHEAT_Damage;
-        public InputAction @CHEAT_FrameRate => m_Wrapper.m_Player_CHEAT_FrameRate;
-        public InputAction @CHEAT_PeriodicEffect => m_Wrapper.m_Player_CHEAT_PeriodicEffect;
-        public InputAction @CHEAT_TemporaryEffect => m_Wrapper.m_Player_CHEAT_TemporaryEffect;
+        public InputAction @Console => m_Wrapper.m_Player_Console;
+        public InputAction @ReturnButton => m_Wrapper.m_Player_ReturnButton;
+        public InputAction @ArrowUp => m_Wrapper.m_Player_ArrowUp;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -559,21 +513,15 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Esc.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
                 @Esc.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
                 @Esc.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEsc;
-                @CHEAT_Time.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
-                @CHEAT_Time.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
-                @CHEAT_Time.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Time;
-                @CHEAT_Damage.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
-                @CHEAT_Damage.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
-                @CHEAT_Damage.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_Damage;
-                @CHEAT_FrameRate.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
-                @CHEAT_FrameRate.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
-                @CHEAT_FrameRate.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_FrameRate;
-                @CHEAT_PeriodicEffect.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
-                @CHEAT_PeriodicEffect.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
-                @CHEAT_PeriodicEffect.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_PeriodicEffect;
-                @CHEAT_TemporaryEffect.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
-                @CHEAT_TemporaryEffect.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
-                @CHEAT_TemporaryEffect.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCHEAT_TemporaryEffect;
+                @Console.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnConsole;
+                @Console.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnConsole;
+                @Console.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnConsole;
+                @ReturnButton.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReturnButton;
+                @ReturnButton.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReturnButton;
+                @ReturnButton.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReturnButton;
+                @ArrowUp.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnArrowUp;
+                @ArrowUp.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnArrowUp;
+                @ArrowUp.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnArrowUp;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -596,21 +544,15 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                 @Esc.started += instance.OnEsc;
                 @Esc.performed += instance.OnEsc;
                 @Esc.canceled += instance.OnEsc;
-                @CHEAT_Time.started += instance.OnCHEAT_Time;
-                @CHEAT_Time.performed += instance.OnCHEAT_Time;
-                @CHEAT_Time.canceled += instance.OnCHEAT_Time;
-                @CHEAT_Damage.started += instance.OnCHEAT_Damage;
-                @CHEAT_Damage.performed += instance.OnCHEAT_Damage;
-                @CHEAT_Damage.canceled += instance.OnCHEAT_Damage;
-                @CHEAT_FrameRate.started += instance.OnCHEAT_FrameRate;
-                @CHEAT_FrameRate.performed += instance.OnCHEAT_FrameRate;
-                @CHEAT_FrameRate.canceled += instance.OnCHEAT_FrameRate;
-                @CHEAT_PeriodicEffect.started += instance.OnCHEAT_PeriodicEffect;
-                @CHEAT_PeriodicEffect.performed += instance.OnCHEAT_PeriodicEffect;
-                @CHEAT_PeriodicEffect.canceled += instance.OnCHEAT_PeriodicEffect;
-                @CHEAT_TemporaryEffect.started += instance.OnCHEAT_TemporaryEffect;
-                @CHEAT_TemporaryEffect.performed += instance.OnCHEAT_TemporaryEffect;
-                @CHEAT_TemporaryEffect.canceled += instance.OnCHEAT_TemporaryEffect;
+                @Console.started += instance.OnConsole;
+                @Console.performed += instance.OnConsole;
+                @Console.canceled += instance.OnConsole;
+                @ReturnButton.started += instance.OnReturnButton;
+                @ReturnButton.performed += instance.OnReturnButton;
+                @ReturnButton.canceled += instance.OnReturnButton;
+                @ArrowUp.started += instance.OnArrowUp;
+                @ArrowUp.performed += instance.OnArrowUp;
+                @ArrowUp.canceled += instance.OnArrowUp;
             }
         }
     }
@@ -659,10 +601,8 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
         void OnEsc(InputAction.CallbackContext context);
-        void OnCHEAT_Time(InputAction.CallbackContext context);
-        void OnCHEAT_Damage(InputAction.CallbackContext context);
-        void OnCHEAT_FrameRate(InputAction.CallbackContext context);
-        void OnCHEAT_PeriodicEffect(InputAction.CallbackContext context);
-        void OnCHEAT_TemporaryEffect(InputAction.CallbackContext context);
+        void OnConsole(InputAction.CallbackContext context);
+        void OnReturnButton(InputAction.CallbackContext context);
+        void OnArrowUp(InputAction.CallbackContext context);
     }
 }

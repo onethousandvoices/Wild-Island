@@ -20,8 +20,6 @@ namespace WildIsland.Controllers
 
         public void Initialize()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            
             _statViewPairs = new Dictionary<PlayerStat, BasePlayerStatView>
             {
                 { _player.Stats.HeadHealth, _viewStatsHolder.PlayerHeadStatView },

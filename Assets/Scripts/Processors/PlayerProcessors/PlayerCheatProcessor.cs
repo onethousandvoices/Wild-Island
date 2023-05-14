@@ -1,7 +1,5 @@
 ﻿using Effects;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using WildIsland.Controllers;
 using WildIsland.Utility;
 using Zenject;
 
@@ -16,34 +14,26 @@ namespace WildIsland.Processors
         private TestTemporaryEffect _testTemporary;
         private TestPeriodicEffect _testPeriodic;
 
-        private bool _isTimeSpeedUp;
-        private bool _isFrameRate60;
+        public void TimeSpeedUp(int time)
+            => Time.timeScale = time;
 
-        public void CHEAT_TimeSpeedUp(InputAction.CallbackContext obj)
-        {
-            _isTimeSpeedUp = !_isTimeSpeedUp;
-            Time.timeScale = _isTimeSpeedUp ? 100f : 1f;
-        }
-
-        public void CHEAT_Damage(InputAction.CallbackContext obj)
+        public void DamagePlayer()
             => _dataProcessor.SetAllHealths(isRandomizing: true);
 
-        public void CHEAT_FrameRateChange(InputAction.CallbackContext obj)
+        public void FrameRateChange(int fps)
         {
-            _isFrameRate60 = !_isFrameRate60;
-            Debug.Log($"Current fps is {Application.targetFrameRate} trying to set {(_isFrameRate60 ? 60 : -1)}");
-            Application.targetFrameRate = _isFrameRate60 ? 60 : -1;
+            Application.targetFrameRate = fps;
             Debug.Log($"Fps set to {Application.targetFrameRate}");
         }
 
-        public void CHEAT_TemporaryEffectApply(InputAction.CallbackContext obj)
+        public void TemporaryEffectApply()
         {
             _testTemporary = new TestTemporaryEffect(5f);
             _testTemporary.AffectedStats.Add(new AffectedStat(_player.Stats.HungerDecrease, 3));
             _effectProcessor.AddEffect(_testTemporary);
         }
 
-        public void CHEAT_PeriodicEffectApply(InputAction.CallbackContext obj)
+        public void PeriodicEffectApply()
         {
             _testPeriodic = new TestPeriodicEffect(1f, 3f);
             _testPeriodic.AffectedStats.Add(new AffectedStat(_player.Stats.HeadHealth, -10));
@@ -53,10 +43,10 @@ namespace WildIsland.Processors
     
     public interface IGetCheats
     {
-        public void CHEAT_TimeSpeedUp(InputAction.CallbackContext obj);
-        public void CHEAT_Damage(InputAction.CallbackContext obj);
-        public void CHEAT_FrameRateChange(InputAction.CallbackContext obj);
-        public void CHEAT_TemporaryEffectApply(InputAction.CallbackContext obj);
-        public void CHEAT_PeriodicEffectApply(InputAction.CallbackContext obj);
+        public void TimeSpeedUp(int time);
+        public void DamagePlayer();
+        public void FrameRateChange(int fps);
+        public void TemporaryEffectApply();
+        public void PeriodicEffectApply();
     }
 }

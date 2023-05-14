@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Views.UI;
 using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
@@ -21,13 +22,14 @@ namespace WildIsland.Processors
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
+        [Inject] private PlayerInput _playerInput;
         [Inject] private IPlayerStatSetter _statSetter;
         [Inject] private IGetPlayerStats _playerStats;
         [Inject] private IPlayerInventory _inventory;
-        [Inject] private IGetCheats _cheats;
+        [Inject] private IConsoleHandler _consoleHandler;
+        [Inject] private IConsoleState _consoleState;
 
         private PlayerData _stats;
-        private PlayerInput _playerInput;
         private InputMap _inputMap;
         private Animator _animator;
         private CapsuleCollider _capsuleCollider;
@@ -92,6 +94,7 @@ namespace WildIsland.Processors
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             BindInputs();
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         public void Dispose()
@@ -107,7 +110,7 @@ namespace WildIsland.Processors
 
         public void FixedTick()
         {
-            if (!Enabled)
+            if (!Enabled || _consoleState.ConsoleShown)
                 return;
 
             Move();
@@ -120,18 +123,23 @@ namespace WildIsland.Processors
 
         private void BindInputs()
         {
-            _playerInput = new PlayerInput();
             _inputMap = new InputMap();
             _inputMap.Enable();
 
-            _inputMap.Player.Jump.performed += OnJumpPerformed;
-            _inputMap.Player.Inventory.performed += _inventory.ShowInventory;
+            _inputMap.Player.Jump.performed += context => CheckConsoleState(() => OnJumpPerformed(context));
+            _inputMap.Player.Inventory.performed += context => CheckConsoleState(() => _inventory.ShowInventory(context));
+            
+            _inputMap.Player.Console.performed += _ => _consoleHandler.ShowConsole();
+            _inputMap.Player.ReturnButton.performed += _ => _consoleHandler.OnReturn();
+            _inputMap.Player.ArrowUp.performed += _ => _consoleHandler.OnUpArrow();
+        }
 
-            _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
-            _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
-            _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
-            _inputMap.Player.CHEAT_PeriodicEffect.started += _cheats.CHEAT_PeriodicEffectApply;
-            _inputMap.Player.CHEAT_TemporaryEffect.started += _cheats.CHEAT_TemporaryEffectApply;
+        private void CheckConsoleState(Action action)
+        {
+            if (_consoleState.ConsoleShown)
+                return;
+
+            action?.Invoke();
         }
 
         private void ReadInput()
@@ -267,7 +275,7 @@ namespace WildIsland.Processors
 
                 _view.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
-            
+
             float horizontalVelocity = new Vector2(_playerInput.Move.x, 0f).magnitude;
 
             if (horizontalVelocity > 0)
@@ -275,10 +283,10 @@ namespace WildIsland.Processors
 
             if (_playerInput.Move.y < 0)
                 CurrentSpeed *= _view.BackwardsVelocityReduction;
-            
+
             if (!_isGrounded)
                 CurrentSpeed *= _view.InAirVelocityReduction;
-            
+
             Vector3 targetDirection = Quaternion.Euler(0f, _targetRotation, 0f) * inputDirection;
 
             Vector3 currentVelocity = _view.Rb.velocity;

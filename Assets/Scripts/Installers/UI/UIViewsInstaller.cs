@@ -11,13 +11,14 @@ namespace WildIsland.Installers
         [SerializeField] private PlayerViewStatsHolder _playerViewStatsHolder;
         [SerializeField] private DayTimerView _dayTimerView;
         [SerializeField] private InventoryView _inventoryView;
+        [SerializeField] private DebugConsoleView _debugConsoleView;
 
-        
         public override void InstallBindings()
         {
             Container.Bind<PlayerViewStatsHolder>().FromInstance(_playerViewStatsHolder);
             Container.Bind<DayTimerView>().FromInstance(_dayTimerView);
-            Container.Bind<InventoryView>().FromInstance(_inventoryView).AsSingle();
+            Container.Bind<InventoryView>().FromInstance(_inventoryView);
+            Container.BindInterfacesAndSelfTo<DebugConsoleView>().FromInstance(_debugConsoleView);
         }
     }
 }
