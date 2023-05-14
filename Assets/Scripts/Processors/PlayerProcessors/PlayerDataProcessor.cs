@@ -1,5 +1,7 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows;
 using WildIsland.Controllers;
 using WildIsland.Data;
 using WildIsland.Views;
@@ -8,7 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace WildIsland.Processors
 {
-    public class PlayerDataProcessor : PlayerProcessor, IPlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
+    public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerInputState _inputState;
@@ -27,7 +29,7 @@ namespace WildIsland.Processors
         public void AcquireGameData(IPartialGameDataContainer container)
             => _dataContainer = ((PlayerDataContainer)container).Default;
 
-        public override void Initialize()
+        public void Initialize()
         {
             _data = new DbValue<PlayerData>("PlayerData", _dataContainer);
             Stats.SetDefaults();
@@ -139,10 +141,36 @@ namespace WildIsland.Processors
 
         public void Dispose()
             => _data.Save();
+#if UNITY_EDITOR
+        [MenuItem("Debug/Clear Save")]
+        public static void ClearSave()
+        {
+            try
+            {
+                File.Delete(MainDataBase.Path);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Reload assemblies");
+            }
+        }
+#endif
+#if UNITY_EDITOR
+        [MenuItem("Debug/Open save folder")]
+#endif
+        public static void OpenSaveFolder()
+        {
+            System.Diagnostics.Process.Start("explorer.exe", Application.persistentDataPath.Replace("/", "\\"));
+        }
     }
 
     public interface IDataProcessor
     {
         public void SetAllHealths(float value = 0f, bool isRandomizing = false);
+    }
+    
+    public interface IGetPlayerStats
+    {
+        public PlayerData Stats { get; }
     }
 }

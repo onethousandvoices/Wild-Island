@@ -17,12 +17,13 @@ namespace WildIsland.Processors
         Jump
     }
 
-    public class PlayerInputProcessor : PlayerProcessor, IFixedPlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
+    public class PlayerInputProcessor : BaseProcessor, IInitializable, IFixedPlayerProcessor, IPlayerSpeed, IPlayerInputState, ILateTickable, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
         [Inject] private IGetPlayerStats _playerStats;
+        [Inject] private IPlayerInventory _inventory;
         [Inject] private IGetCheats _cheats;
 
         private PlayerData _stats;
@@ -48,12 +49,10 @@ namespace WildIsland.Processors
         private float _staminaJumpCost;
         private float _staminaSprintCost;
 
-        private const float _inAirVelocityReduction = 0.95f;
         private const float _inputMagnitude = 1f;
         private const float _speedUpChangeRate = 1.1f;
-        private const float _slowDownChangeRate = 8.8f;
+        private const float _slowDownChangeRate = 7f;
         private const float _rotationSmoothTime = 0.12f;
-        private const float _jumpHeight = 6f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
         private const float _groundedOffset = 0.05f;
@@ -67,7 +66,6 @@ namespace WildIsland.Processors
         private static readonly int _animIDGrounded = Animator.StringToHash("Grounded");
         private static readonly int _animIDJump = Animator.StringToHash("Jump");
         private static readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
-        private static readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
 
         private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
@@ -75,7 +73,7 @@ namespace WildIsland.Processors
         public PlayerInputState State { get; private set; }
         public float CurrentSpeed { get; private set; }
 
-        public override void Initialize()
+        public void Initialize()
         {
             State = PlayerInputState.Idle;
             _stats = _playerStats.Stats;
@@ -93,19 +91,7 @@ namespace WildIsland.Processors
             _animator = _view.GetComponent<Animator>();
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
-            _playerInput = new PlayerInput();
-            _inputMap = new InputMap();
-            _inputMap.Enable();
-
-            _inputMap.Player.Jump.performed += OnJumpPerformed;
-
-            Cursor.lockState = CursorLockMode.Locked;
-            
-            _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
-            _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
-            _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
-            _inputMap.Player.CHEAT_PeriodicEffect.started += _cheats.CHEAT_PeriodicEffectApply;
-            _inputMap.Player.CHEAT_TemporaryEffect.started += _cheats.CHEAT_TemporaryEffectApply;
+            BindInputs();
         }
 
         public void Dispose()
@@ -132,10 +118,29 @@ namespace WildIsland.Processors
         public void LateTick()
             => CameraRotation();
 
+        private void BindInputs()
+        {
+            _playerInput = new PlayerInput();
+            _inputMap = new InputMap();
+            _inputMap.Enable();
+
+            _inputMap.Player.Jump.performed += OnJumpPerformed;
+            _inputMap.Player.Inventory.performed += _inventory.ShowInventory;
+
+            _inputMap.Player.CHEAT_Time.started += _cheats.CHEAT_TimeSpeedUp;
+            _inputMap.Player.CHEAT_Damage.started += _cheats.CHEAT_Damage;
+            _inputMap.Player.CHEAT_FrameRate.started += _cheats.CHEAT_FrameRateChange;
+            _inputMap.Player.CHEAT_PeriodicEffect.started += _cheats.CHEAT_PeriodicEffectApply;
+            _inputMap.Player.CHEAT_TemporaryEffect.started += _cheats.CHEAT_TemporaryEffectApply;
+        }
+
         private void ReadInput()
         {
             _playerInput.SetLook(_inputMap.Player.Look.ReadValue<Vector2>());
-            _playerInput.SetMove(_inputMap.Player.Move.ReadValue<Vector2>());
+            Vector2 move = _inputMap.Player.Move.ReadValue<Vector2>();
+            if (_playerInput.Sprint)
+                move = Vector2.up;
+            _playerInput.SetMove(move);
             CheckSprint();
         }
 
@@ -143,7 +148,8 @@ namespace WildIsland.Processors
         {
             if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f)
                 return;
-            _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _jumpHeight, _view.Rb.velocity.z);
+            _playerInput.SetLastMove(_inputMap.Player.Move.ReadValue<Vector2>());
+            _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _view.JumpHeight, _view.Rb.velocity.z);
             _playerInput.SetJump(obj.ReadValueAsButton());
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }
@@ -158,7 +164,7 @@ namespace WildIsland.Processors
                 return;
             }
 
-            if (!_sprintPossible)
+            if (!_sprintPossible || _playerInput.Move != Vector2.up)
             {
                 _playerInput.SetSprint(false);
                 return;
@@ -236,34 +242,44 @@ namespace WildIsland.Processors
             if (_isGrounded)
                 State = pendingInputState;
 
+            float rbSpeed = new Vector3(_view.Rb.velocity.x, 0f, _view.Rb.velocity.z).magnitude;
             float modifier = _playerInput.Move.sqrMagnitude > 0 ? _speedUpChangeRate : _slowDownChangeRate;
 
-            CurrentSpeed = Mathf.Lerp(CurrentSpeed, targetSpeed * _inputMagnitude,
-                Time.deltaTime * modifier);
+            CurrentSpeed = Mathf.Lerp(rbSpeed, targetSpeed * _inputMagnitude,
+                Time.fixedDeltaTime * modifier);
 
             CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * modifier * 5f);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * modifier * 5f);
             if (_animationBlend < 0.01f)
                 _animationBlend = 0f;
 
-            Vector3 inputDirection = new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized;
+            Vector3 inputDirection = _isGrounded
+                                         ? new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized
+                                         : new Vector3(_playerInput.LastMove.x, 0.0f, _playerInput.LastMove.y).normalized;
 
-            if (_playerInput.Move != Vector2.zero)
+            if (_playerInput.Move != Vector2.zero && _isGrounded)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
+                _targetRotation = _mainCamera.transform.eulerAngles.y;
 
                 float rotation = Mathf.SmoothDampAngle(_view.transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     _rotationSmoothTime);
 
                 _view.transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
+            
+            float horizontalVelocity = new Vector2(_playerInput.Move.x, 0f).magnitude;
 
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            if (horizontalVelocity > 0)
+                CurrentSpeed *= _view.HorizontalVelocityReduction;
 
+            if (_playerInput.Move.y < 0)
+                CurrentSpeed *= _view.BackwardsVelocityReduction;
+            
             if (!_isGrounded)
-                CurrentSpeed *= _inAirVelocityReduction;
+                CurrentSpeed *= _view.InAirVelocityReduction;
+            
+            Vector3 targetDirection = Quaternion.Euler(0f, _targetRotation, 0f) * inputDirection;
 
             Vector3 currentVelocity = _view.Rb.velocity;
             targetDirection *= CurrentSpeed;
@@ -274,9 +290,7 @@ namespace WildIsland.Processors
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
 
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            
             _animator.SetFloat(_animIDSpeed, _animationBlend);
-            _animator.SetFloat(_animIDMotionSpeed, _inputMagnitude);
         }
 
         private Vector3 AdjustSlopeVelocity(Vector3 velocity)

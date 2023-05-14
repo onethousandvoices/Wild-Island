@@ -51,6 +51,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Esc",
+                    "type": "Button",
+                    "id": "dfa089d2-d6fc-4e58-962f-dc5488ce80cb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "CHEAT_Time",
                     "type": "Button",
                     "id": "f95a2ce1-63e4-4fb4-8225-b80057174058",
@@ -336,6 +345,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "CHEAT_TemporaryEffect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e98d6451-d220-44ed-acb4-becaf9ab4207",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Esc",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

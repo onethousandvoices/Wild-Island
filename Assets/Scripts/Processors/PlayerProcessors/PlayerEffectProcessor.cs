@@ -8,7 +8,7 @@ using Zenject;
 
 namespace WildIsland.Processors
 {
-    public class PlayerEffectProcessor : PlayerProcessor, IPlayerProcessor, IEffectProcessor
+    public class PlayerEffectProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IEffectProcessor
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
@@ -17,7 +17,7 @@ namespace WildIsland.Processors
         private List<BaseEffect> _effects;
         private BaseEffect[] _nativeEffects;
 
-        public override void Initialize()
+        public void Initialize()
         {
             _effects = new List<BaseEffect>();
             _nativeEffects = Array.Empty<BaseEffect>();

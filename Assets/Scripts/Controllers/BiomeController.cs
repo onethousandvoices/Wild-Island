@@ -7,10 +7,10 @@ namespace WildIsland.Controllers
 {
     public class BiomeController : IInitializable, IGDConsumer, IBiomeDayAffect
     {
-        [Inject] private ForestBiomeView _forest;
-        [Inject] private WinterBiomeView _winter;
-        [Inject] private DesertBiomeView _desert;
-        [Inject] private SwampBiomeView _swamp;
+        [InjectOptional] private ForestBiomeView _forest;
+        [InjectOptional] private WinterBiomeView _winter;
+        [InjectOptional] private DesertBiomeView _desert;
+        [InjectOptional] private SwampBiomeView _swamp;
 
         private BaseBiomeView[] _biomes;
         private BiomesData _data;
@@ -22,10 +22,14 @@ namespace WildIsland.Controllers
 
         public void Initialize()
         {
-            _forest.Init(_data.ForestBiomeData);
-            _winter.Init(_data.WinterBiomeData);
-            _desert.Init(_data.DesertBiomeData);
-            _swamp.Init(_data.SwampBiomeData);
+            if (_forest != null)
+                _forest.Init(_data.ForestBiomeData);
+            if (_winter != null)
+                _winter.Init(_data.WinterBiomeData);
+            if (_desert != null)
+                _desert.Init(_data.DesertBiomeData);
+            if (_swamp != null)
+                _swamp.Init(_data.SwampBiomeData);
 
             _biomes = new BaseBiomeView[]
             {
@@ -39,7 +43,11 @@ namespace WildIsland.Controllers
         public void UpdateBiomesTemperature(float temperatureAffect)
         {
             foreach (BaseBiomeView biome in _biomes)
+            {
+                if (biome == null)
+                    continue;
                 biome.UpdateTemperature(temperatureAffect);
+            }
         }
     }
 

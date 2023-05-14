@@ -4,13 +4,13 @@ using Zenject;
 
 namespace WildIsland.Processors
 {
-    public class PlayerSoundProcessor : PlayerProcessor
+    public class PlayerSoundProcessor : BaseProcessor, IInitializable
     {
         [Inject] private PlayerView _view;
         
         private const float _footstepAudioVolume = 0.5f;
 
-        public override void Initialize()
+        public void Initialize()
         {
             _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);

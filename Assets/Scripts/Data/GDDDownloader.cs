@@ -24,8 +24,9 @@ namespace WildIsland.Data
         private static string LdXlsxFile => Application.dataPath + "/Editor/Data/ld.xlsx";
 
         private const string LoadXlsxUri = "https://docs.google.com/spreadsheets/d/{0}/export?format=xlsx";
-
+#if UNITY_EDITOR
         [UnityEditor.MenuItem("Tools/GDD/Download, parse, copy", priority = 26)]
+#endif
         private static async void LoadGDDFilesParseCopy()
         {
             await LoadGDDXlsxs();

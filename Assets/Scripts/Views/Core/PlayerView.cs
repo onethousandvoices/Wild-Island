@@ -18,6 +18,11 @@ namespace WildIsland.Views
         [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 ThirstRegenStage4Range { get; private set; }
         [field: SerializeField, HorizontalLine(color: EColor.Blue), Range(1f, 50f)] public float StaminaJumpCost { get; private set; }
         [field: SerializeField, Range(1f, 50f)] public float StaminaSprintCost { get; private set; }
+        [field: SerializeField, Range(1f, 10f)] public float JumpHeight { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float InAirVelocityReduction { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float HorizontalVelocityReduction { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float BackwardsVelocityReduction { get; private set; }
+        
         [field: SerializeField, HorizontalLine(color: EColor.Red)] public AudioClip LandingAudioClip { get; private set; }
         [field: SerializeField] public AudioClip[] FootstepAudioClips { get; private set; }
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
