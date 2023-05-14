@@ -31,7 +31,9 @@ namespace WildIsland.Processors
         public void CHEAT_FrameRateChange(InputAction.CallbackContext obj)
         {
             _isFrameRate60 = !_isFrameRate60;
-            Application.targetFrameRate = _isFrameRate60 ? 60 : 150;
+            Debug.Log($"Current fps is {Application.targetFrameRate} trying to set {(_isFrameRate60 ? 60 : -1)}");
+            Application.targetFrameRate = _isFrameRate60 ? 60 : -1;
+            Debug.Log($"Fps set to {Application.targetFrameRate}");
         }
 
         public void CHEAT_TemporaryEffectApply(InputAction.CallbackContext obj)

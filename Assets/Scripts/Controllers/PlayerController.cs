@@ -50,6 +50,8 @@ namespace WildIsland.Controllers
             _playerProcessors.ForEach(x => x.Enable());
             _basePlayerStatViews = _statViewPairs.Values.ToList();
             _basePlayerStatViews.ForEach(x => x.Init());
+
+            QualitySettings.vSyncCount = 0;
         }
 
         public void Tick()
