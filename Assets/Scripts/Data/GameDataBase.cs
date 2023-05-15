@@ -214,7 +214,7 @@ namespace WildIsland.Data
 
         public static T LoadFromCompressedJSON<T>(string name, string json) where T : GameDataBase
         {
-            JObject jObject = Newtonsoft.Json.Linq.JObject.Parse(json);
+            JObject jObject = JObject.Parse(json);
             byte[] bytesData = (byte[])jObject["Data"];
             MemoryStream stream = new MemoryStream(bytesData);
             GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress);
