@@ -14,7 +14,7 @@ namespace WildIsland.Installers
 
         public override void InstallBindings()
         {
-            Container.Bind<DayLightView>().FromInstance(_dayLightView).AsSingle();
+            Container.BindInterfacesAndSelfTo<DayLightView>().FromInstance(_dayLightView).AsSingle();
             Container.Bind<PlayerView>().FromInstance(_playerView).AsSingle();
             Container.Bind<Camera>().FromInstance(_camera).AsSingle();
 

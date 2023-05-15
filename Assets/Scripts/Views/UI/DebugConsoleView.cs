@@ -9,6 +9,7 @@ namespace Views.UI
         public bool ConsoleShown { get; private set; }
         
         private bool _helpShown;
+        private bool _previousInput;
 
         private DebugCommandBase[] _commands;
         private Vector2 _scroll;
@@ -26,7 +27,10 @@ namespace Views.UI
             => Input = "";
 
         public void SetInput(string previous)
-            => Input = previous;
+        {
+            Input = previous;
+            _previousInput = true;
+        }
 
         private void OnGUI()
         {
@@ -68,6 +72,14 @@ namespace Views.UI
             Input = GUI.TextField(new Rect(10f, y + 5f, width - 20f, 20f), Input);
 
             GUI.FocusControl("console");
+            
+            if (!_previousInput)
+                return;
+            
+            _previousInput = false;
+            
+            TextEditor textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+            textEditor.MoveTextEnd();
         }
     }
 

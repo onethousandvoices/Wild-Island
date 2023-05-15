@@ -35,14 +35,12 @@ namespace WildIsland.Controllers
             _dayDuration = _daySettings.DayTimer;
             _nightDuration = _daySettings.NightTimer;
 
-            _skyBoxMaterial = new Material(_view.DaySkybox);
+            // _skyBoxMaterial = new Material(_view.DaySkybox);
         }
 
         public void Tick()
         {
-            return;
-            
-            CheckTemperatureEffectRanges();
+            /*CheckTemperatureEffectRanges();
 
             if (_dayTime < 1)
                 _dayTime += Time.deltaTime / _dayDuration;
@@ -80,7 +78,7 @@ namespace WildIsland.Controllers
 
             Shader.SetGlobalVector(GlobalSunDirection, -(evaluation > 0.5f ? _view.Moon : _view.Sun).transform.forward);
 
-            DynamicGI.UpdateEnvironment();
+            DynamicGI.UpdateEnvironment();*/
         }
 
         private void CheckTemperatureEffectRanges()

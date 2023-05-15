@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
 using Views.UI;
 using WildIsland.Processors;
+using WildIsland.SOs;
+using WildIsland.Views;
 using Zenject;
 
 namespace WildIsland.Controllers
@@ -10,6 +14,7 @@ namespace WildIsland.Controllers
     {
         [Inject] private DebugConsoleView _view;
         [Inject] private IGetCheats _cheats;
+        [Inject] private IDaySetter _daySetter;
 
         private DebugCommandBase[] _commands;
         private string _previousCommand;
@@ -20,9 +25,11 @@ namespace WildIsland.Controllers
             DebugCommand damagePlayer = new DebugCommand("damage", "Damage player", "damage", _cheats.DamagePlayer);
             DebugCommand tempEffect = new DebugCommand("effect_temp", "Temporary hunger decrease for 3 secs", "effect_temp", _cheats.TemporaryEffectApply);
             DebugCommand periodicEffect = new DebugCommand("effect_periodic", "Periodic damage to head for 3 secs every 1 secs", "effect_periodic", _cheats.PeriodicEffectApply);
+            DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(PresetType.Day));
+            DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(PresetType.Night));
 
             DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps", "fps_<value>", i => _cheats.FrameRateChange(i));
-            DebugCommand<int> setTime = new DebugCommand<int>("time_", "Set time", "time_<value>", i => _cheats.TimeSpeedUp(i));
+            DebugCommand<int> setTime = new DebugCommand<int>("time_speed_", "Set time speed", "time_speed_<value>", i => _cheats.TimeSpeedUp(i));
 
             _commands = new DebugCommandBase[]
             {
@@ -32,6 +39,8 @@ namespace WildIsland.Controllers
                 periodicEffect,
                 setFps,
                 setTime,
+                setDay,
+                setNight
             };
 
             _view.Init(_commands);
@@ -75,7 +84,11 @@ namespace WildIsland.Controllers
         }
 
         public void OnUpArrow()
-            => _view.SetInput(_previousCommand);
+        {
+            _view.SetInput(_previousCommand);
+            // TextEditor textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+            // textEditor.MoveTextEnd();
+        }
     }
 
     public interface IConsoleHandler

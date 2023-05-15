@@ -2,9 +2,16 @@
 
 namespace WildIsland.SOs
 {
+    public enum PresetType : byte
+    {
+        Day,
+        Night
+    }
+    
     [CreateAssetMenu(fileName = "Day Preset", menuName = "SOs/Day Preset")]
     public class DayPreset : ScriptableObject
     {
+        [field: SerializeField] public PresetType Type { get; private set; }
         [field: SerializeField] public Material SkyboxMaterial { get; private set; }
         [field: SerializeField, Range(0f, 8f)] public float LightingIntensityMultiplier { get; private set; }
         [field: SerializeField, Range(0f, 5f)] public float DirectionalLightIntensity { get; private set; }
