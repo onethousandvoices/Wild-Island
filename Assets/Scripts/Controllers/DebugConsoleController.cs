@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using Views.UI;
 using WildIsland.Processors;
 using WildIsland.SOs;
@@ -28,7 +26,7 @@ namespace WildIsland.Controllers
             DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(PresetType.Day));
             DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(PresetType.Night));
 
-            DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps", "fps_<value>", i => _cheats.FrameRateChange(i));
+            DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", i => _cheats.FrameRateChange(i));
             DebugCommand<int> setTime = new DebugCommand<int>("time_speed_", "Set time speed", "time_speed_<value>", i => _cheats.TimeSpeedUp(i));
 
             _commands = new DebugCommandBase[]
@@ -84,11 +82,7 @@ namespace WildIsland.Controllers
         }
 
         public void OnUpArrow()
-        {
-            _view.SetInput(_previousCommand);
-            // TextEditor textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
-            // textEditor.MoveTextEnd();
-        }
+            => _view.SetInput(_previousCommand);
     }
 
     public interface IConsoleHandler

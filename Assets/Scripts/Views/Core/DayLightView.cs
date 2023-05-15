@@ -49,6 +49,8 @@ namespace WildIsland.Views
                 _leaves.Play();
             else
                 _leaves.Stop();
+            
+            DynamicGI.UpdateEnvironment();
         }
     }
     

@@ -314,6 +314,9 @@ namespace WildIsland.Processors
 
         private void CameraRotation()
         {
+            if (_consoleState.ConsoleShown)
+                return;
+            
             if (_playerInput.Look.sqrMagnitude >= _threshold && !_isLockCameraPosition)
             {
                 _cinemachineTargetYaw += _playerInput.Look.x * _deltaTimeMultiplier;
