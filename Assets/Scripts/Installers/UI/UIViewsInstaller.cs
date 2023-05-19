@@ -12,6 +12,7 @@ namespace WildIsland.Installers
         [SerializeField] private DayTimerView _dayTimerView;
         [SerializeField] private InventoryView _inventoryView;
         [SerializeField] private DebugConsoleView _debugConsoleView;
+        [SerializeField] private InventoryItemViewBase _inventoryItemViewBasePrefab;
 
         public override void InstallBindings()
         {
@@ -19,6 +20,7 @@ namespace WildIsland.Installers
             Container.Bind<DayTimerView>().FromInstance(_dayTimerView);
             Container.Bind<InventoryView>().FromInstance(_inventoryView);
             Container.BindInterfacesAndSelfTo<DebugConsoleView>().FromInstance(_debugConsoleView);
+            Container.Bind<InventoryItemViewBase>().FromInstance(_inventoryItemViewBasePrefab);
         }
     }
 }

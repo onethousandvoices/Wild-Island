@@ -19,7 +19,6 @@ namespace WildIsland.Installers
             Container.BindInterfacesTo<PlayerEffectProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerSoundProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerInputProcessor>().AsSingle();
-            Container.BindInterfacesTo<PlayerCheatProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerInventoryProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerController>().AsSingle();
         }

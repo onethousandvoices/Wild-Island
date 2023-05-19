@@ -35,12 +35,7 @@ namespace Views.UI
         private void OnGUI()
         {
             if (!ConsoleShown)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
                 return;
-            }
-
-            Cursor.lockState = CursorLockMode.Confined;
             
             float y = Screen.height / 2f;
             const float commandHeight = 22;
