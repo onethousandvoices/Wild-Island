@@ -9,13 +9,12 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Sky 04
   m_Shader: {fileID: 4800000, guid: 6fc9318f5193c094c98c0d450cd61e3b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _BACKGROUNDMODE_COLORS
   - _ENABLECLOUDSROTATION_ON
   - _ENABLECLOUDS_ON
-  - _ENABLEPATTERNOVERLAY_ON
-  - _ENABLESTARSTWINKLING_ON
-  - _ENABLESTARS_ON
   - _ENABLESUN_ON
   m_InvalidKeywords:
   - _BUILTINFOG_ON
@@ -40,6 +39,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -52,7 +52,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CloudsCubemap:
-        m_Texture: {fileID: 8900000, guid: eb066507e9bb4884e9d201eb874ccf2c, type: 3}
+        m_Texture: {fileID: 8900000, guid: c41da0a82ed4c184f9b64e9e3e4783f3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cubemap:
@@ -88,7 +88,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MoonTexture:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: bca1a5f579c02d74dbc7e7f61cda640b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
@@ -136,7 +136,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SunTexture:
-        m_Texture: {fileID: 2800000, guid: b15c2596790c6ce42980282a7e842f57, type: 3}
+        m_Texture: {fileID: 2800000, guid: dd566660fc358aa4098080e42ca0db56, type: 3}
         m_Scale: {x: 0, y: 0}
         m_Offset: {x: 1, y: 1}
     - _Tex:
@@ -203,7 +203,7 @@ Material:
     - _CloudHeight: -0.185
     - _Clouds: 1
     - _CloudsCat: 1
-    - _CloudsHeight: 0.2
+    - _CloudsHeight: 0.5
     - _CloudsIntensity: 1
     - _CloudsLitbySun: 0
     - _CloudsRotation: 160
@@ -225,13 +225,13 @@ Material:
     - _EnableFogMessage: 0
     - _EnableMoon: 0
     - _EnablePattern: 1
-    - _EnablePatternOverlay: 1
+    - _EnablePatternOverlay: 0
     - _EnableSkyPatternOverlay: 1
-    - _EnableStars: 1
+    - _EnableStars: 0
     - _EnableStarsHeightMask: 0
     - _EnableStarsRotation: 0
     - _EnableStarsSunMask: 1
-    - _EnableStarsTwinkling: 1
+    - _EnableStarsTwinkling: 0
     - _EnableSun: 1
     - _EnableSunMask: 1
     - _EnableSunMoon: 1
@@ -262,12 +262,12 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _MoonCat: 1
-    - _MoonIntensity: 1
-    - _MoonSize: 0.5
+    - _MoonIntensity: 4.34
+    - _MoonSize: 0.63
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PatternCat: 1
-    - _PatternContrast: 0.2
+    - _PatternContrast: 0.113
     - _PatternOverlay: 1
     - _RoatationSpeed: 0.4
     - _Rotation: 0
@@ -289,7 +289,7 @@ Material:
     - _StarsHeightMask: 0.2
     - _StarsHeigntMask: 1
     - _StarsHorizonMask: 1
-    - _StarsIntensity: 3
+    - _StarsIntensity: 5
     - _StarsLayer: 3
     - _StarsMaskPower: 1
     - _StarsRotation: 360
@@ -297,10 +297,10 @@ Material:
     - _StarsSize: 0.6
     - _StarsSunMask: 0.02
     - _SunCat: 1
-    - _SunIntensity: 2
+    - _SunIntensity: 10
     - _SunRadiusB: 0
     - _SunRadoisA: 0
-    - _SunSize: 0.8
+    - _SunSize: 0.1
     - _SunorMoon: 1
     - _TITLE: 1
     - _ToggleSwitch0: 0
@@ -325,8 +325,8 @@ Material:
     m_Colors:
     - _CloudLightColor: {r: 0.5620674, g: 0.6149295, b: 0.6764706, a: 1}
     - _CloudShadowColor: {r: 0.03952206, g: 0.12203295, b: 0.31617644, a: 1}
-    - _CloudsLightColor: {r: 0.9485294, g: 0.7671929, b: 0.8310924, a: 1}
-    - _CloudsShadowColor: {r: 0.5228196, g: 0.31125647, b: 0.74264705, a: 1}
+    - _CloudsLightColor: {r: 1, g: 1, b: 1, a: 1}
+    - _CloudsShadowColor: {r: 0.31707335, g: 0, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color0: {r: 0, g: 0.5054344, b: 1, a: 0}
     - _Color1: {r: 1, g: 1, b: 1, a: 0}
@@ -342,7 +342,7 @@ Material:
     - _SkyboxRotationAxis: {r: 0, g: 1, b: 0, a: 0}
     - _Skycol: {r: 0.27941146, g: 0.64219046, b: 1, a: 0}
     - _StarsRotationAxis: {r: 0, g: 1, b: 0, a: 0}
-    - _SunColor: {r: 0.78133863, g: 0.6764706, b: 1, a: 1}
+    - _SunColor: {r: 1, g: 0.99569863, b: 0.8742138, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 0}
     - _Vector1: {r: 0, g: 1, b: 1, a: 0}
     - _water: {r: 0.5, g: 0.5, b: 0.5, a: 1}
