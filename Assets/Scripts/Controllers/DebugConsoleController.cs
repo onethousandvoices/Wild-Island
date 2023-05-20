@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Effects;
+using System;
 using System.Linq;
+using UnityEngine;
 using Views.UI;
 using WildIsland.Processors;
 using WildIsland.SOs;
+using WildIsland.Utility;
 using WildIsland.Views;
 using Zenject;
 
@@ -11,23 +14,29 @@ namespace WildIsland.Controllers
     public class DebugConsoleController : IInitializable, IConsoleHandler
     {
         [Inject] private DebugConsoleView _view;
-        [Inject] private IGetCheats _cheats;
         [Inject] private IDaySetter _daySetter;
+        [Inject] private IGetPlayerStats _player;
+        [Inject] private IDataProcessor _dataProcessor;
+        [Inject] private IEffectProcessor _effectProcessor;
 
         private DebugCommandBase[] _commands;
+        
+        private TestTemporaryEffect _testTemporary;
+        private TestPeriodicEffect _testPeriodic;
+
         private string _previousCommand;
 
         public void Initialize()
         {
             DebugCommand help = new DebugCommand("help", "List of all commands", "help", _view.UpdateHelpState);
-            DebugCommand damagePlayer = new DebugCommand("damage", "Damage player", "damage", _cheats.DamagePlayer);
-            DebugCommand tempEffect = new DebugCommand("effect_temp", "Temporary hunger decrease for 3 secs", "effect_temp", _cheats.TemporaryEffectApply);
-            DebugCommand periodicEffect = new DebugCommand("effect_periodic", "Periodic damage to head for 3 secs every 1 secs", "effect_periodic", _cheats.PeriodicEffectApply);
+            DebugCommand damagePlayer = new DebugCommand("damage", "Damage player", "damage", DamagePlayer);
+            DebugCommand tempEffect = new DebugCommand("effect_temp", "Temporary hunger decrease for 3 secs", "effect_temp", TemporaryEffectApply);
+            DebugCommand periodicEffect = new DebugCommand("effect_periodic", "Periodic damage to head for 3 secs every 1 secs", "effect_periodic", PeriodicEffectApply);
             DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(PresetType.Day));
             DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(PresetType.Night));
 
-            DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", i => _cheats.FrameRateChange(i));
-            DebugCommand<int> setTime = new DebugCommand<int>("time_speed_", "Set time speed", "time_speed_<value>", i => _cheats.TimeSpeedUp(i));
+            DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", FrameRateChange);
+            DebugCommand<int> setTime = new DebugCommand<int>("time_speed_", "Set time speed", "time_speed_<value>", TimeSpeedUp);
 
             _commands = new DebugCommandBase[]
             {
@@ -69,6 +78,32 @@ namespace WildIsland.Controllers
             }
         }
 
+        private void TimeSpeedUp(int time)
+            => Time.timeScale = time;
+
+        private void DamagePlayer()
+            => _dataProcessor.SetAllHealths(isRandomizing: true);
+
+        private void FrameRateChange(int fps)
+        {
+            Application.targetFrameRate = fps;
+            Debug.Log($"Fps set to {Application.targetFrameRate}");
+        }
+
+        private void TemporaryEffectApply()
+        {
+            _testTemporary = new TestTemporaryEffect(5f);
+            _testTemporary.AffectedStats.Add(new AffectedStat(_player.Stats.HungerDecrease, 3));
+            _effectProcessor.AddEffect(_testTemporary);
+        }
+
+        private void PeriodicEffectApply()
+        {
+            _testPeriodic = new TestPeriodicEffect(1f, 3f);
+            _testPeriodic.AffectedStats.Add(new AffectedStat(_player.Stats.HeadHealth, -10));
+            _effectProcessor.AddEffect(_testPeriodic);
+        }
+        
         public void ShowConsole()
         {
             _view.UpdateConsoleState();

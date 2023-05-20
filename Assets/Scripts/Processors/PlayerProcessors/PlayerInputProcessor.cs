@@ -33,6 +33,8 @@ namespace WildIsland.Processors
         private InputMap _inputMap;
         private Animator _animator;
         private CapsuleCollider _capsuleCollider;
+        private Vector2 _speedBlend;
+        private Vector2 _sprintBlend;
 
         private bool _isLockCameraPosition;
         private bool _isGrounded = true;
@@ -43,7 +45,6 @@ namespace WildIsland.Processors
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
         private float _relativeSpeed;
-        private float _animationBlend;
         private float _targetRotation;
         private float _rotationVelocity;
         private float _jumpTimeoutDelta;
@@ -64,10 +65,11 @@ namespace WildIsland.Processors
         private const float _threshold = 0.01f;
         private const float _deltaTimeMultiplier = 1f;
 
-        private static readonly int _animIDSpeed = Animator.StringToHash("Speed");
-        private static readonly int _animIDGrounded = Animator.StringToHash("Grounded");
-        private static readonly int _animIDJump = Animator.StringToHash("Jump");
-        private static readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
+        private static readonly int _animSpeedX = Animator.StringToHash("SpeedX");
+        private static readonly int _animSpeedY = Animator.StringToHash("SpeedY");
+        private static readonly int _animGrounded = Animator.StringToHash("Grounded");
+        private static readonly int _animJump = Animator.StringToHash("Jump");
+        private static readonly int _animFreeFall = Animator.StringToHash("FreeFall");
 
         private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
@@ -90,11 +92,10 @@ namespace WildIsland.Processors
             _sprintSpeed = _stats.SprintSpeed.Value;
 
             _capsuleCollider = _view.GetComponent<CapsuleCollider>();
-            _animator = _view.GetComponent<Animator>();
+            _animator = _view.Animator;
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             BindInputs();
-            Cursor.lockState = CursorLockMode.Locked;
         }
 
         public void Dispose()
@@ -106,6 +107,7 @@ namespace WildIsland.Processors
                 return;
 
             ReadInput();
+            CheckCursor();
         }
 
         public void FixedTick()
@@ -128,7 +130,7 @@ namespace WildIsland.Processors
 
             _inputMap.Player.Jump.performed += context => CheckConsoleState(() => OnJumpPerformed(context));
             _inputMap.Player.Inventory.performed += context => CheckConsoleState(() => _inventory.ShowInventory(context));
-            
+
             _inputMap.Player.Console.performed += _ => _consoleHandler.ShowConsole();
             _inputMap.Player.ReturnButton.performed += _ => _consoleHandler.OnReturn();
             _inputMap.Player.ArrowUp.performed += _ => _consoleHandler.OnUpArrow();
@@ -140,6 +142,17 @@ namespace WildIsland.Processors
                 return;
 
             action?.Invoke();
+        }
+
+        private void CheckCursor()
+        {
+            if (_consoleState.ConsoleShown || _inventory.IsInventoryShown)
+            {
+                Cursor.lockState = CursorLockMode.Confined;
+                return;
+            }
+
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void ReadInput()
@@ -158,7 +171,7 @@ namespace WildIsland.Processors
                 return;
             _playerInput.SetLastMove(_inputMap.Player.Move.ReadValue<Vector2>());
             _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _view.JumpHeight, _view.Rb.velocity.z);
-            _playerInput.SetJump(obj.ReadValueAsButton());
+            _playerInput.SetJump(true);
             _statSetter.SetStat(_stats.Stamina, -_staminaJumpCost, true);
         }
 
@@ -188,23 +201,23 @@ namespace WildIsland.Processors
             {
                 _fallTimeoutDelta = _fallTimeout;
 
-                _animator.SetBool(_animIDJump, false);
-                _animator.SetBool(_animIDFreeFall, false);
+                _animator.SetBool(_animJump, false);
+                _animator.SetBool(_animFreeFall, false);
 
                 if (_playerInput.Jump && _jumpTimeoutDelta <= 0f)
-                    _animator.SetBool(_animIDJump, true);
+                    _animator.SetBool(_animJump, true);
 
-                if (_jumpTimeoutDelta >= 0.0f)
+                if (_jumpTimeoutDelta >= 0f)
                     _jumpTimeoutDelta -= Time.deltaTime;
             }
             else
             {
                 _jumpTimeoutDelta = _jumpTimeout;
 
-                if (_fallTimeoutDelta >= 0.0f)
+                if (_fallTimeoutDelta >= 0f)
                     _fallTimeoutDelta -= Time.deltaTime;
 
-                _animator.SetBool(_animIDFreeFall, true);
+                _animator.SetBool(_animFreeFall, true);
                 _playerInput.ResetJump();
             }
         }
@@ -215,14 +228,24 @@ namespace WildIsland.Processors
             Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _groundedOffset, playerPos.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _groundCheckSphereRadius, _view.GroundLayers, QueryTriggerInteraction.Ignore);
 
-            if (_isGrounded && _playerInput.Move.sqrMagnitude == 0)
-                _capsuleCollider.material = _view.FrictionMaterial;
-            else
-                _capsuleCollider.material = _view.SlipperyMaterial;
+            switch (_isGrounded)
+            {
+                case true:
+                    State = PlayerInputState.Idle;
+                    _capsuleCollider.material = _playerInput.Move.sqrMagnitude == 0
+                                                    ? _view.FrictionMaterial
+                                                    : _view.SlipperyMaterial;
 
-            State = _isGrounded ? PlayerInputState.Idle : PlayerInputState.Jump;
+                    if (_fallTimeoutDelta <= 0f)
+                        _playerInput.SetLastMove(Vector2.zero);
+                    break;
+                case false:
+                    State = PlayerInputState.Jump;
+                    _capsuleCollider.material = _view.SlipperyMaterial;
+                    break;
+            }
 
-            _animator.SetBool(_animIDGrounded, _isGrounded);
+            _animator.SetBool(_animGrounded, _isGrounded);
         }
 
         private void Move()
@@ -257,10 +280,6 @@ namespace WildIsland.Processors
                 Time.fixedDeltaTime * modifier);
 
             CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
-
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * modifier * 5f);
-            if (_animationBlend < 0.01f)
-                _animationBlend = 0f;
 
             Vector3 inputDirection = _isGrounded
                                          ? new Vector3(_playerInput.Move.x, 0.0f, _playerInput.Move.y).normalized
@@ -298,7 +317,12 @@ namespace WildIsland.Processors
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
 
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            _animator.SetFloat(_animIDSpeed, _animationBlend);
+
+            _sprintBlend = new Vector2(0f, _playerInput.Sprint ? 1 : 0);
+            _speedBlend = Vector3.Lerp(_speedBlend, _playerInput.Move + _sprintBlend, Time.fixedDeltaTime * modifier * 5f);
+            
+            _animator.SetFloat(_animSpeedX, _speedBlend.x);
+            _animator.SetFloat(_animSpeedY, _speedBlend.y);
         }
 
         private Vector3 AdjustSlopeVelocity(Vector3 velocity)
@@ -316,7 +340,7 @@ namespace WildIsland.Processors
         {
             if (_consoleState.ConsoleShown)
                 return;
-            
+
             if (_playerInput.Look.sqrMagnitude >= _threshold && !_isLockCameraPosition)
             {
                 _cinemachineTargetYaw += _playerInput.Look.x * _deltaTimeMultiplier;

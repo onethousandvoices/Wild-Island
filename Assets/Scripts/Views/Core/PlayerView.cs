@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace WildIsland.Views
 {
-    [RequireComponent(typeof(Rigidbody), typeof(Animator))]
     public class PlayerView : MonoBehaviour, IEffectReceiver
     {
         [field: SerializeField, HorizontalLine(color: EColor.Blue), MinMaxSlider(0f, 100f)] public Vector2 HungerRegenStage1Range { get; private set; }
@@ -22,24 +21,25 @@ namespace WildIsland.Views
         [field: SerializeField, Range(0.5f, 1f)] public float InAirVelocityReduction { get; private set; }
         [field: SerializeField, Range(0.5f, 1f)] public float HorizontalVelocityReduction { get; private set; }
         [field: SerializeField, Range(0.5f, 1f)] public float BackwardsVelocityReduction { get; private set; }
-        
-        [field: SerializeField, HorizontalLine(color: EColor.Red)] public AudioClip LandingAudioClip { get; private set; }
+
+        [field: SerializeField, HorizontalLine(color: EColor.Red)] public Animator Animator { get; private set; }
+        [field: SerializeField] public AudioClip LandingAudioClip { get; private set; }
         [field: SerializeField] public AudioClip[] FootstepAudioClips { get; private set; }
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
         [field: SerializeField] public GameObject CinemachineCameraTarget { get; private set; }
         [field: SerializeField] public PhysicMaterial SlipperyMaterial { get; private set; }
         [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
-        
+
         private Rigidbody _rb;
-        
+
         private Action<AnimationEvent> OnLandCallback;
         private Action<AnimationEvent> OnFootStepCallback;
-        
+
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
-        
+
         public Rigidbody Rb => _rb ??= GetComponent<Rigidbody>();
-        
+
         public void SetEffectCallbacks(Action<BaseEffect> apply, Action<Type> remove)
         {
             OnEffectApplied = apply;
