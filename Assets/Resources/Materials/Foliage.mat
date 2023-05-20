@@ -262,7 +262,7 @@ Material:
     - _WINDQUALITY: 1
     - _WindQuality: 1
     - _Wind_density: 0.07
-    - _Wind_power: 0.1
+    - _Wind_power: 0.5
     - _WorkflowMode: 1
     - _ZTest: 4
     - _ZTestDepthEqualForOpaque: 3
