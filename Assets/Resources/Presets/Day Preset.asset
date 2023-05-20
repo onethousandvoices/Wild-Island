@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 467a23835f124cd480361a720b27a0f1, type: 3}
   m_Name: Day Preset
   m_EditorClassIdentifier: 
+  <Type>k__BackingField: 0
   <SkyboxMaterial>k__BackingField: {fileID: 2100000, guid: 06127287beb7fb84f9d205230a55a9a6,
     type: 2}
-  <LightingIntensityMultiplier>k__BackingField: 2
-  <DirectionalLightIntensity>k__BackingField: 1.7
+  <LightingIntensityMultiplier>k__BackingField: 1.3
+  <DirectionalLightIntensity>k__BackingField: 3.7
   <DirectionalLightColor>k__BackingField: {r: 1, g: 0.99607843, b: 0.89411765, a: 0}
   <LeavesParticlesState>k__BackingField: 1
