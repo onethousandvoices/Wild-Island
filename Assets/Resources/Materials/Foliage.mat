@@ -39,12 +39,10 @@ Material:
   m_Name: Foliage
   m_Shader: {fileID: -6465566751694194690, guid: c73322accfc7387478ae4d8478055888,
     type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 2
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -53,7 +51,6 @@ Material:
   - TransparentDepthPostpass
   - TransparentBackface
   - RayTracingPrepass
-  m_LockedProperties: Texture2D_9DCAAA49
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
