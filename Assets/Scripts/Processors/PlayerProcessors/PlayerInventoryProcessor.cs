@@ -21,12 +21,13 @@ namespace WildIsland.Processors
     public class PlayerInventoryProcessor : BaseProcessor, IPlayerInventory, IInitializable
     {
         [Inject] private InventoryView _inventoryView;
-        [Inject] private InventoryItemViewBase _itemPrefab;
+        [Inject] private InventoryItemView _itemPrefab;
 
         private CellView[] _allCells;
         private CellView[,] _cells;
         private ToolView[] _tools;
-        private List<InventoryItemViewBase> _items;
+        private List<InventoryItemView> _items;
+        private List<CellView> _affectedCells;
         private HandsView _hands;
 
         public bool IsInventoryShown { get; private set; }
@@ -44,7 +45,9 @@ namespace WildIsland.Processors
             {
                 for (int j = 0; j < _cells.GetLength(1); j++)
                 {
-                    _cells[i, j] = _allCells[index];
+                    CellView cell = _allCells[index];
+                    _cells[i, j] = cell;
+                    cell.SetCoordinates(new Vector2(j, i));
                     index++;
                 }
             }
@@ -52,16 +55,13 @@ namespace WildIsland.Processors
             _tools = _inventoryView.GetComponentsInChildren<ToolView>();
             _hands = _inventoryView.GetComponentInChildren<HandsView>();
 
-            _items = new List<InventoryItemViewBase>
-            {
-                Object.Instantiate(_itemPrefab, _inventoryView.Bg),
-                Object.Instantiate(_itemPrefab, _inventoryView.Bg),
-            };
+            _items = new List<InventoryItemView> { Object.Instantiate(_itemPrefab, _inventoryView.Bg) };
+            _affectedCells = new List<CellView>();
 
-            _cells[0, 0].SetOccupied(_items[0]);
-            _cells[1, 1].SetOccupied(_items[1]);
+            _items[0].Init();
+            TryFitItem(_items[0]);
 
-            foreach (InventoryItemViewBase testItem in _items)
+            foreach (InventoryItemView testItem in _items)
             {
                 testItem.SetOnStartDragCallback(OnItemStartDrag);
                 testItem.SetOnDragCallback(OnItemDrag);
@@ -73,72 +73,52 @@ namespace WildIsland.Processors
         public void ShowInventory(InputAction.CallbackContext obj)
             => IsInventoryShown = _inventoryView.ShowHide();
 
-        private void OnItemStartDrag(InventoryItemViewBase item, PointerEventData data)
+        private void OnItemStartDrag(InventoryItemView item, PointerEventData data)
         {
-            item.CellPair.SetOccupied(false);
+            item.FreeCells();
             item.transform.parent = _inventoryView.Bg;
         }
-        
-        private void OnItemDrag(InventoryItemViewBase item, PointerEventData data)
+
+        private void OnItemDrag(InventoryItemView item, PointerEventData data)
         {
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(item.RT, data.position, data.pressEventCamera, out Vector3 globalMousePos))
                 item.RT.position = globalMousePos;
             // Debug.Log(IsPlaceable(item) ? "can be placed" : "CANT be placed");
         }
 
-        private void OnItemEndDrag(InventoryItemViewBase item, PointerEventData data)
+        private void OnItemEndDrag(InventoryItemView item, PointerEventData data)
         {
             TryFitItem(item);
         }
 
-        private void OnItemClick(InventoryItemViewBase item, PointerEventData data) { }
+        private void OnItemClick(InventoryItemView item, PointerEventData data) { }
 
-        public void AutoFitItem(InventoryItemViewBase item)
-        {
-            for (int i = 0; i < _cells.GetLength(0); i++)
-            {
-                for (int j = 0; j < _cells.GetLength(1); j++)
-                {
-                    CellView cell = _cells[i, j];
-
-                    if (cell.IsOccupied)
-                        continue;
-
-                    if (item.Size == Vector2.one)
-                    {
-                        cell.SetOccupied(item);
-                        return;
-                    }
-                }
-            }
-        }
-
-        private void TryFitItem(InventoryItemViewBase item)
+        private void TryFitItem(InventoryItemView item)
         {
             CellView closest = ClosestCell(item);
             
-            switch (closest.IsOccupied)
+            switch (ItemSizeCheck(closest, item))
             {
                 case true:
-                    item.ResetPosition();
+                    item.OccupyCells(closest, _affectedCells.ToArray());
                     break;
                 case false:
-                    closest.SetOccupied(item);
+                    item.ResetPosition();
                     break;
             }
         }
 
-        private CellView ClosestCell(InventoryItemViewBase item)
+        private CellView ClosestCell(InventoryItemView item)
         {
             CellView closest = null;
             float distance = 999;
-            
+
             for (int i = 0; i < _cells.GetLength(0); i++)
             {
                 for (int j = 0; j < _cells.GetLength(1); j++)
                 {
                     CellView cell = _cells[i, j];
-                    
+
                     float distanceToItem = Vector2.Distance(cell.RT.position, item.RT.position);
 
                     if (distanceToItem > distance)
@@ -149,6 +129,52 @@ namespace WildIsland.Processors
             }
 
             return closest;
+        }
+
+        private bool ItemSizeCheck(CellView cell, InventoryItemView item)
+        {
+            _affectedCells.Clear();
+
+            Vector2 targetCoordinate = cell.Coordinates - Vector2.one + item.Size;
+            int targetY = (int)targetCoordinate.y;
+            int targetX = (int)targetCoordinate.x;
+
+            for (int y = (int)cell.Coordinates.y; y <= targetY; y++)
+            {
+                for (int x = (int)cell.Coordinates.x; x <= targetX; x++)
+                {
+                    if (y >= _height || x >= _width || y < 0 || x < 0)
+                        return false;
+                    
+                    CellView affectedCell = _cells[y, x];
+                    if (affectedCell.IsOccupied)
+                        return false;
+                    
+                    _affectedCells.Add(affectedCell);
+                }
+            }
+
+            return true;
+        }
+
+        public void AutoFitItem(InventoryItemView item)
+        {
+            for (int i = 0; i < _cells.GetLength(0); i++)
+            {
+                for (int j = 0; j < _cells.GetLength(1); j++)
+                {
+                    CellView cell = _cells[i, j];
+
+                    if (cell.IsOccupied)
+                        continue;
+
+                    // if (item.Size == Vector2.one)
+                    // {
+                        // cell.SetOccupied(item);
+                        // return;
+                    // }
+                }
+            }
         }
 
         private CellView GetNeighbour(int x, int y, NeighbourSide side)
@@ -171,14 +197,14 @@ namespace WildIsland.Processors
             return null;
         }
 
-        private bool IsPlaceable(InventoryItemViewBase item)
+        private bool IsPlaceable(InventoryItemView item)
             => _allCells.Select(cell => cell.RT.Contains(item.RT) && !cell.IsOccupied).FirstOrDefault();
     }
 
     public interface IPlayerInventory
     {
         public void ShowInventory(InputAction.CallbackContext obj);
-        public void AutoFitItem(InventoryItemViewBase item);
+        public void AutoFitItem(InventoryItemView item);
         public bool IsInventoryShown { get; }
     }
 }
