@@ -92,7 +92,7 @@ namespace WildIsland.Processors
             _sprintSpeed = _stats.SprintSpeed.Value;
 
             _capsuleCollider = _view.GetComponent<CapsuleCollider>();
-            _animator = _view.GetComponent<Animator>();
+            _animator = _view.Animator;
             _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             BindInputs();
