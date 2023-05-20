@@ -36,19 +36,22 @@ namespace WildIsland.Views
         }
         
 
-        public void SetPreset(PresetType type)
+        public void SetPreset(DayPresetType type)
         {
-            DayPreset current = type == PresetType.Day ? _dayPreset : _nightPreset;
+            DayPreset current = type == DayPresetType.Day ? _dayPreset : _nightPreset;
             
             RenderSettings.skybox = current.SkyboxMaterial;
             RenderSettings.ambientIntensity = current.LightingIntensityMultiplier;
             Directional.intensity = current.DirectionalLightIntensity;
             Directional.color = current.DirectionalLightColor;
-            
-            if (current.LeavesParticlesState)
-                _leaves.Play();
-            else
-                _leaves.Stop();
+
+            if (_leaves != null)
+            {
+                if (current.LeavesParticlesState)
+                    _leaves.Play();
+                else
+                    _leaves.Stop();
+            }
             
             DynamicGI.UpdateEnvironment();
         }
@@ -56,6 +59,6 @@ namespace WildIsland.Views
     
     public interface IDaySetter
     {
-        public void SetPreset(PresetType type);
+        public void SetPreset(DayPresetType type);
     }
 }

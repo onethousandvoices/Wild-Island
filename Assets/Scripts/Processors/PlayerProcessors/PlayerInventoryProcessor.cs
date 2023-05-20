@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Views.UI.Inventory;
-using WildIsland.Extras;
 using Zenject;
 using Object = UnityEngine.Object;
 
@@ -102,17 +100,6 @@ namespace WildIsland.Processors
         {
             CellView closest = ClosestCell(item);
             item.OccupyCells(closest, _affectedCells);
-            return;
-
-            switch (ItemSizeCheck(closest, item))
-            {
-                case true:
-                    item.OccupyCells(closest, _sizeCheckCells.ToArray());
-                    break;
-                case false:
-                    item.ResetPosition();
-                    break;
-            }
         }
 
         private CellView ClosestCell(InventoryItemView item)
@@ -145,6 +132,14 @@ namespace WildIsland.Processors
         {
             _sizeCheckCells.Clear();
 
+            if (item.Size == Vector2.one)
+            {
+                if (cell.OccupiedBy != null)
+                    return false;
+                _sizeCheckCells.Add(cell);
+                return true;
+            }
+            
             Vector2 targetCoordinate = cell.Coordinates - Vector2.one + item.Size;
             int targetY = (int)targetCoordinate.y;
             int targetX = (int)targetCoordinate.x;
@@ -206,9 +201,6 @@ namespace WildIsland.Processors
             }
             return null;
         }
-
-        private bool IsPlaceable(InventoryItemView item)
-            => _allCells.Select(cell => cell.RT.Contains(item.RT) && !cell.OccupiedBy).FirstOrDefault();
     }
 
     public interface IPlayerInventory

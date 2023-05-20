@@ -40,14 +40,17 @@ namespace WildIsland.Processors
 
         public void Tick()
         {
-            if (!Enabled)
+            return;
+            
+            if (!Enabled || _effects.Count < 1)
                 return;
             
-            if (_effects.Count < 1)
-                return;
             _nativeEffects = _effects.ToArray();
+            
             foreach (BaseEffect effect in _nativeEffects)
             {
+                if (effect == null)
+                    continue;
                 if (effect.Process())
                     SetStats(effect.Apply(_player.Stats));
                 else if (effect.IsExecuted)

@@ -64,7 +64,7 @@ namespace Views.UI.Inventory
                 cellView.SetOccupied(state ? this : null);
         }
 
-        public void ResetPosition()
+        private void ResetPosition()
         {
             CellPair.SetOccupied(this);
             OccupyInner(true);

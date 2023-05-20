@@ -32,11 +32,12 @@ namespace WildIsland.Controllers
             DebugCommand damagePlayer = new DebugCommand("damage", "Damage player", "damage", DamagePlayer);
             DebugCommand tempEffect = new DebugCommand("effect_temp", "Temporary hunger decrease for 3 secs", "effect_temp", TemporaryEffectApply);
             DebugCommand periodicEffect = new DebugCommand("effect_periodic", "Periodic damage to head for 3 secs every 1 secs", "effect_periodic", PeriodicEffectApply);
-            DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(PresetType.Day));
-            DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(PresetType.Night));
+            
+            // DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(DayPresetType.Day));
+            // DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(DayPresetType.Night));
 
             DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", FrameRateChange);
-            DebugCommand<int> setTime = new DebugCommand<int>("time_", "Set time speed", "time_<value>", TimeSpeedUp);
+            DebugCommand<string> setTime = new DebugCommand<string>("time_", "Set time speed or day/night", "time_<value>", TimeCommandDeterminate);
 
             _commands = new DebugCommandBase[]
             {
@@ -46,8 +47,6 @@ namespace WildIsland.Controllers
                 periodicEffect,
                 setFps,
                 setTime,
-                setDay,
-                setNight
             };
 
             _view.Init(_commands);
@@ -74,13 +73,28 @@ namespace WildIsland.Controllers
                     case DebugCommand<int> debugCommandInt:
                         debugCommandInt.Invoke(int.Parse(properties));
                         break;
+                    case DebugCommand<string> debugCommandString:
+                        debugCommandString.Invoke(properties);
+                        break;
                 }
             }
         }
 
-        private void TimeSpeedUp(int time)
-            => Time.timeScale = time;
+        private void TimeCommandDeterminate(string value)
+        {
+            Array dayPresetTypes = Enum.GetValues(typeof(DayPresetType));
 
+            foreach (object presetType in dayPresetTypes)
+            {
+                if (!string.Equals(presetType.ToString(), value, StringComparison.CurrentCultureIgnoreCase))
+                    continue;
+                _daySetter.SetPreset((DayPresetType)presetType);
+                return;
+            }
+
+            Time.timeScale = Mathf.Clamp(int.Parse(value), 0, 100 );
+        }
+        
         private void DamagePlayer()
             => _dataProcessor.SetAllHealths(isRandomizing: true);
 
