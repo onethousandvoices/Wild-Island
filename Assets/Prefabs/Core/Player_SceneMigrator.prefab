@@ -7554,7 +7554,7 @@ MonoBehaviour:
   _dayTimerView: {fileID: 3282906497036161369}
   _inventoryView: {fileID: 5986225367954978468}
   _debugConsoleView: {fileID: 5771508623107339846}
-  _inventoryItemViewBasePrefab: {fileID: 3946528619223062684, guid: f5ced3aace3d8fb41b06cdc8a3d393ab,
+  inventoryItemViewPrefab: {fileID: 3946528619223062684, guid: f5ced3aace3d8fb41b06cdc8a3d393ab,
     type: 3}
 --- !u!1 &4560732162590210465
 GameObject:
@@ -7592,7 +7592,7 @@ Transform:
   - {fileID: 4560732161793138934}
   - {fileID: 7609091868914300183}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4560732162706049410
 GameObject:
@@ -13639,7 +13639,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7609091868914300170}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.041, y: 1.074, z: -4}
+  m_LocalPosition: {x: 1.0409851, y: 1.0739975, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13876,7 +13876,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7732757672195970377}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.041, y: 1.074, z: -4}
+  m_LocalPosition: {x: 1.0409851, y: 1.0739975, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13915,6 +13915,13 @@ MonoBehaviour:
     GateFit: 2
     FocusDistance: 10
     m_SensorSize: {x: 1, y: 1}
+    Iso: 200
+    ShutterSpeed: 0.005
+    Aperture: 16
+    BladeCount: 5
+    Curvature: {x: 2, y: 11}
+    BarrelClipping: 0.25
+    Anamorphism: 0
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

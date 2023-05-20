@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Views.UI.Inventory
 {
@@ -15,7 +16,9 @@ namespace Views.UI.Inventory
         private Action<InventoryItemView, PointerEventData> _onClickCallback;
 
         private RectTransform _rect;
-        private CellView[] _occupiedCells = { };
+        private CellView[] _occupiedCells;
+
+        private const int _cellSize = 98;
 
         public RectTransform RT => _rect ??= GetComponent<RectTransform>();
         public CellView CellPair { get; private set; }
@@ -58,12 +61,12 @@ namespace Views.UI.Inventory
         private void OccupyInner(bool state)
         {
             foreach (CellView cellView in _occupiedCells)
-                cellView.SetOccupied(state);
+                cellView.SetOccupied(state ? this : null);
         }
 
         public void ResetPosition()
         {
-            CellPair.SetOccupied(true);
+            CellPair.SetOccupied(this);
             OccupyInner(true);
             transform.parent = CellPair.transform;
             RT.anchoredPosition = Vector2.zero;
@@ -84,6 +87,20 @@ namespace Views.UI.Inventory
         private void OnValidate()
         {
             _events ??= GetComponentInChildren<PointerEventsReceiver>();
+
+            Image img = GetComponentInChildren<Image>();
+            if (img == null)
+                return;
+
+            RectTransform imgRT = img.GetComponent<RectTransform>();
+
+            float sizeX = Size.x * _cellSize;
+            float sizeY = Size.y * _cellSize;
+            imgRT.sizeDelta = new Vector2(sizeX, sizeY);
+
+            float deltaX = (sizeX - _cellSize) / 2;
+            float deltaY = (sizeY - _cellSize) / 2;
+            imgRT.anchoredPosition = new Vector3(deltaX, -deltaY);
         }
     }
 }

@@ -8,8 +8,9 @@ OcclusionCullingSettings:
     smallestOccluder: 5
     smallestHole: 0.25
     backfaceThreshold: 100
-  m_SceneGUID: 00000000000000000000000000000000
-  m_OcclusionCullingData: {fileID: 0}
+  m_SceneGUID: 99c9720ab356a0642a771bea13969a05
+  m_OcclusionCullingData: {fileID: 36300000, guid: 400b032d62f3e2f4387fd08f94ca438e,
+    type: 2}
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
@@ -38,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 410087040}
-  m_IndirectSpecularColor: {r: 0.65282667, g: 0.63182974, b: 0.7984008, a: 1}
+  m_IndirectSpecularColor: {r: 0.65366423, g: 0.63221145, b: 0.7994566, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1084,26 +1085,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7609091868914300183, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.0409851
-      objectReference: {fileID: 0}
-    - target: {fileID: 7609091868914300183, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0739975
-      objectReference: {fileID: 0}
-    - target: {fileID: 7732757672195970383, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.0409851
-      objectReference: {fileID: 0}
-    - target: {fileID: 7732757672195970383, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0739975
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

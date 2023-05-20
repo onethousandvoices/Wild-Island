@@ -36,7 +36,7 @@ namespace WildIsland.Controllers
             DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(PresetType.Night));
 
             DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", FrameRateChange);
-            DebugCommand<int> setTime = new DebugCommand<int>("time_speed_", "Set time speed", "time_speed_<value>", TimeSpeedUp);
+            DebugCommand<int> setTime = new DebugCommand<int>("time_", "Set time speed", "time_<value>", TimeSpeedUp);
 
             _commands = new DebugCommandBase[]
             {

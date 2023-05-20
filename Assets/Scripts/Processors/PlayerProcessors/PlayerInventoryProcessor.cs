@@ -25,10 +25,12 @@ namespace WildIsland.Processors
 
         private CellView[] _allCells;
         private CellView[,] _cells;
-        private ToolView[] _tools;
+        private CellView[] _affectedCells;
+        private List<CellView> _sizeCheckCells;
         private List<InventoryItemView> _items;
-        private List<CellView> _affectedCells;
+        private ToolView[] _tools;
         private HandsView _hands;
+        private Vector2 _startDragPos;
 
         public bool IsInventoryShown { get; private set; }
         private const int _width = 6;
@@ -54,20 +56,24 @@ namespace WildIsland.Processors
 
             _tools = _inventoryView.GetComponentsInChildren<ToolView>();
             _hands = _inventoryView.GetComponentInChildren<HandsView>();
-
-            _items = new List<InventoryItemView> { Object.Instantiate(_itemPrefab, _inventoryView.Bg) };
-            _affectedCells = new List<CellView>();
-
-            _items[0].Init();
-            TryFitItem(_items[0]);
-
+            
+            _items = new List<InventoryItemView>();
+            _sizeCheckCells = new List<CellView>();
+            
+            for (int i = 0; i < 2; i++)
+                _items.Add(Object.Instantiate(_itemPrefab, _inventoryView.Bg));
+            
             foreach (InventoryItemView testItem in _items)
             {
+                testItem.Init();
                 testItem.SetOnStartDragCallback(OnItemStartDrag);
                 testItem.SetOnDragCallback(OnItemDrag);
                 testItem.SetOnEndDragCallback(OnItemEndDrag);
                 testItem.SetOnClickCallback(OnItemClick);
             }
+            
+            TryFitItem(_items[0]);
+            TryFitItem(_items[1]);
         }
 
         public void ShowInventory(InputAction.CallbackContext obj)
@@ -77,13 +83,12 @@ namespace WildIsland.Processors
         {
             item.FreeCells();
             item.transform.parent = _inventoryView.Bg;
+            _startDragPos = (Vector2)item.RT.position - data.position;
         }
 
         private void OnItemDrag(InventoryItemView item, PointerEventData data)
         {
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(item.RT, data.position, data.pressEventCamera, out Vector3 globalMousePos))
-                item.RT.position = globalMousePos;
-            // Debug.Log(IsPlaceable(item) ? "can be placed" : "CANT be placed");
+            item.RT.position = data.position + _startDragPos;
         }
 
         private void OnItemEndDrag(InventoryItemView item, PointerEventData data)
@@ -96,11 +101,13 @@ namespace WildIsland.Processors
         private void TryFitItem(InventoryItemView item)
         {
             CellView closest = ClosestCell(item);
-            
+            item.OccupyCells(closest, _affectedCells);
+            return;
+
             switch (ItemSizeCheck(closest, item))
             {
                 case true:
-                    item.OccupyCells(closest, _affectedCells.ToArray());
+                    item.OccupyCells(closest, _sizeCheckCells.ToArray());
                     break;
                 case false:
                     item.ResetPosition();
@@ -118,22 +125,25 @@ namespace WildIsland.Processors
                 for (int j = 0; j < _cells.GetLength(1); j++)
                 {
                     CellView cell = _cells[i, j];
+                    
+                    if (cell.OccupiedBy == item || !ItemSizeCheck(cell, item))
+                        continue;
 
                     float distanceToItem = Vector2.Distance(cell.RT.position, item.RT.position);
 
                     if (distanceToItem > distance)
                         continue;
+                    _affectedCells = _sizeCheckCells.ToArray();
                     distance = distanceToItem;
                     closest = cell;
                 }
             }
-
             return closest;
         }
 
         private bool ItemSizeCheck(CellView cell, InventoryItemView item)
         {
-            _affectedCells.Clear();
+            _sizeCheckCells.Clear();
 
             Vector2 targetCoordinate = cell.Coordinates - Vector2.one + item.Size;
             int targetY = (int)targetCoordinate.y;
@@ -145,15 +155,15 @@ namespace WildIsland.Processors
                 {
                     if (y >= _height || x >= _width || y < 0 || x < 0)
                         return false;
-                    
+
                     CellView affectedCell = _cells[y, x];
-                    if (affectedCell.IsOccupied)
+                    if (affectedCell.OccupiedBy)
                         return false;
-                    
-                    _affectedCells.Add(affectedCell);
+
+                    _sizeCheckCells.Add(affectedCell);
                 }
             }
-
+            
             return true;
         }
 
@@ -165,13 +175,13 @@ namespace WildIsland.Processors
                 {
                     CellView cell = _cells[i, j];
 
-                    if (cell.IsOccupied)
+                    if (cell.OccupiedBy)
                         continue;
 
                     // if (item.Size == Vector2.one)
                     // {
-                        // cell.SetOccupied(item);
-                        // return;
+                    // cell.SetOccupied(item);
+                    // return;
                     // }
                 }
             }
@@ -198,7 +208,7 @@ namespace WildIsland.Processors
         }
 
         private bool IsPlaceable(InventoryItemView item)
-            => _allCells.Select(cell => cell.RT.Contains(item.RT) && !cell.IsOccupied).FirstOrDefault();
+            => _allCells.Select(cell => cell.RT.Contains(item.RT) && !cell.OccupiedBy).FirstOrDefault();
     }
 
     public interface IPlayerInventory
