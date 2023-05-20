@@ -1,9 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using GoogleSheetsToUnity.ThirdPary;
 #if ODIN_INSPECTOR
-using Sirenix.OdinInspector;
 #endif
 using TinyJSON;
 using UnityEngine;
@@ -208,7 +206,7 @@ namespace GoogleSheetsToUnity
 
 
             string json = JSON.Dump(requestData, EncodeOptions.NoTypeHints);
-            UnityWebRequest request = UnityWebRequest.PostWwwForm(sb.ToString(), "");
+            UnityWebRequest request = UnityWebRequest.Post(sb.ToString(), "");
             byte[] bodyRaw = new UTF8Encoding().GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
@@ -268,7 +266,7 @@ namespace GoogleSheetsToUnity
 
             string json = JSON.Dump(inputData, EncodeOptions.NoTypeHints);
 
-            UnityWebRequest request = UnityWebRequest.PostWwwForm(sb.ToString(), "");
+            UnityWebRequest request = UnityWebRequest.Post(sb.ToString(), "");
 
             //have to do this cause unitywebrequest post will nto accept json data corrently...
             byte[] bodyRaw = new UTF8Encoding().GetBytes(json);
