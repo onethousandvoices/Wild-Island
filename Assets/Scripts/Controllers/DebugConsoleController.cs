@@ -1,5 +1,6 @@
 ﻿using Effects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Views.UI;
@@ -18,9 +19,10 @@ namespace WildIsland.Controllers
         [Inject] private IGetPlayerStats _player;
         [Inject] private IDataProcessor _dataProcessor;
         [Inject] private IEffectProcessor _effectProcessor;
+        [Inject] private IPlayerState _playerState;
 
         private DebugCommandBase[] _commands;
-        
+
         private TestTemporaryEffect _testTemporary;
         private TestPeriodicEffect _testPeriodic;
 
@@ -28,13 +30,11 @@ namespace WildIsland.Controllers
 
         public void Initialize()
         {
-            DebugCommand help = new DebugCommand("help", "List of all commands", "help", _view.UpdateHelpState);
+            DebugCommand help = new DebugCommand("help", "List of all commands", "help", Help);
             DebugCommand damagePlayer = new DebugCommand("damage", "Damage player", "damage", DamagePlayer);
             DebugCommand tempEffect = new DebugCommand("effect_temp", "Temporary hunger decrease for 3 secs", "effect_temp", TemporaryEffectApply);
             DebugCommand periodicEffect = new DebugCommand("effect_periodic", "Periodic damage to head for 3 secs every 1 secs", "effect_periodic", PeriodicEffectApply);
-            
-            // DebugCommand setDay = new DebugCommand("time_day", "Set day", "time_day", () => _daySetter.SetPreset(DayPresetType.Day));
-            // DebugCommand setNight = new DebugCommand("time_night", "Set night", "time_night", () => _daySetter.SetPreset(DayPresetType.Night));
+            DebugCommand testException = new DebugCommand("exception", "Test exception", "exception", TestException);
 
             DebugCommand<int> setFps = new DebugCommand<int>("fps_", "Set fps (0 - uncapped)", "fps_<value>", FrameRateChange);
             DebugCommand<string> setTime = new DebugCommand<string>("time_", "Set time speed or day/night", "time_<value>", TimeCommandDeterminate);
@@ -45,11 +45,12 @@ namespace WildIsland.Controllers
                 damagePlayer,
                 tempEffect,
                 periodicEffect,
+                testException,
                 setFps,
                 setTime,
             };
 
-            _view.Init(_commands);
+            Application.logMessageReceived += AppLog;
         }
 
         private void HandeInput()
@@ -80,6 +81,38 @@ namespace WildIsland.Controllers
             }
         }
 
+        private void AppLog(string condition, string stacktrace, LogType type)
+        {
+            Color color = new Color();
+
+            switch (type)
+            {
+                case LogType.Error:
+                    color = Color.red;
+                    break;
+                case LogType.Warning:
+                    color = Color.yellow;
+                    break;
+                case LogType.Log:
+                    color = Color.white;
+                    break;
+                case LogType.Exception:
+                    color = Color.red;
+                    break;
+            }
+
+            IEnumerable<string> splitInParts = condition.SplitInParts(_view.LoggedStringWidth);
+
+            foreach (string s in splitInParts)
+                _view.Log(new LoggedString(s, color));
+        }
+
+        private void Help()
+            => _view.Log(_commands.Select(x => new LoggedString($"{x.Format} - {x.Description}", Color.green)).ToArray());
+
+        private static void TestException()
+            => throw new Exception("TEST EXCEPTION");
+
         private void TimeCommandDeterminate(string value)
         {
             Array dayPresetTypes = Enum.GetValues(typeof(DayPresetType));
@@ -92,13 +125,13 @@ namespace WildIsland.Controllers
                 return;
             }
 
-            Time.timeScale = Mathf.Clamp(int.Parse(value), 0, 100 );
+            Time.timeScale = Mathf.Clamp(int.Parse(value), 0, 100);
         }
-        
+
         private void DamagePlayer()
             => _dataProcessor.SetAllHealths(isRandomizing: true);
 
-        private void FrameRateChange(int fps)
+        private static void FrameRateChange(int fps)
         {
             Application.targetFrameRate = fps;
             Debug.Log($"Fps set to {Application.targetFrameRate}");
@@ -117,11 +150,14 @@ namespace WildIsland.Controllers
             _testPeriodic.AffectedStats.Add(new AffectedStat(_player.Stats.HeadHealth, -10));
             _effectProcessor.AddEffect(_testPeriodic);
         }
-        
+
         public void ShowConsole()
         {
-            _view.UpdateConsoleState();
             _view.ResetInput();
+            if (_view.UpdateConsoleState())
+                _playerState.AddAllExcept(InputState.BlockInventory);
+            else
+                _playerState.RemoveAllExcept(InputState.None);
         }
 
         public void OnReturn()

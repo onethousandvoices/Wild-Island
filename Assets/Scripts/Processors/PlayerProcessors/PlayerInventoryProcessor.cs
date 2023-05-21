@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using Views.UI.Inventory;
 using Zenject;
 using Object = UnityEngine.Object;
@@ -20,6 +19,7 @@ namespace WildIsland.Processors
     {
         [Inject] private InventoryView _inventoryView;
         [Inject] private InventoryItemView _itemPrefab;
+        [Inject] private IPlayerState _playerState;
 
         private CellView[] _allCells;
         private CellView[,] _cells;
@@ -30,7 +30,6 @@ namespace WildIsland.Processors
         private HandsView _hands;
         private Vector2 _startDragPos;
 
-        public bool IsInventoryShown { get; private set; }
         private const int _width = 6;
         private const int _height = 8;
 
@@ -74,8 +73,16 @@ namespace WildIsland.Processors
             TryFitItem(_items[1]);
         }
 
-        public void ShowInventory(InputAction.CallbackContext obj)
-            => IsInventoryShown = _inventoryView.ShowHide();
+        public void ShowInventory()
+        {
+            if (_playerState.InputState.HasFlag(InputState.BlockInventory))
+                return;
+
+            if (_inventoryView.ShowHide())
+                _playerState.AddAllExcept(InputState.BlockInventory);
+            else
+                _playerState.RemoveAllExcept(InputState.None);
+        }
 
         private void OnItemStartDrag(InventoryItemView item, PointerEventData data)
         {
@@ -205,8 +212,7 @@ namespace WildIsland.Processors
 
     public interface IPlayerInventory
     {
-        public void ShowInventory(InputAction.CallbackContext obj);
+        public void ShowInventory();
         public void AutoFitItem(InventoryItemView item);
-        public bool IsInventoryShown { get; }
     }
 }

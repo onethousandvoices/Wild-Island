@@ -13,9 +13,8 @@ namespace WildIsland.Processors
     public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
     {
         [Inject] private PlayerView _view;
-        [Inject] private IPlayerInputState _inputState;
         [Inject] private IPlayerStatSetter _statSetter;
-        [Inject] private IPlayerSpeed _playerSpeed;
+        [Inject] private IPlayerState _playerState;
         [Inject] private IGetPlayerStats _player;
 
         private DbValue<PlayerData> _data;
@@ -40,7 +39,7 @@ namespace WildIsland.Processors
             if (!Enabled)
                 return;
 
-            _relativeSpeed = _playerSpeed.CurrentSpeed / _player.Stats.SprintSpeed.Value;
+            _relativeSpeed = _playerState.CurrentSpeed / _player.Stats.SprintSpeed.Value;
 
             ProcessHealth();
             ProcessStamina();
@@ -99,7 +98,7 @@ namespace WildIsland.Processors
         private void ProcessStamina()
         {
             if (Math.Abs(_player.Stats.Stamina.Value - _player.Stats.Stamina.Default) < 0.01f ||
-                _inputState.State == PlayerInputState.Jump || _inputState.State == PlayerInputState.Sprint)
+                _playerState.MoveState == MoveState.Jump || _playerState.MoveState == MoveState.Sprint)
                 return;
 
             float currentFatigue = _player.Stats.Fatigue.Value / _player.Stats.Fatigue.Default;

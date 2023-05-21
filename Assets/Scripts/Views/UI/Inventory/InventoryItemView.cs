@@ -68,7 +68,7 @@ namespace Views.UI.Inventory
         {
             CellPair.SetOccupied(this);
             OccupyInner(true);
-            transform.parent = CellPair.transform;
+            transform.SetParent(CellPair.transform, false);
             RT.anchoredPosition = Vector2.zero;
         }
 

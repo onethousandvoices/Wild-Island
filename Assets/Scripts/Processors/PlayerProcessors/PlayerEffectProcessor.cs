@@ -40,8 +40,6 @@ namespace WildIsland.Processors
 
         public void Tick()
         {
-            return;
-            
             if (!Enabled || _effects.Count < 1)
                 return;
             

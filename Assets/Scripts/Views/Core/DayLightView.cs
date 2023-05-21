@@ -54,6 +54,7 @@ namespace WildIsland.Views
             }
             
             DynamicGI.UpdateEnvironment();
+            Debug.Log($"Day preset was set to {type}");
         }
     }
     
