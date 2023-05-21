@@ -49,8 +49,6 @@ namespace WildIsland.Controllers
                 setFps,
                 setTime,
             };
-
-            Application.logMessageReceived += AppLog;
         }
 
         private void HandeInput()
@@ -155,10 +153,13 @@ namespace WildIsland.Controllers
         {
             _view.ResetInput();
             if (_view.UpdateConsoleState())
-                _playerState.AddAllExcept(InputState.BlockInventory);
+                _playerState.AddAllExcept(InputState.None);
             else
                 _playerState.RemoveAllExcept(InputState.None);
         }
+
+        public void SubscribeToLog()
+            => Application.logMessageReceived += AppLog;
 
         public void OnReturn()
         {
@@ -173,6 +174,7 @@ namespace WildIsland.Controllers
     public interface IConsoleHandler
     {
         public void ShowConsole();
+        public void SubscribeToLog();
         public void OnReturn();
         public void OnUpArrow();
     }

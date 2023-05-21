@@ -65,7 +65,6 @@ namespace WildIsland.Processors
         private float _staminaJumpCost;
         private float _staminaSprintCost;
 
-        private const float _inputMagnitude = 1f;
         private const float _speedUpChangeRate = 1.1f;
         private const float _slowDownChangeRate = 7f;
         private const float _rotationSmoothTime = 0.12f;
@@ -286,9 +285,7 @@ namespace WildIsland.Processors
             float rbSpeed = new Vector3(_view.Rb.velocity.x, 0f, _view.Rb.velocity.z).magnitude;
             float modifier = _move.sqrMagnitude > 0 ? _speedUpChangeRate : _slowDownChangeRate;
 
-            CurrentSpeed = Mathf.Lerp(rbSpeed, targetSpeed * _inputMagnitude,
-                Time.fixedDeltaTime * modifier);
-
+            CurrentSpeed = Mathf.Lerp(rbSpeed, targetSpeed, Time.fixedDeltaTime * modifier);
             CurrentSpeed = Mathf.Round(CurrentSpeed * 1000f) / 1000f;
 
             Vector3 inputDirection = _isGrounded
@@ -325,7 +322,7 @@ namespace WildIsland.Processors
             velocityChange = new Vector3(velocityChange.x, 0f, velocityChange.z);
             velocityChange = AdjustSlopeVelocity(velocityChange);
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
-
+            
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
 
             _sprintBlend = new Vector2(0f, _sprint ? 1 : 0);

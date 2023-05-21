@@ -8,6 +8,8 @@ namespace WildIsland.Installers
     {
         public override void InstallBindings()
         {
+            Container.BindInterfacesTo<GameController>().AsSingle();
+            
             Container.BindInterfacesTo<GameDataController>().AsSingle();
             Container.BindInterfacesTo<DayController>().AsSingle();
             Container.BindInterfacesTo<BiomeController>().AsSingle();
