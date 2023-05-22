@@ -1,14 +1,19 @@
 fileFormatVersion: 2
 guid: 153ca4f9ab36ff743b5c12ea8fde7dd4
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 21300
   internalIDToNameTable: []
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: tree1_leafs_base_color.007
-    second: {fileID: 2100000, guid: 68f0034a068b08f46a16247c9a3e129e, type: 2}
+      name: Berry
+    second: {fileID: 2100000, guid: d7bf3e0ae0bf8644f8a4ef499a6a5c3f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bush_test
+    second: {fileID: 2100000, guid: 652e5170306376b47a734ec74c264028, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -19,7 +24,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 0
+    removeConstantScaleCurves: 1
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -72,7 +77,6 @@ ModelImporter:
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
-    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -105,7 +109,6 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
-  importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
