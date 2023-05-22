@@ -107,6 +107,7 @@ Material:
     - _AlphaClip: 1
     - _AlphaToMask: 1
     - _Alpha_clip: 0.4
+    - _BendHeight: 0.3
     - _Bend_power: 4
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
@@ -137,6 +138,10 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _WindDensity: 0.7
+    - _WindPower: 1
+    - _WindScale: 1
+    - _WindSpeed: 0.3
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
