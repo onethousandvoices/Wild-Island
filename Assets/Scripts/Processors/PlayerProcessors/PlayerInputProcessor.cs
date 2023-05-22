@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using WildIsland.Controllers;
 using WildIsland.Data;
+using WildIsland.Utility;
 using WildIsland.Views;
 using Zenject;
 
@@ -66,7 +67,7 @@ namespace WildIsland.Processors
         private float _staminaSprintCost;
 
         private const float _speedUpChangeRate = 1.1f;
-        private const float _slowDownChangeRate = 7f;
+        private const float _slowDownChangeRate = 2f;
         private const float _rotationSmoothTime = 0.12f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
@@ -144,15 +145,26 @@ namespace WildIsland.Processors
 
             _inputMap.Player.Jump.performed += OnJumpPerformed;
             _inputMap.Player.Inventory.performed += _ => _inventory.ShowInventory();
-
             _inputMap.Player.Console.performed += _ => _consoleHandler.ShowConsole();
             _inputMap.Player.ReturnButton.performed += _ => _consoleHandler.OnReturn();
             _inputMap.Player.ArrowUp.performed += _ => _consoleHandler.OnUpArrow();
+            _inputMap.Player.LMB.performed += OnLMB;
+            _inputMap.Player.RMB.performed += OnRMB;
+        }
+
+        private void OnRMB(InputAction.CallbackContext obj)
+        {
+            Debug.Log("RMB");
+        }
+
+        private void OnLMB(InputAction.CallbackContext obj)
+        {
+            Debug.Log("LMB");
         }
 
         private void CheckCursor()
         {
-            if (InputState.HasFlag(InputState.ShowCursor))
+            if (InputState.HasFlagOptimized(InputState.ShowCursor))
             {
                 Cursor.lockState = CursorLockMode.Confined;
                 return;
@@ -163,17 +175,14 @@ namespace WildIsland.Processors
 
         private void ReadInput()
         {
-            _look = _inputMap.Player.Look.ReadValue<Vector2>();
-            Vector2 move = _inputMap.Player.Move.ReadValue<Vector2>();
-            if (_sprint)
-                move = Vector2.up;
-            _move = move;
+            _look = InputState.HasFlagOptimized(InputState.BlockCamera) ? Vector2.zero : _inputMap.Player.Look.ReadValue<Vector2>();
+            _move = InputState.HasFlagOptimized(InputState.BlockMove) ? Vector2.zero : _inputMap.Player.Move.ReadValue<Vector2>();
             CheckSprint();
         }
 
         private void OnJumpPerformed(InputAction.CallbackContext obj)
         {
-            if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f || InputState.HasFlag(InputState.BlockJump))
+            if (!_jumpPossible || !_isGrounded || _jumpTimeoutDelta > 0f || InputState.HasFlagOptimized(InputState.BlockJump))
                 return;
             _lastMove = _inputMap.Player.Move.ReadValue<Vector2>();
             _view.Rb.velocity = new Vector3(_view.Rb.velocity.x, _view.JumpHeight, _view.Rb.velocity.z);
@@ -184,6 +193,9 @@ namespace WildIsland.Processors
         private void CheckSprint()
         {
             bool isSprinting = _inputMap.Player.Sprint.IsPressed();
+            
+            if (InputState.HasFlagOptimized(InputState.BlockSprint))
+                isSprinting = false;
 
             if (!isSprinting)
             {
@@ -256,9 +268,6 @@ namespace WildIsland.Processors
 
         private void Movement()
         {
-            if (InputState.HasFlag(InputState.BlockMove))
-                return;
-            
             float targetSpeed;
             MoveState pendingState;
 
@@ -322,7 +331,7 @@ namespace WildIsland.Processors
             velocityChange = new Vector3(velocityChange.x, 0f, velocityChange.z);
             velocityChange = AdjustSlopeVelocity(velocityChange);
             velocityChange = Vector3.ClampMagnitude(velocityChange, CurrentSpeed);
-            
+
             _view.Rb.AddForce(velocityChange, ForceMode.VelocityChange);
 
             _sprintBlend = new Vector2(0f, _sprint ? 1 : 0);
@@ -345,7 +354,7 @@ namespace WildIsland.Processors
 
         private void CameraRotation()
         {
-            if (InputState.HasFlag(InputState.BlockCamera))
+            if (InputState.HasFlagOptimized(InputState.BlockCamera))
                 return;
 
             if (_look.sqrMagnitude >= _threshold && !_isLockCameraPosition)

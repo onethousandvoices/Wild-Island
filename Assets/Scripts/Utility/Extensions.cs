@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WildIsland.Processors;
 
 namespace WildIsland.Utility
 {
@@ -15,5 +16,8 @@ namespace WildIsland.Utility
             for (int i = 0; i < s.Length; i += partLength)
                 yield return s.Substring(i, Math.Min(partLength, s.Length - i));
         }
+        
+        public static bool HasFlagOptimized(this InputState input, InputState has)
+            => (input & has) > 0;
     }
 }
