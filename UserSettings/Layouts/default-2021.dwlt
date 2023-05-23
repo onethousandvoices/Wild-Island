@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1357.3334
   m_ShowMode: 4
-  m_Title: Hierarchy
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 492}
   m_MaxSize: {x: 10000, y: 10000}
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 8096}
   vertical: 0
-  controlID: 130
+  controlID: 604
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: GameView
+  m_Name: SceneView
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -143,11 +143,11 @@ MonoBehaviour:
     height: 1307.3334
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 10}
+  m_ActualView: {fileID: 11}
   m_Panes:
   - {fileID: 10}
   - {fileID: 11}
-  m_Selected: 0
+  m_Selected: 1
   m_LastSelected: 1
 --- !u!114 &7
 MonoBehaviour:
@@ -624,9 +624,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 348.64752, y: 101.204025, z: 344.05695}
+    m_Target: {x: 345.74777, y: 100.51863, z: 342.24918}
     speed: 2
-    m_Value: {x: 348.64752, y: 101.204025, z: 344.05695}
+    m_Value: {x: 345.74777, y: 100.51863, z: 342.24918}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -673,9 +673,9 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.057986066, y: 0.054789342, z: 0.0031783406, w: -0.996874}
+    m_Target: {x: 0.10101686, y: -0.09000861, z: -0.009191729, w: -0.9908306}
     speed: 2
-    m_Value: {x: 0.05798607, y: 0.054789346, z: 0.0031783408, w: -0.99687403}
+    m_Value: {x: 0.10099611, y: -0.09148855, z: -0.009342611, w: -0.9906273}
   m_Size:
     m_Target: 1.1277905
     speed: 2
@@ -736,9 +736,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 3c840000
-      m_LastClickedID: 33852
-      m_ExpandedIDs: d0faffff
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: cefaffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -804,22 +804,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Materials
+    - Assets
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/Materials
+  - Assets
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Unity_projects\Wild_island
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: d8920000
-    m_LastClickedID: 37592
-    m_ExpandedIDs: 00000000d4920000d6920000d8920000da920000dc920000de920000e0920000e292000000ca9a3b
+    m_SelectedIDs: d2930000
+    m_LastClickedID: 37842
+    m_ExpandedIDs: 00000000d2930000d4930000d6930000d8930000da930000dc930000de930000e093000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -847,7 +847,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000d4920000d6920000d8920000da920000dc920000de920000e0920000e2920000
+    m_ExpandedIDs: 00000000d2930000d4930000d6930000d8930000da930000dc930000de930000e093000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
