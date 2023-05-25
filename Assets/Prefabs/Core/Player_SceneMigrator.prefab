@@ -13596,7 +13596,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7483522175121731266}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.041, y: 0, z: 0}
+  m_LocalPosition: {x: 1.041, y: 12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13655,12 +13655,12 @@ MonoBehaviour:
   <ThirstRegenStage2Range>k__BackingField: {x: 51, y: 75}
   <ThirstRegenStage3Range>k__BackingField: {x: 26, y: 50}
   <ThirstRegenStage4Range>k__BackingField: {x: 0, y: 25}
-  <StaminaJumpCost>k__BackingField: 1
-  <StaminaSprintCost>k__BackingField: 1
-  <JumpHeight>k__BackingField: 10
+  <StaminaJumpCost>k__BackingField: 15
+  <StaminaSprintCost>k__BackingField: 20
+  <JumpHeight>k__BackingField: 5
   <InAirVelocityReduction>k__BackingField: 0.96
-  <HorizontalVelocityReduction>k__BackingField: 0.96
-  <BackwardsVelocityReduction>k__BackingField: 0.96
+  <HorizontalVelocityReduction>k__BackingField: 0.995
+  <BackwardsVelocityReduction>k__BackingField: 0.97
   <Animator>k__BackingField: {fileID: 1006202132895751804}
   <LandingAudioClip>k__BackingField: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2,
     type: 3}
@@ -13711,7 +13711,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7609091868914300170}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.0409851, y: 1.0739975, z: -4}
+  m_LocalPosition: {x: 1.0409851, y: 13.0739975, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13930,7 +13930,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7732757672195970377}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.0409851, y: 1.0739975, z: -4}
+  m_LocalPosition: {x: 1.0409851, y: 13.0739975, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
