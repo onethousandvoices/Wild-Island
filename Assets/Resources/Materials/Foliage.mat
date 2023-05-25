@@ -259,7 +259,7 @@ Material:
     - _WINDQUALITY: 1
     - _WindQuality: 1
     - _Wind_density: 0.07
-    - _Wind_power: 0.5
+    - _Wind_power: 1
     - _WorkflowMode: 1
     - _ZTest: 4
     - _ZTestDepthEqualForOpaque: 3
@@ -280,7 +280,7 @@ Material:
     - _Thickness_Remap: {r: 0, g: 1, b: 0, a: 0}
     - _TreeInstanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _TreeInstanceScale: {r: 1, g: 1, b: 1, a: 1}
-    - _Wind_movement: {r: 6, g: 0, b: 0, a: 0}
+    - _Wind_movement: {r: 6, g: 6, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &6576418290216403004
 MonoBehaviour:

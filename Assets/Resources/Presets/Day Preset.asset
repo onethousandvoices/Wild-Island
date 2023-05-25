@@ -15,7 +15,7 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <SkyboxMaterial>k__BackingField: {fileID: 2100000, guid: 06127287beb7fb84f9d205230a55a9a6,
     type: 2}
-  <LightingIntensityMultiplier>k__BackingField: 1.3
-  <DirectionalLightIntensity>k__BackingField: 3.7
+  <LightingIntensityMultiplier>k__BackingField: 1.1
+  <DirectionalLightIntensity>k__BackingField: 2.5
   <DirectionalLightColor>k__BackingField: {r: 1, g: 0.99607843, b: 0.89411765, a: 0}
   <LeavesParticlesState>k__BackingField: 1
