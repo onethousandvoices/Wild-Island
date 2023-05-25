@@ -20,6 +20,7 @@ namespace WildIsland.Installers
             Container.BindInterfacesTo<PlayerSoundProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerInventoryProcessor>().AsSingle();
+            Container.BindInterfacesTo<PlayerCameraProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerController>().AsSingle();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using WildIsland.Controllers;
@@ -29,7 +30,7 @@ namespace WildIsland.Processors
         ShowCursor = 64
     }
 
-    public class PlayerProcessor : BaseProcessor, IInitializable, IFixedPlayerProcessor, IPlayerState, ILateTickable, IDisposable
+    public class PlayerProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IFixedPlayerProcessor, IPlayerState, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;
@@ -37,6 +38,8 @@ namespace WildIsland.Processors
         [Inject] private IGetPlayerStats _playerStats;
         [Inject] private IPlayerInventory _inventory;
         [Inject] private IConsoleHandler _consoleHandler;
+        [Inject] private IPlayerCamera _playerCamera;
+        [Inject] private List<IRMBListener> _rmbListeners;
 
         private PlayerData _stats;
         private InputMap _inputMap;
@@ -44,7 +47,6 @@ namespace WildIsland.Processors
         private CapsuleCollider _capsuleCollider;
         private Vector2 _speedBlend;
         private Vector2 _sprintBlend;
-        private Vector2 _look;
         private Vector2 _move;
         private Vector2 _lastMove;
 
@@ -55,9 +57,6 @@ namespace WildIsland.Processors
 
         private float _moveSpeed;
         private float _sprintSpeed;
-        private float _cameraAngleOverride;
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
         private float _relativeSpeed;
         private float _targetRotation;
         private float _rotationVelocity;
@@ -73,10 +72,6 @@ namespace WildIsland.Processors
         private const float _fallTimeout = 0.15f;
         private const float _groundedOffset = 0.05f;
         private const float _groundCheckSphereRadius = 0.15f;
-        private const float _topClamp = 70f;
-        private const float _bottomClamp = -30f;
-        private const float _threshold = 0.01f;
-        private const float _deltaTimeMultiplier = 1f;
 
         private static readonly int _animSpeedX = Animator.StringToHash("SpeedX");
         private static readonly int _animSpeedY = Animator.StringToHash("SpeedY");
@@ -86,6 +81,9 @@ namespace WildIsland.Processors
 
         private bool _jumpPossible => _staminaJumpCost < _stats.Stamina.Value;
         private bool _sprintPossible => _stats.Stamina.Value - _staminaJumpCost * Time.deltaTime > 0;
+
+        public event Action InputStateChanged;
+        public event Action MoveStateChanged;
 
         public MoveState MoveState { get; private set; }
         public InputState InputState { get; private set; }
@@ -108,7 +106,6 @@ namespace WildIsland.Processors
 
             _capsuleCollider = _view.GetComponent<CapsuleCollider>();
             _animator = _view.Animator;
-            _cinemachineTargetYaw = _view.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             BindInputs();
         }
@@ -135,9 +132,6 @@ namespace WildIsland.Processors
             GroundedCheck();
         }
 
-        public void LateTick()
-            => CameraRotation();
-
         private void BindInputs()
         {
             _inputMap = new InputMap();
@@ -149,19 +143,18 @@ namespace WildIsland.Processors
             _inputMap.Player.ReturnButton.performed += _ => _consoleHandler.OnReturn();
             _inputMap.Player.ArrowUp.performed += _ => _consoleHandler.OnUpArrow();
             _inputMap.Player.LMB.performed += OnLMB;
-            _inputMap.Player.RMB.performed += OnRMB;
+            _inputMap.Player.RMB.started += OnRMBStarted;
+            _inputMap.Player.RMB.canceled += OnRMBCanceled;
         }
 
-        private void OnRMB(InputAction.CallbackContext obj)
-        {
-            Debug.Log("RMB");
-        }
+        private void OnRMBStarted(InputAction.CallbackContext obj)
+            => _rmbListeners.ForEach(x => x.OnRMBStarted(obj));
 
-        private void OnLMB(InputAction.CallbackContext obj)
-        {
-            Debug.Log("LMB");
-        }
+        private void OnRMBCanceled(InputAction.CallbackContext obj)
+            => _rmbListeners.ForEach(x => x.OnRMBCanceled(obj));
 
+        private void OnLMB(InputAction.CallbackContext obj) { }
+        
         private void CheckCursor()
         {
             if (InputState.HasFlagOptimized(InputState.ShowCursor))
@@ -169,14 +162,18 @@ namespace WildIsland.Processors
                 Cursor.lockState = CursorLockMode.Confined;
                 return;
             }
-
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void ReadInput()
         {
-            _look = InputState.HasFlagOptimized(InputState.BlockCamera) ? Vector2.zero : _inputMap.Player.Look.ReadValue<Vector2>();
-            _move = InputState.HasFlagOptimized(InputState.BlockMove) ? Vector2.zero : _inputMap.Player.Move.ReadValue<Vector2>();
+            _move = InputState.HasFlagOptimized(InputState.BlockMove)
+                        ? Vector2.zero
+                        : _inputMap.Player.Move.ReadValue<Vector2>();
+            _playerCamera.SetLookVector(
+                InputState.HasFlagOptimized(InputState.BlockCamera)
+                    ? Vector2.zero
+                    : _inputMap.Player.Look.ReadValue<Vector2>());
             CheckSprint();
         }
 
@@ -193,7 +190,7 @@ namespace WildIsland.Processors
         private void CheckSprint()
         {
             bool isSprinting = _inputMap.Player.Sprint.IsPressed();
-            
+
             if (InputState.HasFlagOptimized(InputState.BlockSprint))
                 isSprinting = false;
 
@@ -262,8 +259,8 @@ namespace WildIsland.Processors
                     _capsuleCollider.material = _view.SlipperyMaterial;
                     break;
             }
-
             _animator.SetBool(_animGrounded, _isGrounded);
+            MoveStateChanged?.Invoke();
         }
 
         private void Movement()
@@ -288,8 +285,11 @@ namespace WildIsland.Processors
                 pendingState = MoveState.Idle;
             }
 
-            if (_isGrounded)
+            if (_isGrounded && MoveState != pendingState)
+            {
                 MoveState = pendingState;
+                MoveStateChanged?.Invoke();
+            }
 
             float rbSpeed = new Vector3(_view.Rb.velocity.x, 0f, _view.Rb.velocity.z).magnitude;
             float modifier = _move.sqrMagnitude > 0 ? _speedUpChangeRate : _slowDownChangeRate;
@@ -352,43 +352,18 @@ namespace WildIsland.Processors
             return adjustedVelocity.y < 0 ? adjustedVelocity : velocity;
         }
 
-        private void CameraRotation()
-        {
-            if (InputState.HasFlagOptimized(InputState.BlockCamera))
-                return;
-
-            if (_look.sqrMagnitude >= _threshold && !_isLockCameraPosition)
-            {
-                _cinemachineTargetYaw += _look.x * _deltaTimeMultiplier;
-                _cinemachineTargetPitch += _look.y * _deltaTimeMultiplier;
-            }
-
-            _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
-            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, _bottomClamp, _topClamp);
-
-            _view.CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + _cameraAngleOverride,
-                _cinemachineTargetYaw, 0.0f);
-        }
-
-        private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
-        {
-            if (lfAngle < -360f)
-                lfAngle += 360f;
-            if (lfAngle > 360f)
-                lfAngle -= 360f;
-            return Mathf.Clamp(lfAngle, lfMin, lfMax);
-        }
-
         public void AddState(params InputState[] newState)
         {
             foreach (InputState state in newState)
                 InputState |= state;
+            InputStateChanged?.Invoke();
         }
 
         public void RemoveState(params InputState[] removeState)
         {
             foreach (InputState state in removeState)
                 InputState &= ~state;
+            InputStateChanged?.Invoke();
         }
 
         public void AddAllExcept(InputState state)
@@ -401,6 +376,7 @@ namespace WildIsland.Processors
                     continue;
                 InputState |= inputState;
             }
+            InputStateChanged?.Invoke();
         }
 
         public void RemoveAllExcept(InputState state)
@@ -413,11 +389,15 @@ namespace WildIsland.Processors
                     continue;
                 InputState &= ~inputState;
             }
+            InputStateChanged?.Invoke();
         }
     }
 
     public interface IPlayerState
     {
+        public event Action InputStateChanged;
+        public event Action MoveStateChanged;
+        
         public MoveState MoveState { get; }
         public InputState InputState { get; }
 
@@ -427,5 +407,11 @@ namespace WildIsland.Processors
         public void RemoveState(params InputState[] removeStates);
         public void AddAllExcept(InputState state);
         public void RemoveAllExcept(InputState state);
+    }
+    
+    public interface IRMBListener
+    {
+        public void OnRMBStarted(InputAction.CallbackContext obj);
+        public void OnRMBCanceled(InputAction.CallbackContext obj);
     }
 }

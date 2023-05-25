@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 410087040}
-  m_IndirectSpecularColor: {r: 0.6528836, g: 0.6320957, b: 0.7983148, a: 1}
+  m_IndirectSpecularColor: {r: 0.6533488, g: 0.6321348, b: 0.7989594, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5761,11 +5761,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1592360714644867401, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 2322182128602856746, guid: b163c812c7cea7d48a433403ae0966eb,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -5775,11 +5770,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4208002035549633891, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -25.711426
       objectReference: {fileID: 0}
     - target: {fileID: 4560732161421943298, guid: b163c812c7cea7d48a433403ae0966eb,
         type: 3}
@@ -6165,16 +6155,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7609091868914300183, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 13.0739975
-      objectReference: {fileID: 0}
-    - target: {fileID: 7732757672195970383, guid: b163c812c7cea7d48a433403ae0966eb,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 13.0739975
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b163c812c7cea7d48a433403ae0966eb, type: 3}
@@ -11321,21 +11301,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2080338916 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7609091868914300170, guid: b163c812c7cea7d48a433403ae0966eb,
-    type: 3}
-  m_PrefabInstance: {fileID: 1152562004}
-  m_PrefabAsset: {fileID: 0}
---- !u!45 &2080338918
-Skybox:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2080338916}
-  m_Enabled: 1
-  m_CustomSkybox: {fileID: 2100000, guid: b4d1e1180d6b45d4eaa6f6b684d18e2b, type: 2}
 --- !u!1001 &2144155325
 PrefabInstance:
   m_ObjectHideFlags: 0

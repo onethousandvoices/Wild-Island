@@ -22,8 +22,13 @@
         public void Tick();
     }
 
-    public interface IFixedPlayerProcessor : IPlayerProcessor
+    public interface IFixedPlayerProcessor : IBaseProcessor
     {
         public void FixedTick();
+    }
+
+    public interface ILatePlayerProcessor : IBaseProcessor
+    {
+        public void LateTick();
     }
 }

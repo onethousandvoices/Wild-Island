@@ -9,6 +9,7 @@ namespace WildIsland.Installers
     {
         [SerializeField] private DayLightView _dayLightView;
         [SerializeField] private PlayerView _playerView;
+        [SerializeField] private PlayerCamerasView _playerCamerasView;
         [SerializeField] private Camera _camera;
         [SerializeField] private BaseBiomeView[] _biomeViews;
 
@@ -16,6 +17,7 @@ namespace WildIsland.Installers
         {
             Container.BindInterfacesAndSelfTo<DayLightView>().FromInstance(_dayLightView).AsSingle();
             Container.Bind<PlayerView>().FromInstance(_playerView).AsSingle();
+            Container.Bind<PlayerCamerasView>().FromInstance(_playerCamerasView).AsSingle();
             Container.Bind<Camera>().FromInstance(_camera).AsSingle();
 
             foreach (BaseBiomeView view in _biomeViews)

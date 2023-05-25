@@ -8,12 +8,13 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class PlayerController : IInitializable, ITickable, IFixedTickable, IPlayerStatSetter
+    public class PlayerController : IInitializable, ITickable, IFixedTickable, ILateTickable, IPlayerStatSetter
     {
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
         [Inject] private IGetPlayerStats _player;
         [Inject] private List<IPlayerProcessor> _playerProcessors;
         [Inject] private List<IFixedPlayerProcessor> _fixedPlayerProcessors;
+        [Inject] private List<ILatePlayerProcessor> _latePlayerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
         private List<BasePlayerStatView> _basePlayerStatViews;
@@ -60,7 +61,10 @@ namespace WildIsland.Controllers
 
         public void FixedTick()
             => _fixedPlayerProcessors.ForEach(x => x.FixedTick());
-
+        
+        public void LateTick()
+            => _latePlayerProcessors.ForEach(x => x.LateTick());
+        
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {
             stat.ApplyValue(value);
