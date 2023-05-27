@@ -12,8 +12,8 @@ namespace Effects
         
         private bool _isInstantApplied;
 
-        public float CurrentCooldown { get; protected set; }
-        public float CurrentDuration { get; protected set; }
+        protected float CurrentCooldown { get; set; }
+        protected float CurrentDuration { get; set; }
         
         public bool IsExecuted { get; protected set; }
 

@@ -113,17 +113,24 @@ namespace WildIsland.Controllers
 
         private void TimeCommandDeterminate(string value)
         {
-            Array dayPresetTypes = Enum.GetValues(typeof(DayPresetType));
-
-            foreach (object presetType in dayPresetTypes)
+            try
             {
-                if (!string.Equals(presetType.ToString(), value, StringComparison.CurrentCultureIgnoreCase))
-                    continue;
-                _daySetter.SetPreset((DayPresetType)presetType);
-                return;
-            }
+                Array dayPresetTypes = Enum.GetValues(typeof(DayPresetType));
 
-            Time.timeScale = Mathf.Clamp(int.Parse(value), 0, 100);
+                foreach (object presetType in dayPresetTypes)
+                {
+                    if (!string.Equals(presetType.ToString(), value, StringComparison.CurrentCultureIgnoreCase))
+                        continue;
+                    _daySetter.SetPreset((DayPresetType)presetType);
+                    return;
+                }
+
+                Time.timeScale = Mathf.Clamp(int.Parse(value), 0, 100);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Command incorrect");
+            }
         }
 
         private void DamagePlayer()

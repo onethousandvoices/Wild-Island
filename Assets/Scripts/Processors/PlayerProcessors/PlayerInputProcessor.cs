@@ -30,7 +30,7 @@ namespace WildIsland.Processors
         ShowCursor = 64
     }
 
-    public class PlayerProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IFixedPlayerProcessor, IPlayerState, IDisposable
+    public class PlayerProcessor : BaseProcessor, IPlayerProcessor, IInitializable, ITickable, IFixedTickable, IPlayerState, IDisposable
     {
         [Inject] private Camera _mainCamera;
         [Inject] private PlayerView _view;

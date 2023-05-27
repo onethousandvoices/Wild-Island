@@ -8,11 +8,11 @@ namespace WildIsland.Processors
     {
         [Inject] private PlayerView _view;
         
-        private const float _footstepAudioVolume = 0.5f;
+        private const float _footstepAudioVolume = 15f;
 
         public void Initialize()
         {
-            _view.SetOnLandCallback(Land);
+            // _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);
         }
 

@@ -9,6 +9,7 @@ namespace WildIsland.Installers
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<GameController>().AsSingle();
+            Container.BindInterfacesTo<TimeTickablesController>().AsSingle();
             
             Container.BindInterfacesTo<GameDataController>().AsSingle();
             Container.BindInterfacesTo<DayController>().AsSingle();

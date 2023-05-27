@@ -8,13 +8,11 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class PlayerController : IInitializable, ITickable, IFixedTickable, ILateTickable, IPlayerStatSetter
+    public class PlayerController : IInitializable, ITickable, IPlayerStatSetter
     {
         [Inject] private PlayerViewStatsHolder _viewStatsHolder;
         [Inject] private IGetPlayerStats _player;
         [Inject] private List<IPlayerProcessor> _playerProcessors;
-        [Inject] private List<IFixedPlayerProcessor> _fixedPlayerProcessors;
-        [Inject] private List<ILatePlayerProcessor> _latePlayerProcessors;
 
         private Dictionary<PlayerStat, BasePlayerStatView> _statViewPairs;
         private List<BasePlayerStatView> _basePlayerStatViews;
@@ -47,6 +45,7 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_player.Stats.Fatigue);
 
             _playerProcessors.ForEach(x => x.Enable());
+            
             _basePlayerStatViews = _statViewPairs.Values.ToList();
             _basePlayerStatViews.ForEach(x => x.Init());
 
@@ -54,17 +53,8 @@ namespace WildIsland.Controllers
         }
 
         public void Tick()
-        {
-            _playerProcessors.ForEach(x => x.Tick());
-            _basePlayerStatViews.ForEach(x => x.UpdateValue());
-        }
+            => _basePlayerStatViews.ForEach(x => x.UpdateValue());
 
-        public void FixedTick()
-            => _fixedPlayerProcessors.ForEach(x => x.FixedTick());
-        
-        public void LateTick()
-            => _latePlayerProcessors.ForEach(x => x.LateTick());
-        
         public void SetStat(PlayerStat stat, float value = 0, bool forceDebugShow = false)
         {
             stat.ApplyValue(value);

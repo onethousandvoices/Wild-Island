@@ -230,7 +230,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.2256532
+        functionName: UnityEvent_Footstep
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: a17a9803bc8b4d448c940dd1c3daaf4a,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.7387173
+        functionName: UnityEvent_Footstep
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: a17a9803bc8b4d448c940dd1c3daaf4a,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

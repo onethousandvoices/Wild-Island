@@ -8,7 +8,7 @@ using CameraType = WildIsland.Views.CameraType;
 
 namespace WildIsland.Processors
 {
-    public class PlayerCameraProcessor : BaseProcessor, IInitializable, ILatePlayerProcessor, IPlayerCamera, IRMBListener, IDisposable
+    public class PlayerCameraProcessor : BaseProcessor, IInitializable, ILateTickable, IPlayerCamera, IRMBListener, IDisposable
     {
         [Inject] private PlayerView _player;
         [Inject] private PlayerCamerasView _cameras;

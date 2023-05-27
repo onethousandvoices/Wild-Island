@@ -23,6 +23,7 @@ namespace WildIsland.Views
         [field: SerializeField, Range(0.5f, 1f)] public float BackwardsVelocityReduction { get; private set; }
 
         [field: SerializeField, HorizontalLine(color: EColor.Red)] public Animator Animator { get; private set; }
+        [field: SerializeField] public PlayerViewEventsReceiver EventsReceiver { get; private set; }
         [field: SerializeField] public AudioClip LandingAudioClip { get; private set; }
         [field: SerializeField] public AudioClip[] FootstepAudioClips { get; private set; }
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
@@ -31,10 +32,6 @@ namespace WildIsland.Views
         [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
 
         private Rigidbody _rb;
-
-        private Action<AnimationEvent> OnLandCallback;
-        private Action<AnimationEvent> OnFootStepCallback;
-
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
 
@@ -46,17 +43,11 @@ namespace WildIsland.Views
             OnEffectRemoved = remove;
         }
 
-        public void SetOnLandCallback(Action<AnimationEvent> callback)
-            => OnLandCallback = callback;
+        // public void SetOnLandCallback(Action<AnimationEvent> callback)
+            // => OnLandCallback = callback;
 
         public void SetOnFootStepCallback(Action<AnimationEvent> callback)
-            => OnFootStepCallback = callback;
-
-        private void OnFootstep(AnimationEvent animationEvent)
-            => OnFootStepCallback?.Invoke(animationEvent);
-
-        private void OnLand(AnimationEvent animationEvent)
-            => OnLandCallback?.Invoke(animationEvent);
+            => EventsReceiver.SetOnFootstepCallback(callback);
     }
 
     public interface IEffectReceiver

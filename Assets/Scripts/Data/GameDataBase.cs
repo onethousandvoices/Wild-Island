@@ -177,39 +177,16 @@ namespace WildIsland.Data
             if (loadedType == -1)
                 CheckLoadingType();
             if (loadedType == 0)
-            {
-#if !UNITY_EDITOR
-                Debug.LogError("LOAD GD " + name + " FROM RESOURCES");
-#endif
                 return LoadFromResources<T>(name);
-            }
-            else
-            {
-                byte[] bytes = null;
-                if (Directory.Exists(GDCachePath) && File.Exists(GDCachePath + name + ".bytes"))
-                {
-                    bytes = File.ReadAllBytes(GDCachePath + name + ".bytes");
-                }
-                T gdCache = null;
-                if (bytes != null && bytes.Length != 0)
-                {
-                    gdCache = LoadFromBytes<T>(bytes);
-                }
-                if (gdCache != null)
-                {
-#if !UNITY_EDITOR
-                Debug.LogError("LOAD GD " + name + " FROM CACHE");
-#endif
-                    return gdCache;
-                }
-                else
-                {
-#if !UNITY_EDITOR
-                Debug.LogError("LOAD GD " + name + " FROM RESOURCES");
-#endif
-                    return LoadFromResources<T>(name);
-                }
-            }
+            
+            byte[] bytes = null;
+            
+            if (Directory.Exists(GDCachePath) && File.Exists(GDCachePath + name + ".bytes"))
+                bytes = File.ReadAllBytes(GDCachePath + name + ".bytes");
+            T gdCache = null;
+            if (bytes != null && bytes.Length != 0)
+                gdCache = LoadFromBytes<T>(bytes);
+            return gdCache ?? LoadFromResources<T>(name);
         }
 
         public static T LoadFromCompressedJSON<T>(string name, string json) where T : GameDataBase

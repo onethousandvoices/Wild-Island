@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace WildIsland.Processors
 {
-    public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
+    public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, ITickable, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
@@ -167,7 +167,7 @@ namespace WildIsland.Processors
     {
         public void SetAllHealths(float value = 0f, bool isRandomizing = false);
     }
-    
+
     public interface IGetPlayerStats
     {
         public PlayerData Stats { get; }
