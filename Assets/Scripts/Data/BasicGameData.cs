@@ -1,43 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace WildIsland.Data
 {
     [Serializable]
-    public class BasicGameData : IGDDDataTypeString
+    public class BasicGameData : IGameData
     {
-        public string ID => "Basic";
+        public DaySettings DaySettingsData;
 
         [Serializable]
         public class DaySettings
         {
-            [SheetColumnName("A1")]
-            public readonly int DayTimer = 0;
-
-            [SheetColumnName("A2")]
-            public readonly int NightTimer = 0;
-
-            [SheetColumnName("A3")]
-            public readonly int DayTemperatureAffectStage1 = 0;
-            
-            [SheetColumnName("A4")]
-            public readonly int DayTemperatureAffectStage2 = 0;
-            
-            [SheetColumnName("A5")]
-            public readonly int DayTemperatureAffectStage3 = 0;
-            
-            [SheetColumnName("A6")]
-            public readonly int NightTemperatureAffectStage1 = 0;
-            
-            [SheetColumnName("A7")]
-            public readonly int NightTemperatureAffectStage2 = 0;
+            [Sheet("A1")] public int DayTimer = 0;
+            [Sheet("A2")] public int NightTimer = 0;
+            [Sheet("A3")] public int DayTemperatureAffectStage1 = 0;
+            [Sheet("A4")] public int DayTemperatureAffectStage2 = 0;
+            [Sheet("A5")] public int DayTemperatureAffectStage3 = 0;
+            [Sheet("A6")] public int NightTemperatureAffectStage1 = 0;
+            [Sheet("A7")] public int NightTemperatureAffectStage2 = 0;
         }
-        
-        public readonly DaySettings DaySettingsData = null;
-
-        public static Dictionary<string, Type> RowTypes = new Dictionary<string, Type>
-        {
-            { "Day", typeof(DaySettings)}
-        };
     }
 }

@@ -1,98 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GoogleSheetsToUnity;
 using System.Reflection;
-using System.Threading;
 using System.Globalization;
 using ExcelDataReader;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UnityEditor;
+using WildIsland.Utility;
 
 namespace WildIsland.Data
 {
     public class GDDDownloader
     {
-        private bool InProcess => _sheetCounter > 0;
-
-        private int _sheetCounter = 0;
-        private static string _oldSeparator, _newSeparator;
-
-        private static string GdXlsxFile => Application.dataPath + "/Editor/Data/gd.xlsx";
-        private static string LdXlsxFile => Application.dataPath + "/Editor/Data/ld.xlsx";
+        private static string GddFile => Application.dataPath + "/Resources/gd.xlsx";
+        private static string GddSO => Application.dataPath + "/Resource/gdd.asset";
 
         private const string LoadXlsxUri = "https://docs.google.com/spreadsheets/d/{0}/export?format=xlsx";
+        private const string DefaultSheetID = "1zbkPxEXDlor0Kvwleha7AOkWgECHD9hUXKgDkKeFNGU";
+        
 #if UNITY_EDITOR
-        [UnityEditor.MenuItem("Tools/GDD/Download, parse, copy", priority = 26)]
+        [MenuItem("Tools/Download Gdd", priority = 26)]
 #endif
         private static async void LoadGDDFilesParseCopy()
         {
-            await LoadGDDXlsxs();
-            ParseGDDFromExcelAndCopy();
-        }
-        
-        // [UnityEditor.MenuItem("Tools/GDD/Download gdd xlsxs", priority = 27)]
-        private static async Task LoadGDDXlsxs()
-        {
-            await DownloadXlsxs();
-            Debug.LogError("GDD Xlsxs downloaded");
-        }
-        
-        // [UnityEditor.MenuItem("Tools/GDD/Parse excel with copy", priority = 28)]
-        private static void ParseGDDFromExcelAndCopy()
-        {
-            ParseGDDFromExcel(true);
-        }
-        
-        private static void ParseGDDFromExcel(bool copy)
-        {
-            Dictionary<string, GameDataBase> _gameDataContainer = new Dictionary<string, GameDataBase>()
-            {
-                {"gameData", new GameData()},
-                {"loadGameData", new LoadGameData()}
-            };
-            
-            ParseExcelToGd(_gameDataContainer);
-
-            Debug.Log("Parse complete");
-
-            foreach (KeyValuePair<string, GameDataBase> keyValue in _gameDataContainer)
-            {
-                keyValue.Value.Save(keyValue.Key, !copy);
-            }
-            Debug.Log("Saving complete");
+            await Download();
+            Parse();
         }
 
-        private static async Task DownloadXlsxs()
+        private static async Task Download()
         {
-            if (File.Exists(GdXlsxFile))
-                File.Delete(GdXlsxFile);
-            if (File.Exists(LdXlsxFile))
-                File.Delete(LdXlsxFile);
+            if (File.Exists(GddFile))
+                File.Delete(GddFile);
+
             WebClient downloader = new WebClient();
-            await downloader.DownloadFileTaskAsync(new Uri(string.Format(LoadXlsxUri, GDDDownloaderConfig.DefaultSheetID)),
-                GdXlsxFile);
-            // await downloader.DownloadFileTaskAsync(new Uri(string.Format(LoadXlsxUri, GDDDownloaderConfig.LocalizationSheetID)),
-                // LdXlsxFile);
+            await downloader.DownloadFileTaskAsync(new Uri(string.Format(LoadXlsxUri, DefaultSheetID)),
+                GddFile);
         }
 
-        private static void ParseExcelToGd(Dictionary<string, GameDataBase> gdContainer)
+        private static void Parse()
         {
-            SetSeparators();
-            ParseExcelToGd(GdXlsxFile, gdContainer, FileGdId.Main);
-            // ParseExcelToGd(LdXlsxFile, gdContainer, FileGdId.Localization);
-        }
+            if (!File.Exists(GddFile))
+                throw new Exception("File " + GddFile + " not exist");
 
-        private static void ParseExcelToGd(string filePath, IReadOnlyDictionary<string, GameDataBase> gdContainer, FileGdId gdId)
-        {
-            if (!File.Exists(filePath))
-            {
-                throw new Exception("File " + filePath + " not exist");
-            }
+            if (File.Exists(GddSO))
+                File.Delete(GddSO);
 
-            FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            Gdd newGdd = ScriptableObject.CreateInstance<Gdd>();
+            AssetDatabase.CreateAsset(newGdd, "Assets/Resources/gdd.asset");
+            AssetDatabase.SaveAssets();
+            EditorUtility.SetDirty(newGdd);
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = newGdd;
+
+            FileStream stream = new FileStream(GddFile, FileMode.Open, FileAccess.Read);
             IExcelDataReader reader = ExcelReaderFactory.CreateReader(stream);
 
             do
@@ -104,7 +67,6 @@ namespace WildIsland.Data
                     int cellsReallyCount = 0;
                     for (int i = 0; i < reader.FieldCount; ++i)
                     {
-                        CellRange[] a = reader.MergeCells;
                         object value = reader.GetValue(i);
                         row.Add(value?.ToString());
                         if (value != null)
@@ -117,85 +79,62 @@ namespace WildIsland.Data
                     rows.Add(row);
                 }
 
-                foreach (GDDDownloaderConfig.WorksheetConfig sheetInfo in GDDDownloaderConfig.ParsingDataTypes)
+                foreach (GddSheet sheet in Gdd.ParsingSheets)
                 {
-                    if (sheetInfo.SheetID != gdId || string.Compare(sheetInfo.TableID, reader.Name, StringComparison.Ordinal) != 0)
+                    if (string.Compare(sheet.SheetId, reader.Name, StringComparison.OrdinalIgnoreCase) != 0)
                         continue;
-                    
-                    if (sheetInfo.CustomAction == null)
-                        ReadWorksheet(sheetInfo, rows, gdContainer[sheetInfo.GameDataId]);
-                    else
-                        sheetInfo.CustomAction(sheetInfo, rows, gdContainer[sheetInfo.GameDataId]);
+
+                    if (sheet.CustomAction == null)
+                        ReadSheet(sheet, rows, newGdd);
                 }
             }
             while (reader.NextResult());
 
             reader.Dispose();
             stream.Dispose();
+
+            Debug.Log("Parse complete");
         }
 
-        public async Task Download(Dictionary<string, GameDataBase> gdContainer)
+        private static void ReadSheet(GddSheet sheet, IReadOnlyList<List<string>> loadedSheet, Gdd gdd)
         {
-            if (InProcess)
-                throw new Exception("Download in process, wait until it ends");
+            List<string> header = loadedSheet[0];
+            object data = Activator.CreateInstance(sheet.DataType);
 
-            SetSeparators();
-            foreach (GDDDownloaderConfig.WorksheetConfig sheetInfo in GDDDownloaderConfig.ParsingDataTypes)
+            for (int i = 1; i < loadedSheet.Count; ++i)
             {
-                string gameDataId = sheetInfo.GameDataId;
-                Interlocked.Increment(ref _sheetCounter);
-                string sheetID = sheetInfo.SheetID switch
-                                 {
-                                     FileGdId.Main         => GDDDownloaderConfig.DefaultSheetID,
-                                     // FileGdId.Localization => GDDDownloaderConfig.LocalizationSheetID,
-                                     _                     => string.Empty
-                                 };
-
-                SpreadsheetManager.ReadPublicSpreadsheet(
-                    new GSTU_Search(
-                        sheetID,
-                        sheetInfo.TableID,
-                        "A1", "EE1000"
-                    ),
-                    sheet =>
+                IEnumerable<FieldInfo> fields = data.GetType().GetFields();
+                foreach (FieldInfo field in fields)
+                {
+                    SheetAttribute attribute = field.GetCustomAttribute<SheetAttribute>();
+                    
+                    if (attribute != null)
                     {
-                        if (sheetInfo.CustomAction == null)
-                            ReadWorksheet(sheetInfo, sheet.ConvertRowsToListString(), gdContainer[gameDataId]);
-                        else
-                            sheetInfo.CustomAction(sheetInfo, sheet.ConvertRowsToListString(), gdContainer[gameDataId]);
-                        Interlocked.Decrement(ref _sheetCounter);
+                        for (int j = 0; j < loadedSheet[i].Count; j++)
+                        {
+                            if (!loadedSheet[i][0].Equals(attribute.ColumnName))
+                                continue;
+                            FieldSetValue(data, field, loadedSheet[i][1]);
+                            break;
+                        }
+                        continue;
                     }
-                );
-                Thread.Sleep(250);
+
+                    string loadedLower = loadedSheet[i][0].ToLower().Replace(".", "");
+                    string fieldLower = field.Name.ToLower();
+
+                    if (!loadedLower.Contains(fieldLower) && !fieldLower.Contains(loadedLower))
+                        continue;
+
+                    object item = CreateObjectFromData(field.FieldType, header, loadedSheet[i]);
+                    data.SetData(item);
+                }
             }
 
-            while (_sheetCounter > 0)
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
-            }
+            gdd.SetData(data);
         }
 
-        private static void SetSeparators()
-        {
-            string currentSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            _oldSeparator = (currentSeparator.Equals(".")) ? "," : ".";
-            _newSeparator = (currentSeparator.Equals(".")) ? "." : ",";
-        }
-
-        private static void ReadWorksheet(GDDDownloaderConfig.WorksheetConfig sheetConfig, List<List<string>> sheet, IGDDDataStorage dataStorage)
-        {
-            List<string> header = sheet[0];
-            List<object> items = new List<object>();
-
-            for (int i = 1; i < sheet.Count; ++i)
-            {
-                object item = CreateObjectFromData(sheetConfig.DataType, header, sheet[i]);
-                items.Add(item);
-            }
-            dataStorage.SetData(sheetConfig.DataType, items.ToArray());
-        }
-
-        public static object CreateObjectFromData(System.Type type, List<string> header, List<string> values, int? rawIndex = null)
+        private static object CreateObjectFromData(Type type, IReadOnlyList<string> header, IReadOnlyList<string> values)
         {
             object item = Activator.CreateInstance(type);
 
@@ -206,29 +145,9 @@ namespace WildIsland.Data
                 try
                 {
                     FieldInfo field = GetFieldByColumnName(type, header[i]);
-                    if (field == null || values.Count <= i)
+                    if (values.Count <= i)
                         continue;
-
-                    if (field.FieldType == typeof(float))
-                        field.SetValue(item, float.Parse(values[i].Replace(_oldSeparator, _newSeparator)));
-                    else if (field.FieldType == typeof(int))
-                        field.SetValue(item, int.Parse(values[i]));
-                    else if (field.FieldType == typeof(double))
-                        field.SetValue(item, double.Parse(values[i].Replace(_oldSeparator, _newSeparator)));
-                    else if (field.FieldType == typeof(Range))
-                        field.SetValue(item, Range.Parse(values[i].Replace(_oldSeparator, _newSeparator)));
-                    else if (field.FieldType == typeof(RangeArray))
-                        field.SetValue(item, RangeArray.Parse(values[i].Replace(_oldSeparator, _newSeparator)));
-                    else if (field.FieldType == typeof(ObjectArray<string>))
-                        field.SetValue(item, ObjectArray<string>.Parse(values[i].Replace(_oldSeparator, _newSeparator)));
-                    else if (field.FieldType == typeof(string))
-                        field.SetValue(item, values[i]);
-                    else if (field.FieldType.IsEnum)
-                        field.SetValue(item, Enum.Parse(field.FieldType, values[i], true));
-                    else if (field.FieldType == typeof(bool))
-                        field.SetValue(item, values[i].ToLower() == "true" || values[i] == "1");
-                    else
-                        throw new NotImplementedException(field.FieldType + " is not implemented yet by downloader");
+                    FieldSetValue(item, field, values[i]);
                 }
                 catch (Exception e)
                 {
@@ -238,42 +157,56 @@ namespace WildIsland.Data
             return item;
         }
 
+        private static void FieldSetValue(object item, FieldInfo field, string value)
+        {
+            if (field == null)
+                return;
+
+            if (field.FieldType == typeof(float))
+                field.SetValue(item, float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+            else if (field.FieldType == typeof(int))
+                field.SetValue(item, int.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+            else if (field.FieldType == typeof(double))
+                field.SetValue(item, double.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+            else if (field.FieldType == typeof(string))
+                field.SetValue(item, value);
+            else if (field.FieldType.IsEnum)
+                field.SetValue(item, Enum.Parse(field.FieldType, value, true));
+            else if (field.FieldType == typeof(bool))
+                field.SetValue(item, value.ToLower() == "true" || value == "1");
+            else if (field.FieldType.BaseType == typeof(PlayerStat) || field.FieldType.BaseType == typeof(VolatilePlayerStat))
+            {
+                object playerStat = Activator.CreateInstance(field.FieldType);
+                PropertyInfo[] properties = playerStat.GetType().GetProperties();
+
+                foreach (PropertyInfo propertyInfo in properties)
+                    propertyInfo.SetValue(playerStat, float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+                
+                item.SetData(playerStat);
+            }
+            else
+                throw new NotImplementedException(field.FieldType + " is not implemented yet by downloader");
+        }
+
         private static FieldInfo GetFieldByColumnName(Type type, string columnName)
         {
-            foreach (FieldInfo field in type.GetFields())
-            {
-                SheetColumnNameAttribute attribute = field.GetCustomAttribute<SheetColumnNameAttribute>();
-                if (attribute == null)
-                    continue;
-                if (string.Equals(attribute.columnName, columnName, StringComparison.CurrentCultureIgnoreCase))
-                    return field;
-            }
-            return null;
-        }
-    }
-
-    internal static class Extensions
-    {
-        /// <summary>
-        /// returns a List<List<string>> of values in Row
-        /// </summary>
-        /// <param name="sheet"></param>
-        /// <returns></returns>
-        public static List<List<string>> ConvertRowsToListString(this GstuSpreadSheet sheet)
-        {
-            List<KeyValuePair<int, List<GSTU_Cell>>> rowsList = sheet.rows.primaryDictionary.ToList();
-            return rowsList.Select(row => row.Value.Select(val => val.value).ToList()).ToList();
+            return type.GetFields()
+                       .Select(field => new { field, attribute = field.GetCustomAttribute<SheetAttribute>() })
+                       .Where(@t => @t.attribute != null)
+                       .Where(@t => string.Equals(@t.attribute.ColumnName, columnName, StringComparison.CurrentCultureIgnoreCase))
+                       .Select(@t => @t.field)
+                       .FirstOrDefault();
         }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class SheetColumnNameAttribute : Attribute
+    public class SheetAttribute : Attribute
     {
-        public readonly string columnName;
+        public readonly string ColumnName;
 
-        public SheetColumnNameAttribute(string columnName)
+        public SheetAttribute(string columnName)
         {
-            this.columnName = columnName;
+            ColumnName = columnName;
         }
     }
 }

@@ -9,8 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3258200219601515021}
-  m_Layer: 0
-  m_Name: whiteMushroom
+  - component: {fileID: 4194536942887766154}
+  - component: {fileID: 3430676303698420865}
+  - component: {fileID: 4574146429264086339}
+  m_Layer: 8
+  m_Name: WhiteMushroom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,12 +35,54 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &4194536942887766154
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4131536217399541668}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &3430676303698420865
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4131536217399541668}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.21979731, y: 0.17167217, z: 0.21977924}
+  m_Center: {x: 0, y: -0.005595058, z: 0}
+--- !u!114 &4574146429264086339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4131536217399541668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1254f696966b4346bd9e68a16cfab255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <InventoryItemView>k__BackingField: {fileID: 7624207809547750131, guid: 880151f239330b849bead97ac1679874,
+    type: 3}
 --- !u!1001 &1602222151540996514
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 3258200219601515021}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c2eae5086ac25be4abd46ce3704c42f4,
@@ -100,10 +145,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: whiteMushroom
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c2eae5086ac25be4abd46ce3704c42f4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2eae5086ac25be4abd46ce3704c42f4, type: 3}
 --- !u!4 &1276354826072071753 stripped
 Transform:

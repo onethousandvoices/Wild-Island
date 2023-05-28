@@ -39,6 +39,7 @@ namespace WildIsland.Processors
         [Inject] private IPlayerInventory _inventory;
         [Inject] private IConsoleHandler _consoleHandler;
         [Inject] private IPlayerCamera _playerCamera;
+        [Inject] private IPickButtonListener _pickButtonListener;
         [Inject] private List<IRMBListener> _rmbListeners;
 
         private PlayerData _stats;
@@ -142,9 +143,11 @@ namespace WildIsland.Processors
             _inputMap.Player.Console.performed += _ => _consoleHandler.ShowConsole();
             _inputMap.Player.ReturnButton.performed += _ => _consoleHandler.OnReturn();
             _inputMap.Player.ArrowUp.performed += _ => _consoleHandler.OnUpArrow();
+            _inputMap.Player.PickButton.performed += _pickButtonListener.OnPickButton;
             _inputMap.Player.LMB.performed += OnLMB;
             _inputMap.Player.RMB.started += OnRMBStarted;
             _inputMap.Player.RMB.canceled += OnRMBCanceled;
+            
         }
 
         private void OnRMBStarted(InputAction.CallbackContext obj)

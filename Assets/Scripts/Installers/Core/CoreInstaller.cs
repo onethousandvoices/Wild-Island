@@ -1,4 +1,6 @@
-﻿using WildIsland.Controllers;
+﻿using UnityEngine;
+using WildIsland.Controllers;
+using WildIsland.Data;
 using WildIsland.Processors;
 using Zenject;
 
@@ -8,10 +10,15 @@ namespace WildIsland.Installers
     {
         public override void InstallBindings()
         {
+            Gdd gdd = Resources.Load<Gdd>("gdd");
+
+            Container.Bind<BasicGameData>().FromInstance(gdd.BasicGameData);
+            Container.Bind<BiomesData>().FromInstance(gdd.BiomesData);
+            Container.Bind<PlayerData>().FromInstance(gdd.PlayerData);
+            
             Container.BindInterfacesTo<GameController>().AsSingle();
             Container.BindInterfacesTo<TimeTickablesController>().AsSingle();
             
-            Container.BindInterfacesTo<GameDataController>().AsSingle();
             Container.BindInterfacesTo<DayController>().AsSingle();
             Container.BindInterfacesTo<BiomeController>().AsSingle();
             Container.BindInterfacesTo<DebugConsoleController>().AsSingle();
@@ -22,6 +29,7 @@ namespace WildIsland.Installers
             Container.BindInterfacesTo<PlayerProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerInventoryProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerCameraProcessor>().AsSingle();
+            Container.BindInterfacesTo<PlayerItemProcessor>().AsSingle();
             Container.BindInterfacesTo<PlayerController>().AsSingle();
         }
     }

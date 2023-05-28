@@ -3,16 +3,21 @@
 namespace WildIsland.Data
 {
     [Serializable]
-    public class BiomesData : IGDDDataTypeString
+    public class BiomesData : IGameData
     {
-        public string ID => "Biomes";
-
         public ForestBiomeData ForestBiomeData;
         public WinterBiomeData WinterBiomeData;
         public DesertBiomeData DesertBiomeData;
         public SwampBiomeData SwampBiomeData;
     }
-
+    
+    [Serializable]
+    public class BiomeData
+    {
+        [Sheet("BiomeTemperature")] public float Temperature;
+        [Sheet("EffectValue")] public float EffectValue;
+    }
+    
     [Serializable]
     public class ForestBiomeData : BiomeData { }
 
@@ -24,11 +29,4 @@ namespace WildIsland.Data
 
     [Serializable]
     public class SwampBiomeData : BiomeData { }
-
-    [Serializable]
-    public class BiomeData
-    {
-        public float Temperature;
-        public float EffectValue;
-    }
 }

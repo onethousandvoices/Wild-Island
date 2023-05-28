@@ -18,7 +18,6 @@ namespace WildIsland.Processors
     public class PlayerInventoryProcessor : BaseProcessor, IPlayerInventory, IInitializable
     {
         [Inject] private InventoryView _inventoryView;
-        [Inject] private InventoryItemView _itemPrefab;
         [Inject] private IPlayerState _playerState;
 
         private CellView[] _allCells;
@@ -53,24 +52,12 @@ namespace WildIsland.Processors
 
             _tools = _inventoryView.GetComponentsInChildren<ToolView>();
             _hands = _inventoryView.GetComponentInChildren<HandsView>();
-            
+
             _items = new List<InventoryItemView>();
             _sizeCheckCells = new List<CellView>();
-            
-            for (int i = 0; i < 2; i++)
-                _items.Add(Object.Instantiate(_itemPrefab, _inventoryView.Bg));
-            
+
             foreach (InventoryItemView testItem in _items)
-            {
-                testItem.Init();
-                testItem.SetOnStartDragCallback(OnItemStartDrag);
-                testItem.SetOnDragCallback(OnItemDrag);
-                testItem.SetOnEndDragCallback(OnItemEndDrag);
-                testItem.SetOnClickCallback(OnItemClick);
-            }
-            
-            TryFitItem(_items[0]);
-            TryFitItem(_items[1]);
+                InitItem(testItem);
         }
 
         public void ShowInventory()
@@ -119,7 +106,7 @@ namespace WildIsland.Processors
                 for (int j = 0; j < _cells.GetLength(1); j++)
                 {
                     CellView cell = _cells[i, j];
-                    
+
                     if (cell.OccupiedBy == item || !ItemSizeCheck(cell, item))
                         continue;
 
@@ -146,7 +133,7 @@ namespace WildIsland.Processors
                 _sizeCheckCells.Add(cell);
                 return true;
             }
-            
+
             Vector2 targetCoordinate = cell.Coordinates - Vector2.one + item.Size;
             int targetY = (int)targetCoordinate.y;
             int targetX = (int)targetCoordinate.x;
@@ -165,26 +152,25 @@ namespace WildIsland.Processors
                     _sizeCheckCells.Add(affectedCell);
                 }
             }
-            
+
             return true;
         }
 
         public void AutoFitItem(InventoryItemView item)
         {
+            InventoryItemView itemInstance = InitItem(Object.Instantiate(item, _inventoryView.Bg));
+
             for (int i = 0; i < _cells.GetLength(0); i++)
             {
                 for (int j = 0; j < _cells.GetLength(1); j++)
                 {
                     CellView cell = _cells[i, j];
 
-                    if (cell.OccupiedBy)
+                    if (cell.OccupiedBy != null || !ItemSizeCheck(cell, itemInstance))
                         continue;
-
-                    // if (item.Size == Vector2.one)
-                    // {
-                    // cell.SetOccupied(item);
-                    // return;
-                    // }
+                    
+                    itemInstance.OccupyCells(cell, _sizeCheckCells.ToArray());
+                    return;
                 }
             }
         }
@@ -208,11 +194,17 @@ namespace WildIsland.Processors
             }
             return null;
         }
+
+        private InventoryItemView InitItem(InventoryItemView item)
+        {
+            _items.Add(item);
+            return item.Init(OnItemStartDrag, OnItemDrag, OnItemEndDrag, OnItemClick);
+        }
     }
 
     public interface IPlayerInventory
     {
         public void ShowInventory();
-        public void AutoFitItem(InventoryItemView item);
+        public void AutoFitItem(InventoryItemView itemInstance);
     }
 }

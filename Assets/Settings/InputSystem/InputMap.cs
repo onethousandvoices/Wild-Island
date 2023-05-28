@@ -125,6 +125,15 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PickButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""62d3e268-fb78-4fbf-a4ab-5d4d63680beb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -380,6 +389,17 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""action"": ""RMB"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8d75ab6c-810f-4615-8416-9d0bf6602d28"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PickButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -447,6 +467,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         m_Player_ArrowUp = m_Player.FindAction("ArrowUp", throwIfNotFound: true);
         m_Player_LMB = m_Player.FindAction("LMB", throwIfNotFound: true);
         m_Player_RMB = m_Player.FindAction("RMB", throwIfNotFound: true);
+        m_Player_PickButton = m_Player.FindAction("PickButton", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -519,6 +540,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ArrowUp;
     private readonly InputAction m_Player_LMB;
     private readonly InputAction m_Player_RMB;
+    private readonly InputAction m_Player_PickButton;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -534,6 +556,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         public InputAction @ArrowUp => m_Wrapper.m_Player_ArrowUp;
         public InputAction @LMB => m_Wrapper.m_Player_LMB;
         public InputAction @RMB => m_Wrapper.m_Player_RMB;
+        public InputAction @PickButton => m_Wrapper.m_Player_PickButton;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -576,6 +599,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @RMB.started += instance.OnRMB;
             @RMB.performed += instance.OnRMB;
             @RMB.canceled += instance.OnRMB;
+            @PickButton.started += instance.OnPickButton;
+            @PickButton.performed += instance.OnPickButton;
+            @PickButton.canceled += instance.OnPickButton;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -613,6 +639,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @RMB.started -= instance.OnRMB;
             @RMB.performed -= instance.OnRMB;
             @RMB.canceled -= instance.OnRMB;
+            @PickButton.started -= instance.OnPickButton;
+            @PickButton.performed -= instance.OnPickButton;
+            @PickButton.canceled -= instance.OnPickButton;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -679,5 +708,6 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         void OnArrowUp(InputAction.CallbackContext context);
         void OnLMB(InputAction.CallbackContext context);
         void OnRMB(InputAction.CallbackContext context);
+        void OnPickButton(InputAction.CallbackContext context);
     }
 }

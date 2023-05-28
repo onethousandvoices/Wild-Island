@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f701a872a7e4dc9a6daa530958774c3, type: 3}
+  m_Name: gdd
+  m_EditorClassIdentifier: 
+  BasicGameData:
+    DaySettingsData:
+      DayTimer: 900
+      NightTimer: 540
+      DayTemperatureAffectStage1: -2
+      DayTemperatureAffectStage2: 5
+      DayTemperatureAffectStage3: -2
+      NightTemperatureAffectStage1: -5
+      NightTemperatureAffectStage2: -10
+  BiomesData:
+    ForestBiomeData:
+      Temperature: 18
+      EffectValue: 0.01
+    WinterBiomeData:
+      Temperature: -10
+      EffectValue: 0.02
+    DesertBiomeData:
+      Temperature: 30
+      EffectValue: 0.02
+    SwampBiomeData:
+      Temperature: 25
+      EffectValue: 0.02
+  PlayerData:
+    HeadHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    BodyHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    LeftArmHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    RightArmHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    LeftLegHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    RightLegHealth:
+      <Value>k__BackingField: 50
+      <Default>k__BackingField: 50
+    HealthRegen:
+      <Value>k__BackingField: 0.05
+      <Default>k__BackingField: 0.05
+    Stamina:
+      <Value>k__BackingField: 100
+      <Default>k__BackingField: 100
+    StaminaRegen:
+      <Value>k__BackingField: 20
+      <Default>k__BackingField: 20
+    Hunger:
+      <Value>k__BackingField: 1000
+      <Default>k__BackingField: 1000
+    HungerDecrease:
+      <Value>k__BackingField: 1
+      <Default>k__BackingField: 1
+    Thirst:
+      <Value>k__BackingField: 1000
+      <Default>k__BackingField: 1000
+    ThirstDecrease:
+      <Value>k__BackingField: 1.1
+      <Default>k__BackingField: 1.1
+    Fatigue:
+      <Value>k__BackingField: 1000
+      <Default>k__BackingField: 1000
+    FatigueDecrease:
+      <Value>k__BackingField: 0.8
+      <Default>k__BackingField: 0.8
+    RegularSpeed:
+      <Value>k__BackingField: 6
+      <Default>k__BackingField: 6
+    SprintSpeed:
+      <Value>k__BackingField: 11
+      <Default>k__BackingField: 11
+    Temperature:
+      <Value>k__BackingField: 18
+      <Default>k__BackingField: 18
+    HealthRegenHungerStage1:
+      <Value>k__BackingField: 0.05
+      <Default>k__BackingField: 0.05
+    HealthRegenHungerStage2:
+      <Value>k__BackingField: 0.03
+      <Default>k__BackingField: 0.03
+    HealthRegenHungerStage3:
+      <Value>k__BackingField: 0.01
+      <Default>k__BackingField: 0.01
+    HealthRegenHungerStage4:
+      <Value>k__BackingField: -0.1
+      <Default>k__BackingField: -0.1
+    HealthRegenThirstStage1:
+      <Value>k__BackingField: 0.05
+      <Default>k__BackingField: 0.05
+    HealthRegenThirstStage2:
+      <Value>k__BackingField: 0.03
+      <Default>k__BackingField: 0.03
+    HealthRegenThirstStage3:
+      <Value>k__BackingField: 0.01
+      <Default>k__BackingField: 0.01
+    HealthRegenThirstStage4:
+      <Value>k__BackingField: -0.1
+      <Default>k__BackingField: -0.1

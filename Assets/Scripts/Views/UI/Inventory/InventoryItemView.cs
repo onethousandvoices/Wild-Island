@@ -15,20 +15,29 @@ namespace Views.UI.Inventory
         private Action<InventoryItemView, PointerEventData> _onEndDragCallback;
         private Action<InventoryItemView, PointerEventData> _onClickCallback;
 
-        private RectTransform _rect;
         private CellView[] _occupiedCells;
+        private CellView _cellPair;
 
         private const int _cellSize = 98;
 
-        public RectTransform RT => _rect ??= GetComponent<RectTransform>();
-        public CellView CellPair { get; private set; }
+        public RectTransform RT { get; private set; }
 
-        public void Init()
+        public InventoryItemView Init(Action<InventoryItemView, PointerEventData> onStartDrag, Action<InventoryItemView, PointerEventData> onDrag,
+                                      Action<InventoryItemView, PointerEventData> onEndDrag, Action<InventoryItemView, PointerEventData> onClick)
         {
+            RT = GetComponent<RectTransform>();
+            
             _events.BeginDragEvent += OnBeginDragEvent;
             _events.DragEvent += OnDragEvent;
             _events.EndDragEvent += OnEndDragEvent;
             _events.ClickEvent += OnClickEvent;
+
+            _onStartDragCallback = onStartDrag;
+            _onDragCallback = onDrag;
+            _onEndDragCallback = onEndDrag;
+            _onClickCallback = onClick;
+
+            return this;
         }
 
         private void OnBeginDragEvent(PointerEventData obj)
@@ -45,7 +54,7 @@ namespace Views.UI.Inventory
 
         private void SetCellPair(CellView cell)
         {
-            CellPair = cell;
+            _cellPair = cell;
             ResetPosition();
         }
 
@@ -66,24 +75,12 @@ namespace Views.UI.Inventory
 
         private void ResetPosition()
         {
-            CellPair.SetOccupied(this);
+            _cellPair.SetOccupied(this);
             OccupyInner(true);
-            transform.SetParent(CellPair.transform, false);
+            transform.SetParent(_cellPair.transform, false);
             RT.anchoredPosition = Vector2.zero;
         }
-
-        public void SetOnStartDragCallback(Action<InventoryItemView, PointerEventData> callback)
-            => _onStartDragCallback = callback;
-
-        public void SetOnDragCallback(Action<InventoryItemView, PointerEventData> callback)
-            => _onDragCallback = callback;
-
-        public void SetOnEndDragCallback(Action<InventoryItemView, PointerEventData> callback)
-            => _onEndDragCallback = callback;
-
-        public void SetOnClickCallback(Action<InventoryItemView, PointerEventData> callback)
-            => _onClickCallback = callback;
-
+        
         private void OnValidate()
         {
             _events ??= GetComponentInChildren<PointerEventsReceiver>();

@@ -1,5 +1,6 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
+using WildIsland.Data;
 using WildIsland.SOs;
 
 namespace WildIsland.Views
@@ -15,6 +16,7 @@ namespace WildIsland.Views
         [SerializeField] private DayPreset _dayPreset;
         [SerializeField] private DayPreset _nightPreset;
         [SerializeField] private ParticleSystem _leaves;
+
         // [field: SerializeField] public AnimationCurve SunCurve { get; private set; }
         // [field: SerializeField] public AnimationCurve MoonCurve { get; private set; }
         // [field: SerializeField] public Material DaySkybox { get; private set; }

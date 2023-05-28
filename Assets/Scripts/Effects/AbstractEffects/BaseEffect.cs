@@ -33,13 +33,13 @@ namespace Effects
         
         public abstract bool Process();
         
-        public PlayerStat[] Apply(PlayerData data)
+        public PlayerStat[] Apply(PlayerData dataDelete)
         {
-            _onApply?.Invoke(data);
+            _onApply?.Invoke(dataDelete);
             return AffectedStats.ApplyReturnStats;
         }
 
-        public void Remove(PlayerData data)
+        public void Remove(PlayerData dataDelete)
         {
             IsExecuted = false;
             _isInstantApplied = false;

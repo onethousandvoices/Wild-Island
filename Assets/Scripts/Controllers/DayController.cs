@@ -7,13 +7,13 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class DayController : IInitializable, ITickable, IGDConsumer
+    public class DayController : IInitializable, ITickable
     {
+        [Inject] private BasicGameData _basicGameData;
         [Inject] private DayLightView _view;
         [Inject] private DayTimerView _dayTimer;
         [Inject] private IBiomeDayAffect _biomeController;
 
-        private BasicGameData.DaySettings _daySettings;
         private Material _skyBoxMaterial;
 
         private float _dayTime;
@@ -24,16 +24,13 @@ namespace WildIsland.Controllers
         private float _currentTemperatureMod;
         
         private static readonly int GlobalSunDirection = Shader.PropertyToID("GlobalSunDirection");
-
-        public Type ContainerType => typeof(BasicGameDataContainer);
-
-        public void AcquireGameData(IPartialGameDataContainer container)
-            => _daySettings = ((BasicGameDataContainer)container).Default.DaySettingsData;
+        
+        private BasicGameData.DaySettings DaySettings => _basicGameData.DaySettingsData;
 
         public void Initialize()
         {
-            _dayDuration = _daySettings.DayTimer;
-            _nightDuration = _daySettings.NightTimer;
+            _dayDuration = DaySettings.DayTimer;
+            _nightDuration = DaySettings.NightTimer;
 
             // _skyBoxMaterial = new Material(_view.DaySkybox);
         }
@@ -90,18 +87,18 @@ namespace WildIsland.Controllers
             if (dayRelativeValue > 0)
             {
                 if (dayRelativeValue < _view.DayTemperatureAffectStage1.y && dayRelativeValue > _view.DayTemperatureAffectStage1.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage1;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage1;
                 else if (dayRelativeValue < _view.DayTemperatureAffectStage2.y && dayRelativeValue > _view.DayTemperatureAffectStage2.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage2;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage2;
                 else if (dayRelativeValue < _view.DayTemperatureAffectStage3.y && dayRelativeValue > _view.DayTemperatureAffectStage3.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage3;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage3;
             }
             else if (nightRelativeValue > 0)
             {
                 if (nightRelativeValue < _view.NightTemperatureAffectStage1.y && nightRelativeValue > _view.NightTemperatureAffectStage1.x)
-                    _currentTemperatureMod = _daySettings.NightTemperatureAffectStage1;
+                    _currentTemperatureMod = DaySettings.NightTemperatureAffectStage1;
                 else if (nightRelativeValue < _view.NightTemperatureAffectStage2.y && nightRelativeValue > _view.NightTemperatureAffectStage2.x)
-                    _currentTemperatureMod = _daySettings.NightTemperatureAffectStage2;
+                    _currentTemperatureMod = DaySettings.NightTemperatureAffectStage2;
             }
 
             if (Math.Abs(_currentTemperatureMod - previousValue) > 0.01f)

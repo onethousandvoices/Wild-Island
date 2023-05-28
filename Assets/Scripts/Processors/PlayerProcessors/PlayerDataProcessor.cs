@@ -10,28 +10,22 @@ using Random = UnityEngine.Random;
 
 namespace WildIsland.Processors
 {
-    public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, ITickable, IDataProcessor, IDisposable, IGetPlayerStats, IGDConsumer
+    public class PlayerDataProcessor : BaseProcessor, IInitializable, IPlayerProcessor, ITickable, IDataProcessor, IDisposable, IGetPlayerStats
     {
+        [Inject] private PlayerData _dataContainer;
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
         [Inject] private IPlayerState _playerState;
-        [Inject] private IGetPlayerStats _player;
 
         private DbValue<PlayerData> _data;
-        private PlayerData _dataContainer;
         private float _relativeSpeed;
 
         public PlayerData Stats => _data.Value;
 
-        public Type ContainerType => typeof(PlayerDataContainer);
-
-        public void AcquireGameData(IPartialGameDataContainer container)
-            => _dataContainer = ((PlayerDataContainer)container).Default;
-
         public void Initialize()
         {
-            _data = new DbValue<PlayerData>("PlayerData", _dataContainer);
-            Stats.SetDefaults();
+            _data = new DbValue<PlayerData>("PlayerData", new PlayerData(_dataContainer));
+            _data.Value.SetDefaults();
         }
 
         public void Tick()
@@ -39,7 +33,7 @@ namespace WildIsland.Processors
             if (!Enabled)
                 return;
 
-            _relativeSpeed = _playerState.CurrentSpeed / _player.Stats.SprintSpeed.Value;
+            _relativeSpeed = _playerState.CurrentSpeed / Stats.SprintSpeed.Value;
 
             ProcessHealth();
             ProcessStamina();
@@ -52,28 +46,28 @@ namespace WildIsland.Processors
         {
             float hungerMod = 0f;
             float thirstMod = 0f;
-            float currentHunger = _player.Stats.Hunger.Value;
-            float currentThirst = _player.Stats.Thirst.Value;
+            float currentHunger = Stats.Hunger.Value;
+            float currentThirst = Stats.Thirst.Value;
 
             if (currentHunger <= _view.HungerRegenStage1Range.y && currentHunger >= _view.HungerRegenStage1Range.x)
-                hungerMod = _player.Stats.HealthRegenHungerStage1.Default;
+                hungerMod = Stats.HealthRegenHungerStage1.Default;
             else if (currentHunger <= _view.HungerRegenStage2Range.y && currentHunger >= _view.HungerRegenStage2Range.x)
-                hungerMod = _player.Stats.HealthRegenHungerStage2.Default;
+                hungerMod = Stats.HealthRegenHungerStage2.Default;
             else if (currentHunger <= _view.HungerRegenStage3Range.y && currentHunger >= _view.HungerRegenStage3Range.x)
-                hungerMod = _player.Stats.HealthRegenHungerStage3.Default;
+                hungerMod = Stats.HealthRegenHungerStage3.Default;
             else if (currentHunger <= _view.HungerRegenStage4Range.y)
-                hungerMod = _player.Stats.HealthRegenHungerStage4.Default;
+                hungerMod = Stats.HealthRegenHungerStage4.Default;
 
             if (currentThirst <= _view.ThirstRegenStage1Range.y && currentThirst >= _view.ThirstRegenStage1Range.x)
-                thirstMod = _player.Stats.HealthRegenThirstStage1.Default;
+                thirstMod = Stats.HealthRegenThirstStage1.Default;
             else if (currentThirst <= _view.ThirstRegenStage2Range.y && currentThirst >= _view.ThirstRegenStage2Range.x)
-                thirstMod = _player.Stats.HealthRegenThirstStage2.Default;
+                thirstMod = Stats.HealthRegenThirstStage2.Default;
             else if (currentThirst <= _view.ThirstRegenStage3Range.y && currentThirst >= _view.ThirstRegenStage3Range.x)
-                thirstMod = _player.Stats.HealthRegenThirstStage3.Default;
+                thirstMod = Stats.HealthRegenThirstStage3.Default;
             else if (currentThirst <= _view.ThirstRegenStage4Range.y)
-                thirstMod = _player.Stats.HealthRegenThirstStage4.Default;
+                thirstMod = Stats.HealthRegenThirstStage4.Default;
 
-            float currentRegen = _player.Stats.HealthRegen.Value + hungerMod + thirstMod;
+            float currentRegen = Stats.HealthRegen.Value + hungerMod + thirstMod;
             SetAllHealths(currentRegen * Time.deltaTime);
         }
 
@@ -81,61 +75,61 @@ namespace WildIsland.Processors
         {
             bool decreasing = value < 0;
 
-            if (_player.Stats.HeadHealth.Value < _player.Stats.HeadHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.BodyHealth.Value < _player.Stats.BodyHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.LeftArmHealth.Value < _player.Stats.LeftArmHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.RightArmHealth.Value < _player.Stats.RightArmHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.LeftLegHealth.Value < _player.Stats.LeftLegHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
-            if (_player.Stats.RightLegHealth.Value < _player.Stats.RightLegHealth.Default || decreasing || isRandomizing)
-                _statSetter.SetStat(_player.Stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.HeadHealth.Value < Stats.HeadHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.HeadHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.BodyHealth.Value < Stats.BodyHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.BodyHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.LeftArmHealth.Value < Stats.LeftArmHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.LeftArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.RightArmHealth.Value < Stats.RightArmHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.RightArmHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.LeftLegHealth.Value < Stats.LeftLegHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.LeftLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
+            if (Stats.RightLegHealth.Value < Stats.RightLegHealth.Default || decreasing || isRandomizing)
+                _statSetter.SetStat(Stats.RightLegHealth, value - (isRandomizing ? Random.Range(1f, 5f) : 0f));
         }
 
         private void ProcessStamina()
         {
-            if (Math.Abs(_player.Stats.Stamina.Value - _player.Stats.Stamina.Default) < 0.01f ||
+            if (Math.Abs(Stats.Stamina.Value - Stats.Stamina.Default) < 0.01f ||
                 _playerState.MoveState == MoveState.Jump || _playerState.MoveState == MoveState.Sprint)
                 return;
 
-            float currentFatigue = _player.Stats.Fatigue.Value / _player.Stats.Fatigue.Default;
-            float currentHunger = _player.Stats.Hunger.Value / _player.Stats.Hunger.Default;
-            float currentThirst = _player.Stats.Thirst.Value / _player.Stats.Thirst.Default;
+            float currentFatigue = Stats.Fatigue.Value / Stats.Fatigue.Default;
+            float currentHunger = Stats.Hunger.Value / Stats.Hunger.Default;
+            float currentThirst = Stats.Thirst.Value / Stats.Thirst.Default;
 
             float currentRegen =
-                _player.Stats.StaminaRegen.Value * (1 - _player.Stats.Stamina.Value / _player.Stats.Stamina.Default) * currentFatigue * currentHunger * currentThirst;
+                Stats.StaminaRegen.Value * (1 - Stats.Stamina.Value / Stats.Stamina.Default) * currentFatigue * currentHunger * currentThirst;
 
-            _statSetter.SetStat(_player.Stats.Stamina, currentRegen * Time.deltaTime);
+            _statSetter.SetStat(Stats.Stamina, currentRegen * Time.deltaTime);
         }
 
         private void ProcessHunger()
         {
-            if (_player.Stats.Hunger.Value <= 0)
+            if (Stats.Hunger.Value <= 0)
                 return;
-
-            float currentHungerDecrease = _player.Stats.HungerDecrease.Value + _relativeSpeed;
-            _statSetter.SetStat(_player.Stats.Hunger, -currentHungerDecrease * Time.deltaTime, true);
+            
+            float currentHungerDecrease = Stats.HungerDecrease.Value + _relativeSpeed;
+            _statSetter.SetStat(Stats.Hunger, -currentHungerDecrease * Time.deltaTime, true);
         }
 
         private void ProcessFatigue()
         {
-            if (_player.Stats.Fatigue.Value <= 0)
+            if (Stats.Fatigue.Value <= 0)
                 return;
 
-            float currentFatigueDecrease = _player.Stats.FatigueDecrease.Value + _relativeSpeed;
-            _statSetter.SetStat(_player.Stats.Fatigue, -currentFatigueDecrease * Time.deltaTime, true);
+            float currentFatigueDecrease = Stats.FatigueDecrease.Value + _relativeSpeed;
+            _statSetter.SetStat(Stats.Fatigue, -currentFatigueDecrease * Time.deltaTime, true);
         }
 
         private void ProcessThirst()
         {
-            if (_player.Stats.Thirst.Value <= 0)
+            if (Stats.Thirst.Value <= 0)
                 return;
 
-            float currentThirstDecrease = _player.Stats.ThirstDecrease.Value + _relativeSpeed;
-            _statSetter.SetStat(_player.Stats.Thirst, -currentThirstDecrease * Time.deltaTime, true);
+            float currentThirstDecrease = Stats.ThirstDecrease.Value + _relativeSpeed;
+            _statSetter.SetStat(Stats.Thirst, -currentThirstDecrease * Time.deltaTime, true);
         }
 
         public void Dispose()
