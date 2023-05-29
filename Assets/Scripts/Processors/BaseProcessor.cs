@@ -1,10 +1,8 @@
-﻿using Zenject;
-
-namespace WildIsland.Processors
+﻿namespace WildIsland.Processors
 {
-    public abstract class BaseProcessor : IBaseProcessor
+    public abstract class BaseProcessor
     {
-        public bool Enabled { get; private set; }
+        protected bool Enabled { get; private set; }
 
         public void Enable()
             => Enabled = true;
@@ -12,11 +10,12 @@ namespace WildIsland.Processors
         public void Disable()
             => Enabled = false;
     }
-    
+
     public interface IBaseProcessor
     {
         public void Enable();
         public void Disable();
     }
-    
+
+    public interface IPlayerProcessor : IBaseProcessor { }
 }

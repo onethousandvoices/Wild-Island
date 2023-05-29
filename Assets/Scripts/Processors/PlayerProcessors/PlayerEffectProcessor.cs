@@ -8,7 +8,7 @@ using Zenject;
 
 namespace WildIsland.Processors
 {
-    public class PlayerEffectProcessor : PlayerProcessor, IPlayerProcessor, IEffectProcessor
+    public class PlayerEffectProcessor : BaseProcessor, IPlayerProcessor, IInitializable, ITickable, IEffectProcessor
     {
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
@@ -17,7 +17,7 @@ namespace WildIsland.Processors
         private List<BaseEffect> _effects;
         private BaseEffect[] _nativeEffects;
 
-        public override void Initialize()
+        public void Initialize()
         {
             _effects = new List<BaseEffect>();
             _nativeEffects = Array.Empty<BaseEffect>();
@@ -40,14 +40,15 @@ namespace WildIsland.Processors
 
         public void Tick()
         {
-            if (!Enabled)
+            if (!Enabled || _effects.Count < 1)
                 return;
-            
-            if (_effects.Count < 1)
-                return;
+
             _nativeEffects = _effects.ToArray();
+
             foreach (BaseEffect effect in _nativeEffects)
             {
+                if (effect == null)
+                    continue;
                 if (effect.Process())
                     SetStats(effect.Apply(_player.Stats));
                 else if (effect.IsExecuted)

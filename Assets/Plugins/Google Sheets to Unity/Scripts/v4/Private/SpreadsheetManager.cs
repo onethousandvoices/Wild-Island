@@ -1,9 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using GoogleSheetsToUnity.ThirdPary;
 #if ODIN_INSPECTOR
-using Sirenix.OdinInspector;
 #endif
 using TinyJSON;
 using UnityEngine;

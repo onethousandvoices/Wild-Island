@@ -4,15 +4,15 @@ using Zenject;
 
 namespace WildIsland.Processors
 {
-    public class PlayerSoundProcessor : PlayerProcessor
+    public class PlayerSoundProcessor : BaseProcessor, IInitializable
     {
         [Inject] private PlayerView _view;
-        
+
         private const float _footstepAudioVolume = 0.5f;
 
-        public override void Initialize()
+        public void Initialize()
         {
-            _view.SetOnLandCallback(Land);
+            // _view.SetOnLandCallback(Land);
             _view.SetOnFootStepCallback(Footstep);
         }
 
@@ -23,14 +23,14 @@ namespace WildIsland.Processors
             if (_view.FootstepAudioClips.Length <= 0)
                 return;
             int index = Random.Range(0, _view.FootstepAudioClips.Length);
-            AudioSource.PlayClipAtPoint(_view.FootstepAudioClips[index], _view.transform.TransformPoint(_view.CharacterController.center), _footstepAudioVolume);
+            AudioSource.PlayClipAtPoint(_view.FootstepAudioClips[index], _view.transform.position, _footstepAudioVolume);
         }
 
         private void Land(AnimationEvent animationEvent)
         {
             if (!(animationEvent.animatorClipInfo.weight > 0.5f))
                 return;
-            AudioSource.PlayClipAtPoint(_view.LandingAudioClip, _view.transform.TransformPoint(_view.CharacterController.center), _footstepAudioVolume);
+            AudioSource.PlayClipAtPoint(_view.LandingAudioClip, _view.transform.position, _footstepAudioVolume);
         }
     }
 }

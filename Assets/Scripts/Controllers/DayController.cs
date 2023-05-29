@@ -7,39 +7,37 @@ using Zenject;
 
 namespace WildIsland.Controllers
 {
-    public class DayController : IInitializable, ITickable, IGDConsumer
+    public class DayController : IInitializable, ITickable
     {
+        [Inject] private BasicGameData _basicGameData;
         [Inject] private DayLightView _view;
         [Inject] private DayTimerView _dayTimer;
         [Inject] private IBiomeDayAffect _biomeController;
 
-        private BasicGameData.DaySettings _daySettings;
+        private Material _skyBoxMaterial;
 
         private float _dayTime;
         private float _nightTime;
-        private float _sunIntensity;
-        private float _moonIntensity;
         private float _skyboxLerp;
         private float _dayDuration;
         private float _nightDuration;
         private float _currentTemperatureMod;
-
-        public Type ContainerType => typeof(BasicGameDataContainer);
-
-        public void AcquireGameData(IPartialGameDataContainer container)
-            => _daySettings = ((BasicGameDataContainer)container).Default.DaySettingsData;
+        
+        private static readonly int GlobalSunDirection = Shader.PropertyToID("GlobalSunDirection");
+        
+        private BasicGameData.DaySettings DaySettings => _basicGameData.DaySettingsData;
 
         public void Initialize()
         {
-            _dayDuration = _daySettings.DayTimer;
-            _nightDuration = _daySettings.NightTimer;
-            _sunIntensity = _view.SunIntensity;
-            _moonIntensity = _view.MoonIntensity;
+            _dayDuration = DaySettings.DayTimer;
+            _nightDuration = DaySettings.NightTimer;
+
+            // _skyBoxMaterial = new Material(_view.DaySkybox);
         }
 
         public void Tick()
         {
-            CheckTemperatureEffectRanges();
+            /*CheckTemperatureEffectRanges();
 
             if (_dayTime < 1)
                 _dayTime += Time.deltaTime / _dayDuration;
@@ -54,10 +52,15 @@ namespace WildIsland.Controllers
             _dayTimer.SetDayTime(_dayTime);
             _dayTimer.SetNightTime(_nightTime);
 
+            float dotProduct = Vector3.Dot(_view.Sun.transform.forward, Vector3.down);
+            float sunIntensity = Mathf.Lerp(0f, 1f, dotProduct);
+            float moonIntensity = Mathf.Lerp(0.5f, 0f, dotProduct);
+            RenderSettings.ambientLight = Color.Lerp(_view.DayAmbientLight, _view.NightAmbientLight, dotProduct);
+            
             float evaluation = (_dayTime + _nightTime) / 2;
 
-            _view.SetSunParams(evaluation, _sunIntensity * _view.SunCurve.Evaluate(_dayTime));
-            _view.SetMoonParams(evaluation, _moonIntensity * _view.MoonCurve.Evaluate(_nightTime));
+            _view.SetSunParams(evaluation, sunIntensity);
+            _view.SetMoonParams(evaluation, moonIntensity);
 
             _skyboxLerp = evaluation switch
                           {
@@ -66,9 +69,13 @@ namespace WildIsland.Controllers
                               _       => _skyboxLerp
                           };
 
-            RenderSettings.skybox.Lerp(_view.DaySkybox, _view.NightSkybox, _skyboxLerp);
+            _skyBoxMaterial.Lerp(_view.DaySkybox, _view.NightSkybox, _skyboxLerp);
+            RenderSettings.skybox = _skyBoxMaterial;
             RenderSettings.sun = evaluation > 0.5f ? _view.Moon : _view.Sun;
-            DynamicGI.UpdateEnvironment();
+
+            Shader.SetGlobalVector(GlobalSunDirection, -(evaluation > 0.5f ? _view.Moon : _view.Sun).transform.forward);
+
+            DynamicGI.UpdateEnvironment();*/
         }
 
         private void CheckTemperatureEffectRanges()
@@ -80,20 +87,20 @@ namespace WildIsland.Controllers
             if (dayRelativeValue > 0)
             {
                 if (dayRelativeValue < _view.DayTemperatureAffectStage1.y && dayRelativeValue > _view.DayTemperatureAffectStage1.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage1;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage1;
                 else if (dayRelativeValue < _view.DayTemperatureAffectStage2.y && dayRelativeValue > _view.DayTemperatureAffectStage2.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage2;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage2;
                 else if (dayRelativeValue < _view.DayTemperatureAffectStage3.y && dayRelativeValue > _view.DayTemperatureAffectStage3.x)
-                    _currentTemperatureMod = _daySettings.DayTemperatureAffectStage3;
+                    _currentTemperatureMod = DaySettings.DayTemperatureAffectStage3;
             }
             else if (nightRelativeValue > 0)
             {
                 if (nightRelativeValue < _view.NightTemperatureAffectStage1.y && nightRelativeValue > _view.NightTemperatureAffectStage1.x)
-                    _currentTemperatureMod = _daySettings.NightTemperatureAffectStage1;
+                    _currentTemperatureMod = DaySettings.NightTemperatureAffectStage1;
                 else if (nightRelativeValue < _view.NightTemperatureAffectStage2.y && nightRelativeValue > _view.NightTemperatureAffectStage2.x)
-                    _currentTemperatureMod = _daySettings.NightTemperatureAffectStage2;
+                    _currentTemperatureMod = DaySettings.NightTemperatureAffectStage2;
             }
-            
+
             if (Math.Abs(_currentTemperatureMod - previousValue) > 0.01f)
                 DayBiomeEffectChanged();
         }

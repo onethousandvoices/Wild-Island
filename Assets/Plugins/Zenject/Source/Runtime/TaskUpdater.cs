@@ -40,7 +40,7 @@ namespace Zenject
 
         public void RemoveTask(TTask task)
         {
-            TaskInfo info = AllTasks.Where(x => ReferenceEquals(x.Task, task)).SingleOrDefault();
+            TaskInfo info = AllTasks.SingleOrDefault(x => ReferenceEquals(x.Task, task));
 
             Assert.IsNotNull(info, "Tried to remove a task not added to DependencyRoot, task = " + task.GetType().Name);
 

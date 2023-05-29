@@ -28,19 +28,19 @@ namespace Views.Biomes
             _biomeEffect = new BiomeEffect(ApplyEffect);
         }
 
-        private void ApplyEffect(PlayerData playerData)
+        private void ApplyEffect(PlayerData playerDataDelete)
         {
-            if (_biomeData.Temperature < playerData.Temperature.Value)
+            if (_biomeData.Temperature < playerDataDelete.Temperature.Value)
             {
                 float currentEffect =
-                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
-                _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.HungerDecrease, currentEffect));
+                    Math.Abs(_biomeData.Temperature - playerDataDelete.Temperature.Value) * _biomeData.EffectValue;
+                _biomeEffect.AffectedStats.Add(new AffectedStat(playerDataDelete.HungerDecrease, currentEffect));
             }
-            else if (_biomeData.Temperature > playerData.Temperature.Value)
+            else if (_biomeData.Temperature > playerDataDelete.Temperature.Value)
             {
                 float currentEffect =
-                    Math.Abs(_biomeData.Temperature - playerData.Temperature.Value) * _biomeData.EffectValue;
-                _biomeEffect.AffectedStats.Add(new AffectedStat(playerData.ThirstDecrease, currentEffect));
+                    Math.Abs(_biomeData.Temperature - playerDataDelete.Temperature.Value) * _biomeData.EffectValue;
+                _biomeEffect.AffectedStats.Add(new AffectedStat(playerDataDelete.ThirstDecrease, currentEffect));
             }
         }
 

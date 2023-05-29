@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace WildIsland.Views
 {
-    [RequireComponent(typeof(CharacterController), typeof(Animator))]
     public class PlayerView : MonoBehaviour, IEffectReceiver
     {
         [field: SerializeField, HorizontalLine(color: EColor.Blue), MinMaxSlider(0f, 100f)] public Vector2 HungerRegenStage1Range { get; private set; }
@@ -18,20 +17,25 @@ namespace WildIsland.Views
         [field: SerializeField, MinMaxSlider(0f, 100f)] public Vector2 ThirstRegenStage4Range { get; private set; }
         [field: SerializeField, HorizontalLine(color: EColor.Blue), Range(1f, 50f)] public float StaminaJumpCost { get; private set; }
         [field: SerializeField, Range(1f, 50f)] public float StaminaSprintCost { get; private set; }
-        [field: SerializeField, HorizontalLine(color: EColor.Red)] public AudioClip LandingAudioClip { get; private set; }
+        [field: SerializeField, Range(1f, 10f)] public float JumpHeight { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float InAirVelocityReduction { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float HorizontalVelocityReduction { get; private set; }
+        [field: SerializeField, Range(0.5f, 1f)] public float BackwardsVelocityReduction { get; private set; }
+
+        [field: SerializeField, HorizontalLine(color: EColor.Red)] public Animator Animator { get; private set; }
+        [field: SerializeField] public PlayerViewEventsReceiver EventsReceiver { get; private set; }
+        [field: SerializeField] public AudioClip LandingAudioClip { get; private set; }
         [field: SerializeField] public AudioClip[] FootstepAudioClips { get; private set; }
         [field: SerializeField] public LayerMask GroundLayers { get; private set; }
         [field: SerializeField] public GameObject CinemachineCameraTarget { get; private set; }
+        [field: SerializeField] public PhysicMaterial SlipperyMaterial { get; private set; }
+        [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
 
-        private CharacterController _characterController;
-        
-        private Action<AnimationEvent> OnLandCallback;
-        private Action<AnimationEvent> OnFootStepCallback;
-        
+        private Rigidbody _rb;
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
-        
-        public CharacterController CharacterController => _characterController ??= GetComponent<CharacterController>();
+
+        public Rigidbody Rb => _rb ??= GetComponent<Rigidbody>();
 
         public void SetEffectCallbacks(Action<BaseEffect> apply, Action<Type> remove)
         {
@@ -39,17 +43,11 @@ namespace WildIsland.Views
             OnEffectRemoved = remove;
         }
 
-        public void SetOnLandCallback(Action<AnimationEvent> callback)
-            => OnLandCallback = callback;
+        // public void SetOnLandCallback(Action<AnimationEvent> callback)
+            // => OnLandCallback = callback;
 
         public void SetOnFootStepCallback(Action<AnimationEvent> callback)
-            => OnFootStepCallback = callback;
-
-        private void OnFootstep(AnimationEvent animationEvent)
-            => OnFootStepCallback?.Invoke(animationEvent);
-
-        private void OnLand(AnimationEvent animationEvent)
-            => OnLandCallback?.Invoke(animationEvent);
+            => EventsReceiver.SetOnFootstepCallback(callback);
     }
 
     public interface IEffectReceiver
