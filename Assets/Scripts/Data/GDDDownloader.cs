@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Reflection;
 using System.Globalization;
 using ExcelDataReader;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -100,12 +101,20 @@ namespace WildIsland.Data
         {
             List<string> header = loadedSheet[0];
             object data = Activator.CreateInstance(sheet.DataType);
+            IEnumerable<FieldInfo> fields = data.GetType().GetFields();
 
             for (int i = 1; i < loadedSheet.Count; ++i)
             {
-                IEnumerable<FieldInfo> fields = data.GetType().GetFields();
                 foreach (FieldInfo field in fields)
                 {
+                    if (field.GetValue(data) is IDictionary dict)
+                    {
+                        Type valueType = dict.GetType().GetGenericArguments()[1];
+                        object dictItem = CreateObjectFromData(valueType, header, loadedSheet[i]);
+                        dict.Add(loadedSheet[i][0], dictItem);
+                        continue;
+                    }
+                    
                     SheetAttribute attribute = field.GetCustomAttribute<SheetAttribute>();
                     
                     if (attribute != null)
@@ -192,9 +201,9 @@ namespace WildIsland.Data
         {
             return type.GetFields()
                        .Select(field => new { field, attribute = field.GetCustomAttribute<SheetAttribute>() })
-                       .Where(@t => @t.attribute != null)
-                       .Where(@t => string.Equals(@t.attribute.ColumnName, columnName, StringComparison.CurrentCultureIgnoreCase))
-                       .Select(@t => @t.field)
+                       .Where(t => t.attribute != null)
+                       .Where(t => string.Equals(t.attribute.ColumnName, columnName, StringComparison.CurrentCultureIgnoreCase))
+                       .Select(t => t.field)
                        .FirstOrDefault();
         }
     }

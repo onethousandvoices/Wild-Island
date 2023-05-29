@@ -22,18 +22,21 @@ MonoBehaviour:
       NightTemperatureAffectStage1: -5
       NightTemperatureAffectStage2: -10
   BiomesData:
-    ForestBiomeData:
-      Temperature: 18
-      EffectValue: 0.01
-    WinterBiomeData:
-      Temperature: -10
-      EffectValue: 0.02
-    DesertBiomeData:
-      Temperature: 30
-      EffectValue: 0.02
-    SwampBiomeData:
-      Temperature: 25
-      EffectValue: 0.02
+    Datas:
+      _keys:
+      - forest
+      - winter
+      - desert
+      - swamp
+      _values:
+      - Temperature: 18
+        EffectValue: 0.01
+      - Temperature: -10
+        EffectValue: 0.02
+      - Temperature: 30
+        EffectValue: 0.02
+      - Temperature: 25
+        EffectValue: 0.02
   PlayerData:
     HeadHealth:
       <Value>k__BackingField: 50

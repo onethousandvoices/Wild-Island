@@ -17,13 +17,13 @@ namespace WildIsland.Controllers
         public void Initialize()
         {
             if (_forest != null)
-                _forest.Init(_biomesData.ForestBiomeData);
+                _forest.Init(_biomesData.Forest);
             if (_winter != null)
-                _winter.Init(_biomesData.WinterBiomeData);
+                _winter.Init(_biomesData.Winter);
             if (_desert != null)
-                _desert.Init(_biomesData.DesertBiomeData);
+                _desert.Init(_biomesData.Desert);
             if (_swamp != null)
-                _swamp.Init(_biomesData.SwampBiomeData);
+                _swamp.Init(_biomesData.Swamp);
 
             _biomes = new BaseBiomeView[]
             {

@@ -24,8 +24,14 @@ namespace WildIsland.Processors
 
         public void Initialize()
         {
-            _data = new DbValue<PlayerData>("PlayerData", new PlayerData(_dataContainer));
-            _data.Value.SetDefaults();
+            _data = new DbValue<PlayerData>("PlayerData");
+            if (_data.Value == null)
+            {
+                _data.Value = new PlayerData();
+                _data.Value.SetDefaults(_dataContainer);
+                return;
+            }
+            _data.Value.SetValues();
         }
 
         public void Tick()
@@ -109,7 +115,7 @@ namespace WildIsland.Processors
         {
             if (Stats.Hunger.Value <= 0)
                 return;
-            
+
             float currentHungerDecrease = Stats.HungerDecrease.Value + _relativeSpeed;
             _statSetter.SetStat(Stats.Hunger, -currentHungerDecrease * Time.deltaTime, true);
         }
