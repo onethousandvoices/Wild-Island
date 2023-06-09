@@ -31,7 +31,7 @@ namespace WildIsland.Processors
                 _data.Value.SetDefaults(_dataContainer);
                 return;
             }
-            _data.Value.SetValues();
+            _data.Value.SetDefaults();
         }
 
         public void Tick()

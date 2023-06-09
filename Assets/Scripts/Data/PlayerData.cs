@@ -33,7 +33,7 @@ namespace WildIsland.Data
         [Sheet("healthRegenThirstStage3")] public PlayerHealthRegenThirstStage3 HealthRegenThirstStage3 = new PlayerHealthRegenThirstStage3();
         [Sheet("healthRegenThirstStage4")] public PlayerHealthRegenThirstStage4 HealthRegenThirstStage4 = new PlayerHealthRegenThirstStage4();
 
-        public void SetValues()
+        public void SetDefaults()
         {
             HeadHealth.SetValue(HeadHealth.Default);
             BodyHealth.SetValue( BodyHealth.Default);

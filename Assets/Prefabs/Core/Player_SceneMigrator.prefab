@@ -1778,10 +1778,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3688f407fae142d9b60a451e86c020ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 250.15
+  height: 4
   commandHeight: 21
   width: 527
   upperLogHeight: 440.8
+  _background: {fileID: 2800000, guid: 5ca5d3d4919ce4b4bbbc4e3c67bf6320, type: 3}
   <LoggedStringWidth>k__BackingField: 88
 --- !u!1 &1350608827074630581
 GameObject:
@@ -7507,6 +7508,7 @@ Transform:
   - {fileID: 4560732162517929831}
   - {fileID: 4560732161910702408}
   - {fileID: 4560732162521690251}
+  - {fileID: 6297227665318692381}
   m_Father: {fileID: 4560732162590210464}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14529,6 +14531,57 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 7732757672143424855}
+--- !u!1 &7844137733184584397
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6297227665318692381}
+  - component: {fileID: 3664361810899734576}
+  m_Layer: 0
+  m_Name: PoolMaster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6297227665318692381
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7844137733184584397}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4560732161249803063}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3664361810899734576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7844137733184584397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24cf4a8355b94e7fb7be9c386a295e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _preInstalledPools:
+  - <Prefab>k__BackingField: {fileID: 5873604717539774720, guid: c2ca94335ed27ab4c9c035df0a17fe8c,
+      type: 3}
+    <Count>k__BackingField: 22
+  - <Prefab>k__BackingField: {fileID: 4446144239891926133, guid: 4bee980372531974d9919df295cb5547,
+      type: 3}
+    <Count>k__BackingField: 5
 --- !u!1 &7915674396019150999
 GameObject:
   m_ObjectHideFlags: 0

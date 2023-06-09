@@ -9,6 +9,7 @@ namespace Views.UI
         [SerializeField] private float commandHeight = 22;
         [SerializeField] private float width = 600;
         [SerializeField] private float upperLogHeight = 333;
+        [SerializeField] private Texture2D _background;
         [field: SerializeField] public int LoggedStringWidth { get; private set; } = 13;
         
         private Vector2 _scroll;
@@ -45,7 +46,7 @@ namespace Views.UI
             if (!ConsoleShown)
                 return;
 
-            float y = height;
+            float y = Screen.height / height;
 
             GUI.Box(new Rect(0, y, width, upperLogHeight), "");
             Rect viewport = new Rect(0, 0, width - 30, commandHeight * _log.Count);
@@ -62,12 +63,13 @@ namespace Views.UI
             y += upperLogHeight;
 
             GUI.Box(new Rect(0, y, width, 30), "");
-            GUI.backgroundColor = new Color(0, 0, 0, 255);
+            GUI.backgroundColor = new Color32(0, 0, 0, 255);
 
             GUI.SetNextControlName("console");
             Input = GUI.TextField(new Rect(10f, y + 5f, width - 20f, 20f), Input);
 
             GUI.FocusControl("console");
+            GUI.skin.box.normal.background = _background;
 
             if (!_previousInput)
                 return;

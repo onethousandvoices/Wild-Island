@@ -2,6 +2,7 @@
 using UnityEngine;
 using WildIsland.Data;
 using WildIsland.SOs;
+using WildIsland.Utility;
 
 namespace WildIsland.Views
 {

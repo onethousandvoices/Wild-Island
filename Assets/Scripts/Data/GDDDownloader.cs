@@ -24,7 +24,6 @@ namespace WildIsland.Data
         
 #if UNITY_EDITOR
         [MenuItem("Tools/Download Gdd", priority = 26)]
-#endif
         private static async void LoadGDDFilesParseCopy()
         {
             await Download();
@@ -206,6 +205,7 @@ namespace WildIsland.Data
                        .Select(t => t.field)
                        .FirstOrDefault();
         }
+#endif
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -214,8 +214,6 @@ namespace WildIsland.Data
         public readonly string ColumnName;
 
         public SheetAttribute(string columnName)
-        {
-            ColumnName = columnName;
-        }
+            => ColumnName = columnName;
     }
 }
