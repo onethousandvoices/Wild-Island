@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Fire_CampFire
+  m_Shader: {fileID: -6465566751694194690, guid: c786e9267b96ec74d92e10e14238b842,
+    type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Fire_Gradient:
+        m_Texture: {fileID: 2800000, guid: d5517a15d758c184a93d6979fd506953, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Fire_Mask1:
+        m_Texture: {fileID: 2800000, guid: 7b439d64dbd2f42499b4d2fffafc76f4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Fire_Mask2:
+        m_Texture: {fileID: 2800000, guid: 3da0bbdbab4a12547a6df063f54d36fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Fire_Noise1:
+        m_Texture: {fileID: 2800000, guid: 75f1fb954018dba4398f3bae3d894633, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Fire_Noise2:
+        m_Texture: {fileID: 2800000, guid: 445d9a2528bd3da478d9e8af9e9f82fa, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Bloom_Power: 10
+    - _Depth_Fade_Dist: 0
+    - _Distortion: -0.04
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _Smooth_Step_OpacityIN: 0
+    - _Smooth_Step_OpacityOUT: 1
+    - _UV_Dietortion_Intensity: -0.45
+    m_Colors:
+    - _Tiling_Panner_Speed_1: {r: 0.6, g: 0.6, b: 0, a: -1}
+    - _Tiling_Panner_Speed_2: {r: 0.6, g: 0.6, b: 0, a: -1}
+  m_BuildTextureStacks: []
+--- !u!114 &1416909356396761105
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
