@@ -65,14 +65,16 @@ namespace WildIsland.Processors
         private float _fallTimeoutDelta;
         private float _staminaJumpCost;
         private float _staminaSprintCost;
+        private float _fallStartHeight;
+        private float _playerHeight;
 
         private const float _speedUpChangeRate = 1.1f;
         private const float _slowDownChangeRate = 2f;
         private const float _rotationSmoothTime = 0.12f;
         private const float _jumpTimeout = 0.1f;
         private const float _fallTimeout = 0.15f;
-        private const float _groundedOffset = 0.05f;
-        private const float _groundCheckSphereRadius = 0.15f;
+        private const float _groundedOffset = 0.25f;
+        private const float _groundCheckSphereRadius = 0.3f;
 
         private static readonly int _animSpeedX = Animator.StringToHash("SpeedX");
         private static readonly int _animSpeedY = Animator.StringToHash("SpeedY");
@@ -106,6 +108,7 @@ namespace WildIsland.Processors
             _sprintSpeed = _stats.SprintSpeed.Value;
 
             _capsuleCollider = _view.GetComponent<CapsuleCollider>();
+            _playerHeight = _capsuleCollider.height;
             _animator = _view.Animator;
 
             BindInputs();
@@ -147,7 +150,6 @@ namespace WildIsland.Processors
             _inputMap.Player.LMB.performed += OnLMB;
             _inputMap.Player.RMB.started += OnRMBStarted;
             _inputMap.Player.RMB.canceled += OnRMBCanceled;
-            
         }
 
         private void OnRMBStarted(InputAction.CallbackContext obj)
@@ -157,7 +159,7 @@ namespace WildIsland.Processors
             => _rmbListeners.ForEach(x => x.OnRMBCanceled(obj));
 
         private void OnLMB(InputAction.CallbackContext obj) { }
-        
+
         private void CheckCursor()
         {
             if (InputState.HasFlagOptimized(InputState.ShowCursor))
@@ -246,6 +248,8 @@ namespace WildIsland.Processors
             Vector3 spherePosition = new Vector3(playerPos.x, playerPos.y - _groundedOffset, playerPos.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _groundCheckSphereRadius, _view.GroundLayers, QueryTriggerInteraction.Ignore);
 
+            _view.SetGroundCheckSphereParams(spherePosition, _groundCheckSphereRadius);
+            
             switch (_isGrounded)
             {
                 case true:
@@ -256,10 +260,24 @@ namespace WildIsland.Processors
 
                     if (_fallTimeoutDelta <= 0f)
                         _lastMove = Vector2.zero;
+                    if (_fallStartHeight > 0)
+                    {
+                        float fallHeight = Mathf.Abs(_view.transform.position.y - _fallStartHeight) / _playerHeight;
+                        if (fallHeight >= _playerHeight)
+                        {
+                            int damage = (int)fallHeight * _view.FallDamagePerHeight;
+                            _playerStats.Stats.LeftLegHealth.ApplyValue(-damage);
+                            _playerStats.Stats.RightLegHealth.ApplyValue(-damage);
+                            Debug.Log($"{damage} fall height damage taken");
+                        }
+                        _fallStartHeight = 0f;
+                    }
                     break;
                 case false:
                     MoveState = MoveState.Jump;
                     _capsuleCollider.material = _view.SlipperyMaterial;
+                    if (_fallStartHeight <= 0)
+                        _fallStartHeight = _view.transform.position.y;
                     break;
             }
             _animator.SetBool(_animGrounded, _isGrounded);
@@ -347,7 +365,7 @@ namespace WildIsland.Processors
         private Vector3 AdjustSlopeVelocity(Vector3 velocity)
         {
             Ray ray = new Ray(_view.transform.position, Vector3.down);
-            if (!Physics.Raycast(ray, out RaycastHit slopeHit, 0.2f))
+            if (!Physics.Raycast(ray, out RaycastHit slopeHit, 2f))
                 return velocity;
             Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, slopeHit.normal);
             Vector3 adjustedVelocity = slopeRotation * velocity;
@@ -400,7 +418,7 @@ namespace WildIsland.Processors
     {
         public event Action InputStateChanged;
         public event Action MoveStateChanged;
-        
+
         public MoveState MoveState { get; }
         public InputState InputState { get; }
 
@@ -411,7 +429,7 @@ namespace WildIsland.Processors
         public void AddAllExcept(InputState state);
         public void RemoveAllExcept(InputState state);
     }
-    
+
     public interface IRMBListener
     {
         public void OnRMBStarted(InputAction.CallbackContext obj);

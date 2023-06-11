@@ -21,6 +21,7 @@ namespace WildIsland.Views
         [field: SerializeField, Range(0.5f, 1f)] public float InAirVelocityReduction { get; private set; }
         [field: SerializeField, Range(0.5f, 1f)] public float HorizontalVelocityReduction { get; private set; }
         [field: SerializeField, Range(0.5f, 1f)] public float BackwardsVelocityReduction { get; private set; }
+        [field: SerializeField, Range(1, 100)] public int FallDamagePerHeight { get; private set; }
 
         [field: SerializeField, HorizontalLine(color: EColor.Red)] public Animator Animator { get; private set; }
         [field: SerializeField] public PlayerViewEventsReceiver EventsReceiver { get; private set; }
@@ -32,6 +33,10 @@ namespace WildIsland.Views
         [field: SerializeField] public PhysicMaterial FrictionMaterial { get; private set; }
 
         private Rigidbody _rb;
+        private Vector3 _spherePosition;
+
+        private float _sphereRadius;
+        
         public Action<BaseEffect> OnEffectApplied { get; private set; }
         public Action<Type> OnEffectRemoved { get; private set; }
 
@@ -48,8 +53,20 @@ namespace WildIsland.Views
 
         public void SetOnFootStepCallback(Action<AnimationEvent> callback)
             => EventsReceiver.SetOnFootstepCallback(callback);
-    }
 
+
+        public void SetGroundCheckSphereParams(Vector3 position, float radius)
+        {
+            _spherePosition = position;
+            _sphereRadius = radius;
+        }
+        
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawSphere(_spherePosition, _sphereRadius);
+        }
+    }
+    
     public interface IEffectReceiver
     {
         public Action<BaseEffect> OnEffectApplied { get; }

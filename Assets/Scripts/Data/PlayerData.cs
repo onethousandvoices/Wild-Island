@@ -111,11 +111,7 @@ namespace WildIsland.Data
         [field: SerializeField] public float Default { get; protected set; }
 
         public void ApplyValue(float applied)
-        {
-            Value += applied;
-            if (Value < 0)
-                Value = 0;
-        }
+            => Value += applied;
 
         public void SetValue(float value)
             => Value = value;

@@ -7,7 +7,7 @@ namespace WildIsland.Utility
 {
     public class PoolMaster : MonoBehaviour
     {
-        [SerializeField] private PreInstalledPool[] _preInstalledPools;
+        [SerializeField] private PreInstalledPool[] _prePopulatedPools;
         
         private static readonly List<Pool> _pools = new List<Pool>();
         private static PoolMaster _instance;
@@ -16,7 +16,7 @@ namespace WildIsland.Utility
         {
             _instance = this;
 
-            foreach (PreInstalledPool pool in _preInstalledPools)
+            foreach (PreInstalledPool pool in _prePopulatedPools)
             {
                Pool newPool = CreateNewPool(pool.Prefab);
                newPool.Populate(pool.Count);
@@ -58,10 +58,10 @@ namespace WildIsland.Utility
         {
             Pool pool = GetPool(prefab);
             PoolItem item = pool.GetFree();
-            item.GO.transform.position = position;
-            item.GO.transform.rotation = rotation;
             if (parent != null) 
                 item.GO.transform.SetParent(parent);
+            item.GO.transform.position = position;
+            item.GO.transform.rotation = rotation;
 
             return item.GO;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -16,9 +17,14 @@ namespace WildIsland.Processors
         [Inject] private PlayerView _view;
         [Inject] private IPlayerStatSetter _statSetter;
         [Inject] private IPlayerState _playerState;
+        [Inject] private ITimeTickable _timeTickable;
 
+        private PlayerStat[] _healths;
         private DbValue<PlayerData> _data;
+        
         private float _relativeSpeed;
+
+        private bool _isDead;
 
         public PlayerData Stats => _data.Value;
 
@@ -32,6 +38,28 @@ namespace WildIsland.Processors
                 return;
             }
             _data.Value.SetDefaults();
+
+            _healths = new PlayerStat[]
+            {
+                Stats.HeadHealth,
+                Stats.BodyHealth,
+                Stats.LeftArmHealth,
+                Stats.RightArmHealth,
+                Stats.LeftLegHealth,
+                Stats.RightLegHealth
+            };
+
+            _timeTickable.AddTickable(0.1f, () =>
+            {
+                if (_isDead || _healths.All(h => h.Value > 0))
+                    return;
+
+                PlayerStat[] statsBelowZero = _healths.Where(h => h.Value <= 0).ToArray();
+                Debug.LogError($"Player is dead due to:");
+                foreach (PlayerStat stat in statsBelowZero)
+                    Debug.LogError($"{stat} below zero");
+                _isDead = true;
+            });
         }
 
         public void Tick()

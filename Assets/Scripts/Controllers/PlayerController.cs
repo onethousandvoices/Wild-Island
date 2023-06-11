@@ -35,7 +35,7 @@ namespace WildIsland.Controllers
 
             _viewStatsHolder.PlayerBodyStatView.SetRefs(_player.Stats.BodyHealth);
             _viewStatsHolder.PlayerHeadStatView.SetRefs(_player.Stats.HeadHealth);
-            _viewStatsHolder.PlayerLeftArmStatView.SetRefs(_player.Stats.LeftLegHealth);
+            _viewStatsHolder.PlayerLeftArmStatView.SetRefs(_player.Stats.LeftArmHealth);
             _viewStatsHolder.PlayerRightArmStatView.SetRefs(_player.Stats.RightArmHealth);
             _viewStatsHolder.PlayerLeftLegStatView.SetRefs(_player.Stats.LeftLegHealth);
             _viewStatsHolder.PlayerRightLegStatView.SetRefs(_player.Stats.RightLegHealth);
@@ -43,11 +43,11 @@ namespace WildIsland.Controllers
             _viewStatsHolder.PlayerHungerStatView.SetRefs(_player.Stats.Hunger);
             _viewStatsHolder.PlayerThirstStatView.SetRefs(_player.Stats.Thirst);
             _viewStatsHolder.PlayerFatigueStatView.SetRefs(_player.Stats.Fatigue);
-
-            _playerProcessors.ForEach(x => x.Enable());
             
             _basePlayerStatViews = _statViewPairs.Values.ToList();
             _basePlayerStatViews.ForEach(x => x.Init());
+            
+            _playerProcessors.ForEach(x => x.Enable());
 
             QualitySettings.vSyncCount = 0;
         }

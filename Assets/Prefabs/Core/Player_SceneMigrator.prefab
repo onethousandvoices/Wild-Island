@@ -14131,6 +14131,7 @@ MonoBehaviour:
   <InAirVelocityReduction>k__BackingField: 0.96
   <HorizontalVelocityReduction>k__BackingField: 0.995
   <BackwardsVelocityReduction>k__BackingField: 0.97
+  <FallDamagePerHeight>k__BackingField: 20
   <Animator>k__BackingField: {fileID: 1006202132895751804}
   <EventsReceiver>k__BackingField: {fileID: 1172791218}
   <LandingAudioClip>k__BackingField: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2,
@@ -14364,8 +14365,8 @@ Skybox:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7609091868914300170}
-  m_Enabled: 1
-  m_CustomSkybox: {fileID: 2100000, guid: b4d1e1180d6b45d4eaa6f6b684d18e2b, type: 2}
+  m_Enabled: 0
+  m_CustomSkybox: {fileID: 2100000, guid: 06127287beb7fb84f9d205230a55a9a6, type: 2}
 --- !u!1 &7732757672143424848
 GameObject:
   m_ObjectHideFlags: 0
@@ -14575,13 +14576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24cf4a8355b94e7fb7be9c386a295e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _preInstalledPools:
-  - <Prefab>k__BackingField: {fileID: 5873604717539774720, guid: c2ca94335ed27ab4c9c035df0a17fe8c,
-      type: 3}
-    <Count>k__BackingField: 22
-  - <Prefab>k__BackingField: {fileID: 4446144239891926133, guid: 4bee980372531974d9919df295cb5547,
-      type: 3}
-    <Count>k__BackingField: 5
+  _prePopulatedPools: []
 --- !u!1 &7915674396019150999
 GameObject:
   m_ObjectHideFlags: 0
